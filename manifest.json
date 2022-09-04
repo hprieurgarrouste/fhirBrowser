@@ -9,8 +9,8 @@
     }
   ],
   "lang": "en",
-  "start_url": "https://hprieurgarrouste.github.io/fhirBrowser",
-  "scope": "https://hprieurgarrouste.github.io/fhirBrowser",
+  "start_url": "./index.html",
+  "scope": "/",
   "display": "standalone",
   "background_color": "white",
   "theme_color": "#ad1f2f"
