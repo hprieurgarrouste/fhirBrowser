@@ -19,7 +19,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
         }
         let shadow = this.attachShadow({ mode: 'open' });
         shadow.innerHTML = `
-            <link rel="stylesheet" href="/material.css">
+            <link rel="stylesheet" href="./material.css">
             <style>
                 #app {
                     display: flex;
