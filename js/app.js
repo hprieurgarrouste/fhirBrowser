@@ -7,7 +7,7 @@ import "./appTabs.js";
 
 /* Only register a service worker if it's supported */
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js');
+    navigator.serviceWorker.register('../service-worker.js');
 }
 
 customElements.define('fhir-browser', class App extends HTMLElement {
