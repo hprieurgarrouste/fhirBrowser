@@ -1,0 +1,17 @@
+{
+  "name": "FHIR Browser",
+  "short_name": "FHIR Browser",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "lang": "en",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "white",
+  "theme_color": "#ad1f2f"
+}

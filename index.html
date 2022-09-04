@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>FHIR Browser</title>
+    <link rel="icon" href="./favicon.png" />
+    <link rel="manifest" href="./manifest.json">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="Description" content="FHIR Browser">
+    <meta name="theme-color" content="#ad1f2f" />
+    <link href="./material.css" rel="stylesheet" />
+    <style>
+        :root {
+            --primary-color: #ad1f2f;
+            --text-color: 0, 0, 0;
+            --text-color-normal: rgba(var(var(--text-color), 87%));
+            --text-color-disabled: rgba(var(--text-color), 38%);
+            --background-color: rgb(255, 255, 255);
+            --border-color: rgba(0, 0, 0, 12%);
+            --hover-color: rgba(0, 0, 0, 5%);
+            --scroll-color: var(--primary-color);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #ad1f2f;
+            --text-color: 255, 255, 255;
+            --text-color-normal: rgba(var(--text-color), 100%);
+            --text-color-disabled: rgba(var(--text-color), 50%);
+            --background-color: rgb(66, 66, 66);
+            --border-color: rgba(255, 255, 255, 12%);
+            --hover-color: rgba(255, 255, 255, 5%);
+            --scroll-color: var(--primary-color);
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+    <script type="module" src="./js/app.js" defer></script>
+    <noscript>This website requires JavaScript.</noscript>
+</head>
+
+<body data-theme="light">
+    <fhir-browser />
+</body>
+
+</html>
