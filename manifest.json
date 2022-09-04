@@ -10,7 +10,7 @@
   ],
   "lang": "en",
   "start_url": "https://hprieurgarrouste.github.io/fhirBrowser",
-  "scope": "/",
+  "scope": "https://hprieurgarrouste.github.io/fhirBrowser",
   "display": "standalone",
   "background_color": "white",
   "theme_color": "#ad1f2f"
