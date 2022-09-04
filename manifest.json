@@ -10,7 +10,6 @@
   ],
   "lang": "en",
   "start_url": "./index.html",
-  "scope": "/fhirBrowser",
   "display": "standalone",
   "background_color": "white",
   "theme_color": "#ad1f2f"
