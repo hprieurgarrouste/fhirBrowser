@@ -3,6 +3,6 @@ export default {
         "url": "https://server.fire.ly"
     },
     "hapi": {
-        "url": "http://hapi.fhir.org/baseR4"
+        "url": "https://hapi.fhir.org/baseR4"
     }
 };
