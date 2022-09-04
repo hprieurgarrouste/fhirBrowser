@@ -10,7 +10,7 @@ customElements.define('app-dialog', class AppDialog extends HTMLElement {
         });
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = `
-            <link rel="stylesheet" href="/material.css">
+            <link rel="stylesheet" href="./material.css">
             <style>
                 #mask {
                     position: absolute;
