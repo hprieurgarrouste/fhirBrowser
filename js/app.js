@@ -81,8 +81,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                             <fhir-server-info id="menuinfo"></fhir-server-info>
                             <fhir-resources-list id="menulist"></fhir-resources-list>
                         </div>                        
-                        <div id="bdy">
-                        </div>
+                        <div id="bdy"></div>
                     </div>
                 </div>
                 <div id="footer"></div>
@@ -111,6 +110,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                 this.connect(conf[server]);
             }
         });
+
     }
 
     connect(server) {
@@ -168,7 +168,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
     }
 
     async loadMetadata() {
-        const response = await fetch(`${this._server.url}/metadata`, {
+        const response = await fetch(`${this._server.url}/metadata?_format=json`, {
             "cache": "reload",
             "headers": this._server.headers
         });
