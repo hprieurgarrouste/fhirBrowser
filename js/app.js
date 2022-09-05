@@ -24,7 +24,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                 #app {
                     display: flex;
                     flex-direction: column;
-                    min-height: 100%;
+                    height: 100vh;
                     font-family: Roboto, Arial, monospace;
                     font-size: 1rem;
                     font-weight: 400;
@@ -39,7 +39,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                 #content {
                     flex:1 1 auto;
                     overflow: auto;
-                    height : calc(100vh - 144px);
+                    height : 0;
                 }
                 #content > div {
                     display:flex;
