@@ -51,13 +51,14 @@ customElements.define('app-tab', class AppTab extends HTMLElement {
         this._shadow.innerHTML = `
             <style>
                 button {
-                    height: 3em;
-                    border: 0 none;
                     background-color: transparent;
-                    font-size: inherit;
-                    font-family: inherit;
-                    text-transform: uppercase;
+                    border: 0 none;
+                    color: var(--text-color-normal, black);
                     cursor: pointer;
+                    font-family: inherit;
+                    font-size: inherit;
+                    height: 3em;
+                    text-transform: uppercase;
                     white-space: nowrap;
                     width:100%;
                 }

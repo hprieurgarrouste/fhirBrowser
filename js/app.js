@@ -1,13 +1,18 @@
 import conf from "../conf.js";
 import "./appBar.js";
 import "./fhirBundle.js";
-import "./fhirServerInfo.js";
+import "./fhirServerSelector.js";
 import "./fhirResourceList.js";
 import "./appTabs.js";
 
 /* Only register a service worker if it's supported */
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./service-worker.js');
+}
+
+if (window.matchMedia &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.body.setAttribute('color-scheme', 'dark');
 }
 
 customElements.define('fhir-browser', class App extends HTMLElement {
@@ -52,12 +57,6 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     flex-direction: column;
                     height : 100%;
                 }
-                #menulist {
-                    border-top:1px solid var(--border-color, gray);
-                    flex:1 1 auto;
-                    overflow: auto;
-                    height:0;
-                }
                 #bdy { 
                     padding:25px;
                     overflow: auto;
@@ -68,18 +67,30 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     min-height:72px;
                     border-top:1px solid var(--border-color, gray);
                 }
+                app-tabs {
+                    border-bottom:1px solid var(--border-color, gray);                    
+                }
+                #serverResources {
+                    flex:1 1 auto;
+                    overflow: auto;
+                    height:0;
+                }
+                #serverDetails {
+                    display:none;
+                }
             </style>
             <div id="app">
                 <app-bar id="header" title="FHIR Browser"></app-bar>
                 <div id="content">
                     <div>
                         <div id="menu">
-                            <fhir-server-info id="menuinfo"></fhir-server-info>
+                            <fhir-server-selector id="serverSelector"></fhir-server-selector>
                             <app-tabs>
                                 <app-tab selected>Resources</app-tab>
                                 <app-tab>Details</app-tab>
                             </app-tabs>
-                            <fhir-resources-list id="menulist"></fhir-resources-list>
+                            <fhir-resources-list id="serverResources"></fhir-resources-list>
+                            <fhir-server-details id="serverDetails"></fhir-server-details>
                         </div>                        
                         <div id="bdy"></div>
                     </div>
@@ -92,7 +103,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             this._menu.style.display = ('none' == this._menu.style.display) ? 'block' : 'none';
         };
         this._bdy = shadow.getElementById("bdy");
-        this._list = shadow.getElementById("menulist");
+        this._list = shadow.getElementById("serverResources");
         this._list.addEventListener('click', (event) => {
             while (this._bdy.firstChild) {
                 this._bdy.removeChild(this._bdy.lastChild);
@@ -102,9 +113,9 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             bundle.load(this._server, event.detail.resourceType);
         });
 
-        this._info = shadow.getElementById("menuinfo");
-        this._info.setup(conf);
-        this._info.addEventListener('serverchange', (event) => {
+        const serverSelector = shadow.getElementById("serverSelector");
+        serverSelector.setup(conf);
+        serverSelector.addEventListener('serverchanged', (event) => {
             const server = event.detail.server;
             if (server && conf[server]) {
                 this.connect(conf[server]);

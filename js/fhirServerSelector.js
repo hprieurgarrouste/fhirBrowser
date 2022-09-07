@@ -1,10 +1,6 @@
-customElements.define('fhir-server-info', class FhirServerInfo extends HTMLElement {
+customElements.define('fhir-server-selector', class FhirServerSelector extends HTMLElement {
     constructor() {
         super();
-        this.serverChangeEvent = new CustomEvent("serverchange", {
-            bubbles: false,
-            cancelable: false,
-        });
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = `
             <link href="./material.css" rel="stylesheet"/>
@@ -12,29 +8,30 @@ customElements.define('fhir-server-info', class FhirServerInfo extends HTMLEleme
                 #wrapper {
                     padding:25px;
                 }
-                #store {
+                #server {
+                    background-color: var(--background-color, white);
                     border: 1px solid rgba(0,0,0,38%);
+                    border-radius: 4px;
+                    color: var(--text-color-normal, rgb(0,0,0,87%));
                     font-family: inherit;
                     font-size: 1em;
-                    color: var(--text-color-normal, rgb(0,0,0,87%));
-                    border-radius: 4px;
                     padding: 8px 5px 5px 5px;
                     width: 100%;
                 }
-                #store:hover {
+                #server:hover {
                     border-color: rgba(0,0,0,87%);
                 }
-                #store:active {
+                #server:active {
                     outline-style: auto;
                     outline-color: var(--primary-color, black);
                 }
-                #store:focus-visible {
+                #server:focus-visible {
                     outline-color: var(--primary-color, black);
                 }
-                #store-wrapper {
+                #server-wrapper {
                     position:relative;
                 }
-                #store-label {
+                #server-label {
                     position: absolute;
                     top: -0.8em;
                     left: 0.5em;
@@ -43,7 +40,7 @@ customElements.define('fhir-server-info', class FhirServerInfo extends HTMLEleme
                     font-family: inherit;
                     padding: 0 5px;"
                 }
-                #url {
+                #server-url {
                     overflow-wrap: break-word;
                     color: var(--text-color-disabled);
                     font-size: 0.9em;
@@ -51,21 +48,21 @@ customElements.define('fhir-server-info', class FhirServerInfo extends HTMLEleme
                 }
             </style>
             <div id="wrapper">
-                <div id="store-wrapper">
-                    <label id="store-label">FHIR store</label>
-                    <select id="store"><option/></select>
+                <div id="server-wrapper">
+                    <label id="server-label">FHIR server</label>
+                    <select id="server"><option/></select>
                 </div>
-                <div id="url"></div>
+                <div id="server-url"></div>
             </div>
         `;
-        this._store = this._shadow.getElementById("store");
-        this._store.addEventListener("change", () => {
-            this._shadow.getElementById("url").innerText = this._conf[this._store.value].url;
-            this.dispatchEvent(new CustomEvent("serverchange", {
+        this._server = this._shadow.getElementById("server");
+        this._server.addEventListener("change", () => {
+            this._shadow.getElementById("server-url").innerText = this._conf[this._server.value].url;
+            this.dispatchEvent(new CustomEvent("serverchanged", {
                 bubbles: false,
                 cancelable: false,
                 'detail': {
-                    server: this._store.value
+                    server: this._server.value
                 }
             }));
         });
@@ -79,7 +76,7 @@ customElements.define('fhir-server-info', class FhirServerInfo extends HTMLEleme
             const opt = document.createElement('OPTION');
             opt.setAttribute("value", key);
             opt.appendChild(document.createTextNode(key));
-            this._store.appendChild(opt);
+            this._server.appendChild(opt);
         }
     }
 

@@ -7,7 +7,7 @@ customElements.define('json-viewer', class JsonViewer extends HTMLElement {
                 #content {
                     font-family: monospace;
                     color: var(--text-color-normal, black);
-                    background-color: var(--background-color, white);
+                    background-color: var(--background-color, inherit);
                     height: 100%;
                     overflow: auto;
                     padding: 0 8px;
@@ -20,10 +20,10 @@ customElements.define('json-viewer', class JsonViewer extends HTMLElement {
                     list-style-type: none;
                 }
                 span:first-of-type {
-                    color: var(--primary-color, #8000FF);
+                    color: var(--json-viewer-properties-color, black);
                 }
                 span {
-                    color: var(--text-color-normal, #800000);
+                    color: var(--json-viewer-values-color, black);
                 }
             </style>
             <div id="content"></div>

@@ -20,9 +20,11 @@
             --border-color: rgba(0, 0, 0, 12%);
             --hover-color: rgba(0, 0, 0, 5%);
             --scroll-color: var(--primary-color);
+            --json-viewer-properties-color: #1F50A4;
+            --json-viewer-values-color: #9D100C;
         }
 
-        [data-theme="dark"] {
+        [color-scheme="dark"] {
             --primary-color: #1A67E5;
             --text-color: 255, 255, 255;
             --text-color-normal: rgba(var(--text-color), 100%);
@@ -31,6 +33,8 @@
             --border-color: rgba(255, 255, 255, 12%);
             --hover-color: rgba(255, 255, 255, 5%);
             --scroll-color: var(--primary-color);
+            --json-viewer-properties-color: #88DCF0;
+            --json-viewer-values-color: #CA9178;
         }
 
         body {
@@ -42,7 +46,7 @@
     <noscript>This website requires JavaScript.</noscript>
 </head>
 
-<body data-theme="light">
+<body color-scheme="light">
     <fhir-browser />
 </body>
 
