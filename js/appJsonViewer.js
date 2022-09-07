@@ -20,10 +20,10 @@ customElements.define('json-viewer', class JsonViewer extends HTMLElement {
                     list-style-type: none;
                 }
                 span:first-of-type {
-                    color: #8000FF;
+                    color: var(--primary-color, #8000FF);
                 }
                 span {
-                    color: #800000;
+                    color: var(--text-color-normal, #800000);
                 }
             </style>
             <div id="content"></div>

@@ -13,6 +13,9 @@ customElements.define('app-tabs', class AppTabs extends HTMLElement {
                     flex-grow:1;
                     border-bottom: 2px solid transparent;
                 }
+                ::slotted(app-tab:hover) {
+                    background-color:var(--hover-color, rgba(0, 0, 0, 5%));
+                }
                 ::slotted(app-tab[selected]) {
                     border-bottom-color: var(--primary-color, #000);
                 }
@@ -48,18 +51,15 @@ customElements.define('app-tab', class AppTab extends HTMLElement {
         this._shadow.innerHTML = `
             <style>
                 button {
-                    height: 48px;
+                    height: 3em;
                     border: 0 none;
                     background-color: transparent;
-                    font-size: 1em;
+                    font-size: inherit;
+                    font-family: inherit;
                     text-transform: uppercase;
                     cursor: pointer;
-                    font-weight: bold;
                     white-space: nowrap;
                     width:100%;
-                }
-                button:hover {
-                    background-color:var(--hover-color, rgba(0, 0, 0, 5%));
                 }
             </style>
             <button>${this.innerHTML}</button>

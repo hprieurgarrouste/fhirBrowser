@@ -34,7 +34,6 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                 }
                 #header {
                     min-height:72px;
-                    border-bottom:1px solid var(--border-color, gray);
                 }
                 #content {
                     flex:1 1 auto;
@@ -48,16 +47,13 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                 }
                 #menu {
                     border-right:1px solid var(--border-color, gray);
-                    min-width:200px;
+                    width:300px;
                     display:flex;
                     flex-direction: column;
                     height : 100%;
                 }
-                #menuinfo {
-                    padding:25px;
-                    border-bottom:1px solid var(--border-color, gray);                    
-                }
                 #menulist {
+                    border-top:1px solid var(--border-color, gray);
                     flex:1 1 auto;
                     overflow: auto;
                     height:0;
@@ -79,6 +75,10 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     <div>
                         <div id="menu">
                             <fhir-server-info id="menuinfo"></fhir-server-info>
+                            <app-tabs>
+                                <app-tab selected>Resources</app-tab>
+                                <app-tab>Details</app-tab>
+                            </app-tabs>
                             <fhir-resources-list id="menulist"></fhir-resources-list>
                         </div>                        
                         <div id="bdy"></div>
@@ -163,7 +163,6 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             this._server.version = this._schemas[metadata.fhirVersion];
             this._server.metadata = metadata;
             this._list.metadata = metadata;
-            this._info.server = this._server;
         });
     }
 
