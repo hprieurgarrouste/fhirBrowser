@@ -31,37 +31,32 @@ customElements.define('fhir-server-details', class FhirServerDetails extends HTM
      */
     set metadata(metadata) {
         const wrapper = this._shadow.getElementById('wrapper');
-        async function buildUL() {
-            make("fhirVersion", metadata.fhirVersion);
-            if (metadata.implementation) {
-                make("implementation name", metadata.implementation.name);
-                make("implementation url", metadata.implementation.url);
-            }
-            make("language", metadata.language);
-            make("name", metadata.name);
-            make("publisher", metadata.publisher);
-            if (metadata.software) {
-                make("software name", metadata.software.name);
-                make("software version", metadata.software.version);
-            }
-            function make(name, value) {
-                if (typeof value === "undefined") return;
-                const item = document.createElement('div');
-                item.classList.add("item");
-                const line1 = document.createElement('div');
-                line1.classList.add("primary");
-                line1.innerText = name;
-                item.appendChild(line1);
-                const line2 = document.createElement('div');
-                line2.classList.add("secondary");
-                line2.innerText = value;
-                item.appendChild(line2);
-                wrapper.appendChild(item);
-            }
+        make("fhirVersion", metadata.fhirVersion);
+        if (metadata.implementation) {
+            make("implementation name", metadata.implementation.name);
+            make("implementation url", metadata.implementation.url);
         }
-        buildUL().then(ul => {
-            wrapper.appendChild(ul);
-        });
+        make("language", metadata.language);
+        make("name", metadata.name);
+        make("publisher", metadata.publisher);
+        if (metadata.software) {
+            make("software name", metadata.software.name);
+            make("software version", metadata.software.version);
+        }
+        function make(name, value) {
+            if (typeof value === "undefined") return;
+            const item = document.createElement('div');
+            item.classList.add("item");
+            const line1 = document.createElement('div');
+            line1.classList.add("primary");
+            line1.innerText = name;
+            item.appendChild(line1);
+            const line2 = document.createElement('div');
+            line2.classList.add("secondary");
+            line2.innerText = value;
+            item.appendChild(line2);
+            wrapper.appendChild(item);
+        }
     }
 
     clear() {

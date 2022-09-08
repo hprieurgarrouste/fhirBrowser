@@ -101,7 +101,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
 		`;
         this._menu = shadow.getElementById("menu");
         shadow.getElementById("header").onMenuClick = () => {
-            this._menu.style.display = ('none' == this._menu.style.display) ? 'block' : 'none';
+            this._menu.style.display = ('none' == this._menu.style.display) ? 'flex' : 'none';
         };
         this._bdy = shadow.getElementById("bdy");
         this._list = shadow.getElementById("serverResources");
