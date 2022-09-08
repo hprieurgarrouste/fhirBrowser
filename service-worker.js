@@ -35,6 +35,7 @@ const PRECACHE_URLS = [
   "./js/fhirBundle.js",
   "./js/fhirJsonViewer.js",
   "./js/fhirResourceList.js",
+  "./js/fhirServerDetails.js",
   "./js/fhirServerSelector.js",
   "./fonts/MaterialIcons.woff2",
   "./fonts/Roboto-Regular.ttf",

@@ -3,6 +3,7 @@ import "./appBar.js";
 import "./fhirBundle.js";
 import "./fhirServerSelector.js";
 import "./fhirResourceList.js";
+import "./fhirServerDetails.js";
 import "./appTabs.js";
 
 /* Only register a service worker if it's supported */
@@ -70,7 +71,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                 app-tabs {
                     border-bottom:1px solid var(--border-color, gray);                    
                 }
-                #serverResources {
+                #serverResources, #serverDetails {
                     flex:1 1 auto;
                     overflow: auto;
                     height:0;
@@ -85,9 +86,9 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     <div>
                         <div id="menu">
                             <fhir-server-selector id="serverSelector"></fhir-server-selector>
-                            <app-tabs>
-                                <app-tab selected>Resources</app-tab>
-                                <app-tab>Details</app-tab>
+                            <app-tabs id="tabs">
+                                <app-tab id="tabResources" selected>Resources</app-tab>
+                                <app-tab id="tabDetails">Details</app-tab>
                             </app-tabs>
                             <fhir-resources-list id="serverResources"></fhir-resources-list>
                             <fhir-server-details id="serverDetails"></fhir-server-details>
@@ -113,6 +114,8 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             bundle.load(this._server, event.detail.resourceType);
         });
 
+        this._serverDetails = shadow.getElementById("serverDetails");
+
         const serverSelector = shadow.getElementById("serverSelector");
         serverSelector.setup(conf);
         serverSelector.addEventListener('serverchanged', (event) => {
@@ -120,6 +123,13 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             if (server && conf[server]) {
                 this.connect(conf[server]);
             }
+        });
+
+        const tabs = shadow.getElementById("tabs");
+        tabs.addEventListener('click', (event) => {
+            const tabId = event.detail.tabId;
+            this._list.style.display = (tabId == 'tabResources') ? 'block' : 'none';
+            this._serverDetails.style.display = (tabId == 'tabDetails') ? 'block' : 'none';
         });
 
     }
@@ -169,11 +179,13 @@ customElements.define('fhir-browser', class App extends HTMLElement {
     async initialize() {
         while (this._bdy.firstChild) this._bdy.removeChild(this._bdy.lastChild);
         this._list.clear();
+        this._serverDetails.clear();
 
         this.loadMetadata().then(metadata => {
             this._server.version = this._schemas[metadata.fhirVersion];
             this._server.metadata = metadata;
             this._list.metadata = metadata;
+            this._serverDetails.metadata = metadata;
         });
     }
 
