@@ -31,10 +31,11 @@ const PRECACHE_URLS = [
   "./js/appLinearLoader.js",
   "./js/appPagination.js",
   "./js/appRoundButton.js",
+  "./js/appTabs.js",
   "./js/fhirBundle.js",
   "./js/fhirJsonViewer.js",
   "./js/fhirResourceList.js",
-  "./js/fhirServerInfo.js",
+  "./js/fhirServerSelector.js",
   "./fonts/MaterialIcons.woff2",
   "./fonts/Roboto-Regular.ttf",
 ];

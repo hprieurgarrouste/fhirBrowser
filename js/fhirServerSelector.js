@@ -10,7 +10,7 @@ customElements.define('fhir-server-selector', class FhirServerSelector extends H
                 }
                 #server {
                     background-color: var(--background-color, white);
-                    border: 1px solid rgba(0,0,0,38%);
+                    border: 1px solid var(--border-color, rgba(0,0,0,38%));
                     border-radius: 4px;
                     color: var(--text-color-normal, rgb(0,0,0,87%));
                     font-family: inherit;
