@@ -31,8 +31,11 @@ customElements.define('fhir-server-details', class FhirServerDetails extends HTM
      */
     set metadata(metadata) {
         const wrapper = this._shadow.getElementById('wrapper');
+        make("copyright", metadata.copyright);
+        make("description", metadata.description);
         make("fhirVersion", metadata.fhirVersion);
         if (metadata.implementation) {
+            make("implementation description", metadata.implementation.description);
             make("implementation name", metadata.implementation.name);
             make("implementation url", metadata.implementation.url);
         }
@@ -42,6 +45,7 @@ customElements.define('fhir-server-details', class FhirServerDetails extends HTM
         if (metadata.software) {
             make("software name", metadata.software.name);
             make("software version", metadata.software.version);
+            make("software release date", metadata.software.releaseDate);
         }
         function make(name, value) {
             if (typeof value === "undefined") return;
