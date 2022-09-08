@@ -33,8 +33,8 @@ customElements.define('fhir-json-viewer', class FhirJsonViewer extends HTMLEleme
             </style>
             <div id="wrapper">
                 <div id = "toolbar" >
-                    <i id="copy" title="copy to clipboard" class="material-icons">content_copy</i>
-                    <i id="download" title="download" class="material-icons">download</i>
+                    <app-round-button id="copy" title="copy to clipboard">content_copy</app-round-button>
+                    <app-round-button id="download" title="download">download</app-round-button>
                 </div >
                 <json-viewer id="viewer"/>
             </div>

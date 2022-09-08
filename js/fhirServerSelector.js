@@ -19,7 +19,7 @@ customElements.define('fhir-server-selector', class FhirServerSelector extends H
                     width: 100%;
                 }
                 #server:hover {
-                    border-color: rgba(0,0,0,87%);
+                    border-color: var(--border-color, rgba(0,0,0,38%));
                 }
                 #server:active {
                     outline-style: auto;
@@ -50,7 +50,7 @@ customElements.define('fhir-server-selector', class FhirServerSelector extends H
             <div id="wrapper">
                 <div id="server-wrapper">
                     <label id="server-label">FHIR server</label>
-                    <select id="server"><option/></select>
+                    <select id="server"><option hidden selected>Select a server</option></select>
                 </div>
                 <div id="server-url"></div>
             </div>

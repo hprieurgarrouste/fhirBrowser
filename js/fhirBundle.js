@@ -28,7 +28,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
             <div>
                 <h1 id="title"></h1>
                 <i id="subtitle"></i>
-                <app-linear-loader id="loader" style="display:none;"></app-linear-loader>
+                <app-linear-loader id="loader" style="visibility:hidden;"></app-linear-loader>
                 <data-table id="table">
                     <data-table-pagination id="pagination" slot="footer"/>
                 </data-table>
@@ -112,7 +112,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
             if (data.total) {
                 this._count = data.total;
                 this.parsePage(data);
-                this._loader.style.display = "none";
+                this._loader.style.visibility = "hidden";
             } else {
                 this.fetchCount().then(count => {
                     this._count = count.total;

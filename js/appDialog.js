@@ -52,6 +52,9 @@ customElements.define('app-dialog', class AppDialog extends HTMLElement {
                     margin:0;
                     flex: 1 1 auto;
                 }
+                #close {
+                    margin-right: 16px;
+                }
                 #content {
                     flex: 1 1 auto;
                     height:0;
@@ -62,8 +65,8 @@ customElements.define('app-dialog', class AppDialog extends HTMLElement {
                 <div id="mask"></div>
                 <div id="surface">
                     <div id="header">
-                        <h2 id="title"></h2>
                         <app-round-button id="close" title="Close">close</app-round-button>
+                        <h2 id="title"></h2>
                     </div>
                     <div id="content">
                         <slot></slot>
