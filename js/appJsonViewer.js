@@ -1,6 +1,7 @@
 customElements.define('json-viewer', class JsonViewer extends HTMLElement {
-    connectedCallback() {
-        let shadow = this.attachShadow({ mode: 'closed' });
+    constructor() {
+        super();
+        const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = `
             <link rel="stylesheet" href="./material.css">
             <style>
@@ -11,6 +12,7 @@ customElements.define('json-viewer', class JsonViewer extends HTMLElement {
                     height: 100%;
                     overflow: auto;
                     padding: 0 8px;
+                    white-space: nowrap;
                 }
                 dl {
                     margin: 0;

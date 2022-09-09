@@ -1,5 +1,6 @@
 customElements.define('fhir-server-details', class FhirServerDetails extends HTMLElement {
-    connectedCallback() {
+    constructor() {
+        super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = `
             <style>

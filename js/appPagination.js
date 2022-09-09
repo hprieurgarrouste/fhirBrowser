@@ -1,11 +1,8 @@
 customElements.define('data-table-pagination', class Pagination extends HTMLElement {
-    connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'closed' });
-        this.pagination = new CustomEvent("pagination", {
-            bubbles: false,
-            cancelable: false,
-        });
-        shadow.innerHTML = `
+    constructor() {
+        super();
+        this._shadow = this.attachShadow({ mode: 'closed' });
+        this._shadow.innerHTML = `
             <link rel="stylesheet" href="./material.css">
             <style>
                 #wrapper {
@@ -37,8 +34,9 @@ customElements.define('data-table-pagination', class Pagination extends HTMLElem
                 <button id="last" title="last" disabled><i class="material-icons">last_page</i></button>
             </div>
         `;
-        const wrapper = shadow.getElementById('wrapper');
-        wrapper.addEventListener('click', (event) => {
+    }
+    connectedCallback() {
+        this._shadow.getElementById('wrapper').addEventListener('click', (event) => {
             let target = event.target;
             while (target && target.nodeName !== 'BUTTON') target = target.parentNode;
             if (target && !target.disabled) {
@@ -51,41 +49,35 @@ customElements.define('data-table-pagination', class Pagination extends HTMLElem
                 }))
             }
         });
-        this._text = shadow.getElementById('text');
-        this._first = shadow.getElementById('first');
-        this._previous = shadow.getElementById('previous');
-        this._next = shadow.getElementById('next');
-        this._last = shadow.getElementById('last');
-
     }
     /**
      * @param {boolean} enable
      */
     set first(enable) {
-        this._first.disabled = !enable;
+        this._shadow.getElementById('first').disabled = !enable;
     }
     /**
      * @param {boolean} enable
      */
     set previous(enable) {
-        this._previous.disabled = !enable;
+        this._shadow.getElementById('previous').disabled = !enable;
     }
     /**
      * @param {boolean} enable
      */
     set next(enable) {
-        this._next.disabled = !enable;
+        this._shadow.getElementById('next').disabled = !enable;
     }
     /**
      * @param {boolean} enable
      */
     set last(enable) {
-        this._last.disabled = !enable;
+        this._shadow.getElementById('last').disabled = !enable;
     }
     /**
      * @param {string} text
      */
     set text(text) {
-        this._text.innerText = text;
+        this._shadow.getElementById('text').innerText = text;
     }
 });

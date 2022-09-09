@@ -28,7 +28,7 @@ customElements.define('fhir-resources-list', class FhirResourcesList extends HTM
                     prev.classList.remove('selected');
                 }
                 event.target.classList.add('selected');
-                this.dispatchEvent(new CustomEvent("click", {
+                this.dispatchEvent(new CustomEvent("resourceSelected", {
                     bubbles: false,
                     cancelable: false,
                     'detail': {

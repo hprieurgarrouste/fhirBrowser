@@ -5,7 +5,8 @@ import "./appPagination.js";
 import "./appDataTable.js";
 
 customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
-    connectedCallback() {
+    constructor() {
+        super();
         let shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = `
             <style>
@@ -39,6 +40,16 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._loader = shadow.getElementById('loader');
         this._dataTable = shadow.getElementById('table');
         this._pagination = shadow.getElementById('pagination');
+        this._server = null;
+        this._resourceType = null;
+        this._dialog = null;
+        this._structureDefinition = null;
+        this._skip = 0;
+        this._pageSize = 20;
+        this._link = null;
+        this._count = null;
+    }
+    connectedCallback() {
         this._pagination.addEventListener("pagination", (event) => {
             this.loadPage(event.detail.button);
         });
@@ -58,7 +69,6 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
                 viewer.source = resource;
             });
             dialog.appendChild(viewer);
-
         });
     }
 
@@ -76,7 +86,6 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         });
 
         this._skip = 0;
-        this._pageSize = 20;
         this._link = {
             "first": `${this._server.url}/${this._resourceType}?_count=${this._pageSize}&_elements=entry.id,entry.lastupdated`
         };

@@ -1,7 +1,8 @@
 import "./appJsonViewer.js";
 
 customElements.define('fhir-json-viewer', class FhirJsonViewer extends HTMLElement {
-    connectedCallback() {
+    constructor() {
+        super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = `
             <link rel="stylesheet" href="./material.css">
@@ -39,6 +40,10 @@ customElements.define('fhir-json-viewer', class FhirJsonViewer extends HTMLEleme
                 <json-viewer id="viewer"/>
             </div>
         `;
+        this._resource = null;
+        this._structureDefinition = null;
+    }
+    connectedCallback() {
         this._shadow.getElementById('download').addEventListener("click", () => {
             const file = new File([JSON.stringify(this._resource)], this._resource.id, {
                 type: 'data:text/json;charset=utf-8',

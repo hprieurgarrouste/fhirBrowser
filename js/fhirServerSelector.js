@@ -55,7 +55,10 @@ customElements.define('fhir-server-selector', class FhirServerSelector extends H
                 <div id="server-url"></div>
             </div>
         `;
+        this._conf = null;
         this._server = this._shadow.getElementById("server");
+    }
+    connectedCallback() {
         this._server.addEventListener("change", () => {
             this._shadow.getElementById("server-url").innerText = this._conf[this._server.value].url;
             this.dispatchEvent(new CustomEvent("serverchanged", {

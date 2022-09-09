@@ -1,13 +1,8 @@
 import "./appRoundButton.js"
 
 customElements.define('app-dialog', class AppDialog extends HTMLElement {
-    static TITLE_ATTRIBUTE = 'dialog-title';
     constructor() {
         super();
-        this.closeEvent = new CustomEvent("close", {
-            bubbles: false,
-            cancelable: false,
-        });
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = `
             <link rel="stylesheet" href="./material.css">
@@ -41,7 +36,7 @@ customElements.define('app-dialog', class AppDialog extends HTMLElement {
                 #header {
                     border-color:var(--border-color, rgba(0,0,0,.12));
                     border-bottom: 1px solid;
-                    padding: 15px 24px;
+                    padding: 1em;
                     display: flex;
                     flex-direction: row;
                     align-items: center;
@@ -53,7 +48,7 @@ customElements.define('app-dialog', class AppDialog extends HTMLElement {
                     flex: 1 1 auto;
                 }
                 #close {
-                    margin-right: 16px;
+                    margin-right: 1.3em;
                 }
                 #content {
                     flex: 1 1 auto;
@@ -76,22 +71,26 @@ customElements.define('app-dialog', class AppDialog extends HTMLElement {
         `;
     }
     connectedCallback() {
+        const closeEvent = new CustomEvent("close", {
+            bubbles: false,
+            cancelable: false,
+        });
         const template = this._shadow.getElementById('template').content;
         this._shadow.appendChild(template.cloneNode(true));
+        this._shadow.getElementById('title').innerText = this.getAttribute('dialog-title');
         this._shadow.getElementById('mask').addEventListener("mousedown", () => {
-            this.dispatchEvent(this.closeEvent)
+            this.dispatchEvent(closeEvent);
         });
         this._shadow.getElementById('close').addEventListener("click", () => {
-            this.dispatchEvent(this.closeEvent)
+            this.dispatchEvent(closeEvent);
         });
-        this._shadow.getElementById('title').innerText = this.getAttribute(AppDialog.TITLE_ATTRIBUTE);
     }
     static get observedAttributes() {
-        return [AppDialog.TITLE_ATTRIBUTE];
+        return ['dialog-title'];
     }
     attributeChangedCallback(name, oldValue, newValue) {
-        if (name === AppDialog.TITLE_ATTRIBUTE && this.isConnected) {
-            this._title.innerText = newValue;
+        if (name === 'dialog-title' && this.isConnected) {
+            this._shadow.getElementById('title').innerText = newValue;
         }
     }
 });

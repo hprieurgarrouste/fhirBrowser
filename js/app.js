@@ -17,14 +17,16 @@ if (window.matchMedia &&
 }
 
 customElements.define('fhir-browser', class App extends HTMLElement {
-    connectedCallback() {
+    constructor() {
+        super();
         this._schemas = {
             '4.3.0': 'R4B',
             '4.0.1': 'R4',
             '3.0.2': 'STU3'
         }
-        let shadow = this.attachShadow({ mode: 'open' });
-        shadow.innerHTML = `
+
+        this._shadow = this.attachShadow({ mode: 'open' });
+        this._shadow.innerHTML = `
             <link rel="stylesheet" href="./material.css">
             <style>
                 #app {
@@ -39,7 +41,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     color: var(--text-color-normal, rgb(0,0,0,87%));
                 }
                 #header {
-                    min-height:72px;
+                    min-height:56px;
                 }
                 #content {
                     flex:1 1 auto;
@@ -51,7 +53,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     flex-direction: row;
                     height : 100%;
                 }
-                #menu {
+                #leftPanel {
                     border-right:1px solid var(--border-color, gray);
                     width:300px;
                     display:flex;
@@ -65,7 +67,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     width: 0;
                 }
                 #footer {
-                    min-height:72px;
+                    min-height:56px;
                     border-top:1px solid var(--border-color, gray);
                 }
                 app-tabs {
@@ -84,7 +86,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                 <app-bar id="header" title="FHIR Browser"></app-bar>
                 <div id="content">
                     <div>
-                        <div id="menu">
+                        <div id="leftPanel">
                             <fhir-server-selector id="serverSelector"></fhir-server-selector>
                             <app-tabs id="tabs">
                                 <app-tab id="tabResources" selected>Resources</app-tab>
@@ -93,19 +95,28 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                             <fhir-resources-list id="serverResources"></fhir-resources-list>
                             <fhir-server-details id="serverDetails"></fhir-server-details>
                         </div>                        
-                        <div id="bdy"></div>
+                        <div id="bdy">
+                            <app-list-filter/>
+                        </div>
                     </div>
                 </div>
                 <div id="footer"></div>
             </div>
 		`;
-        this._menu = shadow.getElementById("menu");
-        shadow.getElementById("header").onMenuClick = () => {
-            this._menu.style.display = ('none' == this._menu.style.display) ? 'flex' : 'none';
-        };
-        this._bdy = shadow.getElementById("bdy");
-        this._list = shadow.getElementById("serverResources");
-        this._list.addEventListener('click', (event) => {
+        this._bdy = this._shadow.getElementById("bdy");
+        this._list = this._shadow.getElementById("serverResources");
+        this._serverDetails = this._shadow.getElementById("serverDetails");
+        const serverSelector = this._shadow.getElementById("serverSelector");
+        serverSelector.setup(conf);
+        this._server = null;
+    }
+    connectedCallback() {
+        this._shadow.getElementById("header").addEventListener('navigationClick', (event) => {
+            const leftPanel = this._shadow.getElementById("leftPanel");
+            leftPanel.style.display = ('none' == leftPanel.style.display) ? 'flex' : 'none';
+        });
+
+        this._shadow.getElementById("serverResources").addEventListener('resourceSelected', (event) => {
             while (this._bdy.firstChild) {
                 this._bdy.removeChild(this._bdy.lastChild);
             }
@@ -114,19 +125,14 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             bundle.load(this._server, event.detail.resourceType);
         });
 
-        this._serverDetails = shadow.getElementById("serverDetails");
-
-        const serverSelector = shadow.getElementById("serverSelector");
-        serverSelector.setup(conf);
-        serverSelector.addEventListener('serverchanged', (event) => {
+        this._shadow.getElementById("serverSelector").addEventListener('serverchanged', (event) => {
             const server = event.detail.server;
             if (server && conf[server]) {
                 this.connect(conf[server]);
             }
         });
 
-        const tabs = shadow.getElementById("tabs");
-        tabs.addEventListener('click', (event) => {
+        this._shadow.getElementById("tabs").addEventListener('click', (event) => {
             const tabId = event.detail.tabId;
             this._list.style.display = (tabId == 'tabResources') ? 'block' : 'none';
             this._serverDetails.style.display = (tabId == 'tabDetails') ? 'block' : 'none';

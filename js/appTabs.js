@@ -19,11 +19,11 @@ customElements.define('app-tabs', class AppTabs extends HTMLElement {
                 ::slotted(app-tab[selected]) {
                     border-bottom-color: var(--primary-color, #000);
                 }
-                </style>
-                <template id="template">
+            </style>
+            <template id="template">
                 <div id="wrapper"><slot></slot></div>
-                </template>
-                `;
+            </template>
+        `;
     }
     connectedCallback() {
         const template = this._shadow.getElementById('template').content;
@@ -46,7 +46,8 @@ customElements.define('app-tabs', class AppTabs extends HTMLElement {
 });
 
 customElements.define('app-tab', class AppTab extends HTMLElement {
-    connectedCallback() {
+    constructor() {
+        super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = `
             <style>
