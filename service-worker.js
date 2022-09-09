@@ -28,6 +28,7 @@ const PRECACHE_URLS = [
   "./js/appDataTable.js",
   "./js/appDialog.js",
   "./js/appJsonViewer.js",
+  "./js/appListFilter.js",
   "./js/appLinearLoader.js",
   "./js/appPagination.js",
   "./js/appRoundButton.js",
