@@ -1,7 +1,7 @@
 customElements.define('app-round-button', class AppRoundButton extends HTMLElement {
     connectedCallback() {
         this.attachShadow({ mode: 'closed' }).innerHTML = `
-            <link href="./material.css" rel="stylesheet"/>            
+            <link href="./material.css" rel="stylesheet"/>
             <style>
                 #wrapper {
                     padding:8px;

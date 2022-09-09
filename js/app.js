@@ -95,9 +95,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                             <fhir-resources-list id="serverResources"></fhir-resources-list>
                             <fhir-server-details id="serverDetails"></fhir-server-details>
                         </div>                        
-                        <div id="bdy">
-                            <app-list-filter/>
-                        </div>
+                        <div id="bdy"></div>
                     </div>
                 </div>
                 <div id="footer"></div>

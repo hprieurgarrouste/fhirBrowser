@@ -1,9 +1,22 @@
+import "./appListFilter.js";
+
 customElements.define('fhir-resources-list', class FhirResourcesList extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = `
+            <link href="./material.css" rel="stylesheet"/>
             <style>
+                #wrapper {
+                    display: flex;
+                    flex-direction: column;
+                    height:100%;
+                }
+                #list {
+                    flex:1 1 auto;
+                    height:0;
+                    overflow:auto;
+                }
                 ul {
                     list-style: none;
                     padding: 0;
@@ -17,11 +30,21 @@ customElements.define('fhir-resources-list', class FhirResourcesList extends HTM
                     background-color:var(--hover-color, lightgray);
                 }
             </style>
-            <div id="wrapper"></div>
+            <div id="wrapper">
+                <app-list-filter id="filter"></app-list-filter>
+                <div id="list"><ul></ul></div>
+            </div>
         `;
     }
     connectedCallback() {
-        this._shadow.getElementById('wrapper').onclick = (event) => {
+        this._shadow.getElementById('filter').addEventListener("filterChanged", (event) => {
+            const ul = this._shadow.getElementById('list').firstElementChild;
+            const filter = event.detail.text.toLowerCase();
+            ul.childNodes.forEach(li => {
+                li.hidden = !li.id.toLowerCase().startsWith(filter);
+            });
+        });
+        this._shadow.getElementById('list').onclick = (event) => {
             if (event.target.nodeName === 'LI') {
                 let prev = this._shadow.querySelector(".selected");
                 if (prev) {
@@ -44,25 +67,19 @@ customElements.define('fhir-resources-list', class FhirResourcesList extends HTM
      * @param {object} metadata
      */
     set metadata(metadata) {
-        async function buildUL() {
-            const ul = document.createElement('ul');
-            metadata.rest[0].resource.forEach(resource => {
-                const li = document.createElement('li');
-                li.id = resource.type;
-                li.innerHTML = resource.type;
-                ul.appendChild(li);
-            })
-            return ul;
-        }
-        buildUL().then(ul => {
-            this._shadow.getElementById('wrapper').appendChild(ul);
-        });
+        const ul = this._shadow.getElementById('list').firstElementChild;
+        metadata.rest[0].resource.forEach(resource => {
+            const li = document.createElement('li');
+            li.id = resource.type;
+            li.innerHTML = resource.type;
+            ul.appendChild(li);
+        })
     }
 
     clear() {
-        const wrapper = this._shadow.getElementById('wrapper');
-        while (wrapper.firstChild) {
-            wrapper.removeChild(wrapper.lastChild);
+        const ul = this._shadow.getElementById('list').firstElementChild;
+        while (ul.firstChild) {
+            ul.removeChild(ul.lastChild);
         }
     }
 });
