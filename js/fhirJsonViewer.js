@@ -34,8 +34,9 @@ customElements.define('fhir-json-viewer', class FhirJsonViewer extends HTMLEleme
             </style>
             <div id="wrapper">
                 <div id = "toolbar" >
-                    <app-round-button id="copy" title="copy to clipboard">content_copy</app-round-button>
-                    <app-round-button id="download" title="download">download</app-round-button>
+                    <app-round-button id="share" title="Share">share</app-round-button>
+                    <app-round-button id="copy" title="Copy to clipboard">content_copy</app-round-button>
+                    <app-round-button id="download" title="Download">download</app-round-button>
                 </div >
                 <json-viewer id="viewer"/>
             </div>
@@ -63,6 +64,17 @@ customElements.define('fhir-json-viewer', class FhirJsonViewer extends HTMLEleme
             }, function (err) {
                 console.error('Async: Could not copy text: ', err);
             });
+        });
+        this._shadow.getElementById('share').addEventListener("click", () => {
+            navigator.share({
+                //"url": ,
+                "text": JSON.stringify(this._resource),
+                "title": this._resource.id
+            }).then(() => {
+                console.log('sharing was successful!');
+            }, (err) => {
+                console.error('Could not share resource: ', err);
+            });;
         });
     }
     /**
