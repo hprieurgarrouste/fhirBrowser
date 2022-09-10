@@ -81,5 +81,6 @@ customElements.define('fhir-resources-list', class FhirResourcesList extends HTM
         while (ul.firstChild) {
             ul.removeChild(ul.lastChild);
         }
+        this._shadow.getElementById('filter').clear();
     }
 });

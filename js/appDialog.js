@@ -55,12 +55,18 @@ customElements.define('app-dialog', class AppDialog extends HTMLElement {
                     height:0;
                     overflow: hidden;
                 }
+                @media (max-width:480px) {
+                    #surface {
+                        height: 100%;
+                        width: 100%;
+                    }
+                }                    
             </style>
             <template id="template">
                 <div id="mask"></div>
                 <div id="surface">
                     <div id="header">
-                        <app-round-button id="close" title="Close">close</app-round-button>
+                        <app-round-button id="close" title="Back">arrow_back</app-round-button>
                         <h2 id="title"></h2>
                     </div>
                     <div id="content">

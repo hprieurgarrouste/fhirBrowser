@@ -81,6 +81,16 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                 #serverDetails {
                     display:none;
                 }
+                @media (max-width:480px){
+                    #leftPanel {
+                        height: calc(100% - 56px - 1px);
+                        position: absolute;
+                        background-color: var(--background-color, rgb(255,255,255));
+                    }
+                    #footer {
+                        display: none;
+                    }
+                }
             </style>
             <div id="app">
                 <app-bar id="header" title="FHIR Browser"></app-bar>
@@ -109,12 +119,14 @@ customElements.define('fhir-browser', class App extends HTMLElement {
         this._server = null;
     }
     connectedCallback() {
+        const leftPanel = this._shadow.getElementById("leftPanel");
         this._shadow.getElementById("header").addEventListener('navigationClick', (event) => {
-            const leftPanel = this._shadow.getElementById("leftPanel");
             leftPanel.style.display = ('none' == leftPanel.style.display) ? 'flex' : 'none';
         });
-
         this._shadow.getElementById("serverResources").addEventListener('resourceSelected', (event) => {
+            if (window.matchMedia("(max-width: 480px)").matches) {
+                leftPanel.style.display = 'none';
+            }
             while (this._bdy.firstChild) {
                 this._bdy.removeChild(this._bdy.lastChild);
             }

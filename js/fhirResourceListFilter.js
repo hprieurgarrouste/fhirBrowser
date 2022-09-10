@@ -62,4 +62,7 @@ customElements.define('fhir-resources-list-filter', class FhirResourcesListFilte
             }));
         }
     }
+    clear() {
+        this._shadow.getElementById("clear").click();
+    }
 });
