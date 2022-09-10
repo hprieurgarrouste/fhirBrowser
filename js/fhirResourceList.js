@@ -1,4 +1,4 @@
-import "./appListFilter.js";
+import "./fhirResourceListFilter.js";
 
 customElements.define('fhir-resources-list', class FhirResourcesList extends HTMLElement {
     constructor() {
@@ -31,7 +31,7 @@ customElements.define('fhir-resources-list', class FhirResourcesList extends HTM
                 }
             </style>
             <div id="wrapper">
-                <app-list-filter id="filter"></app-list-filter>
+                <fhir-resources-list-filter id="filter"></fhir-resources-list-filter>
                 <div id="list"><ul></ul></div>
             </div>
         `;
