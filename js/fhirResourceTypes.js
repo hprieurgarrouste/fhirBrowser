@@ -1,6 +1,6 @@
-import "./fhirResourceListFilter.js";
+import "./fhirResourceTypesFilter.js";
 
-customElements.define('fhir-resources-list', class FhirResourcesList extends HTMLElement {
+customElements.define('fhir-resource-types', class FhirResourceTypes extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
@@ -31,7 +31,7 @@ customElements.define('fhir-resources-list', class FhirResourcesList extends HTM
                 }
             </style>
             <div id="wrapper">
-                <fhir-resources-list-filter id="filter"></fhir-resources-list-filter>
+                <fhir-resource-types-filter id="filter"></fhir-resource-types-filter>
                 <div id="list"><ul></ul></div>
             </div>
         `;

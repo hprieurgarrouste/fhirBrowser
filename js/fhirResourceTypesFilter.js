@@ -1,4 +1,4 @@
-customElements.define('fhir-resources-list-filter', class FhirResourcesListFilter extends HTMLElement {
+customElements.define('fhir-resource-types-filter', class FhirResourceTypesFilter extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });

@@ -9,6 +9,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         super();
         let shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = `
+            <link href="./material.css" rel="stylesheet"/>
             <style>
                 div {
                     display:flex;
@@ -22,16 +23,20 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
                 #title {
                     margin: 0;
                 }
-                .header {
+                h2 {
                     margin-bottom: 1em;
                     flex-basis: content;
                 }
+                i {
+                    vertical-align: middle;
+                    color: var(--primary-color);
+                    margin-left: 1em;
+                }
             </style>
             <div>
-                <div class="header">
-                    <h2 id="title"></h2>
-                    <i id="subtitle"></i>
-                </div>
+                <h2 class="header">
+                    <span id="title"></span><a id="help" href="#" target="_blank"><i class="material-icons">help</i></a>
+                </h2>
                 <app-linear-loader id="loader" style="visibility:hidden;"></app-linear-loader>
                 <data-table id="table">
                     <data-table-pagination id="pagination" slot="footer"/>
@@ -39,14 +44,13 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
             </div>
         `;
         this._title = shadow.getElementById('title');
-        this._subTitle = shadow.getElementById('subtitle');
+        this._help = shadow.getElementById('help');
         this._loader = shadow.getElementById('loader');
         this._dataTable = shadow.getElementById('table');
         this._pagination = shadow.getElementById('pagination');
         this._server = null;
         this._resourceType = null;
         this._dialog = null;
-        this._structureDefinition = null;
         this._skip = 0;
         this._pageSize = 20;
         this._link = null;
@@ -67,7 +71,6 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
             this._dialog = dialog;
 
             let viewer = document.createElement('fhir-json-viewer');
-            viewer.structureDefinition = this._structureDefinition;
             this.fetchResource(this._resourceType, event.detail.resourceId).then(resource => {
                 viewer.source = resource;
             });
@@ -82,20 +85,15 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._server = server;
         this._resourceType = resourceType;
 
+        const resourceDefinition = server.metadata.rest[0].resource.find(r => r.type == resourceType);
+        this._help.href = resourceDefinition.profile;
+
         this._title.innerText = resourceType;
-        this.fetchStructureDefinition(resourceType).then(structureDefinition => {
-            this._structureDefinition = structureDefinition;
-            this._subTitle.innerText = structureDefinition.description;
-        });
 
         this._skip = 0;
         this._link = {
             "first": `${this._server.url}/${this._resourceType}?_count=${this._pageSize}&_elements=entry.id,entry.lastupdated`
         };
-        //this.count().then(count => {
-        //    this._count = count.total;
-        //this._pagination.text = `${this._skip + 1}-${Math.min(this._pageSize, count.total)} of ${count.total}`;
-        //});
         this.loadPage();
     }
 
@@ -187,13 +185,6 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
                 }
             });
         }
-    }
-
-    async fetchStructureDefinition(resourceType) {
-        const response = await fetch(`./schema/${this._server.version}/StructureDefinition-${resourceType}.json`, {
-            "headers": this._server.headers
-        });
-        return response.json();
     }
 
     async fetchPage(url) {

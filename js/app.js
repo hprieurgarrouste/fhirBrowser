@@ -2,7 +2,7 @@ import conf from "../conf.js";
 import "./appBar.js";
 import "./fhirBundle.js";
 import "./fhirServerSelector.js";
-import "./fhirResourceList.js";
+import "./fhirResourceTypes.js";
 import "./fhirServerDetails.js";
 import "./appTabs.js";
 
@@ -66,10 +66,6 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     flex: 1 1 auto;
                     width: 0;
                 }
-                #footer {
-                    min-height:56px;
-                    border-top:1px solid var(--border-color, gray);
-                }
                 app-tabs {
                     border-bottom:1px solid var(--border-color, gray);                    
                 }
@@ -87,9 +83,6 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                         position: absolute;
                         background-color: var(--background-color, rgb(255,255,255));
                     }
-                    #footer {
-                        display: none;
-                    }
                 }
             </style>
             <div id="app">
@@ -99,16 +92,15 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                         <div id="leftPanel">
                             <fhir-server-selector id="serverSelector"></fhir-server-selector>
                             <app-tabs id="tabs">
-                                <app-tab id="tabResources" selected>Resources</app-tab>
+                                <app-tab id="tabResources" selected>Resource Types</app-tab>
                                 <app-tab id="tabDetails">Details</app-tab>
                             </app-tabs>
-                            <fhir-resources-list id="serverResources"></fhir-resources-list>
+                            <fhir-resource-types id="serverResources"></fhir-resource-types>
                             <fhir-server-details id="serverDetails"></fhir-server-details>
                         </div>                        
                         <div id="bdy"></div>
                     </div>
                 </div>
-                <div id="footer"></div>
             </div>
 		`;
         this._bdy = this._shadow.getElementById("bdy");
@@ -130,7 +122,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             while (this._bdy.firstChild) {
                 this._bdy.removeChild(this._bdy.lastChild);
             }
-            let bundle = document.createElement('fhir-bundle');
+            const bundle = document.createElement('fhir-bundle');
             this._bdy.appendChild(bundle);
             bundle.load(this._server, event.detail.resourceType);
         });
