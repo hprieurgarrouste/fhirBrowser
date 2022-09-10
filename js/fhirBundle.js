@@ -22,13 +22,16 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
                 #title {
                     margin: 0;
                 }
-                #subtitle {
-                    margin-bottom: 20px;
+                .header {
+                    margin-bottom: 1em;
+                    flex-basis: content;
                 }
             </style>
             <div>
-                <h1 id="title"></h1>
-                <i id="subtitle"></i>
+                <div class="header">
+                    <h2 id="title"></h2>
+                    <i id="subtitle"></i>
+                </div>
                 <app-linear-loader id="loader" style="visibility:hidden;"></app-linear-loader>
                 <data-table id="table">
                     <data-table-pagination id="pagination" slot="footer"/>

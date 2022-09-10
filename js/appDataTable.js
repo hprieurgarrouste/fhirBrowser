@@ -63,6 +63,7 @@ customElements.define('data-table', class DataTable extends HTMLElement {
                 }
                 tfoot td {
                     text-align: right;
+                    overflow: hidden;
                 }
             </style>
             <div>

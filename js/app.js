@@ -61,7 +61,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     height : 100%;
                 }
                 #bdy { 
-                    padding:25px;
+                    padding:1em;
                     overflow: auto;
                     flex: 1 1 auto;
                     width: 0;
