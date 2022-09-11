@@ -66,10 +66,11 @@ customElements.define('fhir-json-viewer', class FhirJsonViewer extends HTMLEleme
             });
         });
         this._shadow.getElementById('share').addEventListener("click", () => {
+            const fileName = `${this._resource.resourceType}.${this._resource.id}.txt`;
+            const file = new File([JSON.stringify(this._resource)], fileName, { type: 'text/plain' });
             navigator.share({
-                //"url": ,
-                "text": JSON.stringify(this._resource),
-                "title": this._resource.id
+                "title": fileName,
+                "files": [file]
             }).then(() => {
                 console.log('sharing was successful!');
             }, (err) => {
