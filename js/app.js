@@ -64,7 +64,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     flex: 1 1 auto;
                     width: 0;
                 }
-                fhir-metadata {
+                #metadata {
                     flex: 1 1 auto;
                     height: 0;
                 }

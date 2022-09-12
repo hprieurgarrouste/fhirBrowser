@@ -4,6 +4,9 @@ customElements.define('fhir-server-details', class FhirServerDetails extends HTM
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = `
             <style>
+                #wrapper {
+                    overflow-y: auto;
+                }
                 .item {
                     padding: 0.5em 1em;
                 }
@@ -32,6 +35,8 @@ customElements.define('fhir-server-details', class FhirServerDetails extends HTM
      */
     set metadata(metadata) {
         const wrapper = this._shadow.getElementById('wrapper');
+        while (wrapper.firstChild) wrapper.removeChild(wrapper.lastChild);
+
         make("copyright", metadata.copyright);
         make("description", metadata.description);
         make("fhirVersion", metadata.fhirVersion);
@@ -64,10 +69,4 @@ customElements.define('fhir-server-details', class FhirServerDetails extends HTM
         }
     }
 
-    clear() {
-        const wrapper = this._shadow.getElementById('wrapper');
-        while (wrapper.firstChild) {
-            wrapper.removeChild(wrapper.lastChild);
-        }
-    }
 });
