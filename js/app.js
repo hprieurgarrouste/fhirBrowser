@@ -2,9 +2,7 @@ import conf from "../conf.js";
 import "./appBar.js";
 import "./fhirBundle.js";
 import "./fhirServerSelector.js";
-import "./fhirResourceTypes.js";
-import "./fhirServerDetails.js";
-import "./appTabs.js";
+import "./fhirMetadata.js";
 
 /* Only register a service worker if it's supported */
 if ('serviceWorker' in navigator) {
@@ -66,16 +64,9 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     flex: 1 1 auto;
                     width: 0;
                 }
-                app-tabs {
-                    border-bottom:1px solid var(--border-color, gray);                    
-                }
-                #serverResources, #serverDetails {
-                    flex:1 1 auto;
-                    overflow: auto;
-                    height:0;
-                }
-                #serverDetails {
-                    display:none;
+                fhir-metadata {
+                    flex: 1 1 auto;
+                    height: 0;
                 }
                 @media (max-width:480px){
                     #leftPanel {
@@ -91,12 +82,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     <div>
                         <div id="leftPanel">
                             <fhir-server-selector id="serverSelector"></fhir-server-selector>
-                            <app-tabs id="tabs">
-                                <app-tab id="tabResources" selected>Resource Types</app-tab>
-                                <app-tab id="tabDetails">Details</app-tab>
-                            </app-tabs>
-                            <fhir-resource-types id="serverResources"></fhir-resource-types>
-                            <fhir-server-details id="serverDetails"></fhir-server-details>
+                            <fhir-metadata id="metadata"></fhir-metadata>                            
                         </div>                        
                         <div id="bdy"></div>
                     </div>
@@ -104,8 +90,6 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             </div>
 		`;
         this._bdy = this._shadow.getElementById("bdy");
-        this._list = this._shadow.getElementById("serverResources");
-        this._serverDetails = this._shadow.getElementById("serverDetails");
         const serverSelector = this._shadow.getElementById("serverSelector");
         serverSelector.setup(conf);
         this._server = null;
@@ -115,7 +99,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
         this._shadow.getElementById("header").addEventListener('navigationClick', (event) => {
             leftPanel.style.display = ('none' == leftPanel.style.display) ? 'flex' : 'none';
         });
-        this._shadow.getElementById("serverResources").addEventListener('resourceSelected', (event) => {
+        this._shadow.getElementById("metadata").addEventListener('resourceTypeSelected', (event) => {
             if (window.matchMedia("(max-width: 480px)").matches) {
                 leftPanel.style.display = 'none';
             }
@@ -132,12 +116,6 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             if (server && conf[server]) {
                 this.connect(conf[server]);
             }
-        });
-
-        this._shadow.getElementById("tabs").addEventListener('click', (event) => {
-            const tabId = event.detail.tabId;
-            this._list.style.display = (tabId == 'tabResources') ? 'block' : 'none';
-            this._serverDetails.style.display = (tabId == 'tabDetails') ? 'block' : 'none';
         });
 
     }
@@ -186,14 +164,11 @@ customElements.define('fhir-browser', class App extends HTMLElement {
 
     async initialize() {
         while (this._bdy.firstChild) this._bdy.removeChild(this._bdy.lastChild);
-        this._list.clear();
-        this._serverDetails.clear();
 
         this.loadMetadata().then(metadata => {
             this._server.version = this._schemas[metadata.fhirVersion];
             this._server.metadata = metadata;
-            this._list.metadata = metadata;
-            this._serverDetails.metadata = metadata;
+            this._shadow.getElementById("metadata").metadata = metadata;
         });
     }
 

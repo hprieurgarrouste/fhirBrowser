@@ -1,6 +1,6 @@
 import "./appJsonViewer.js";
 
-customElements.define('fhir-json-viewer', class FhirJsonViewer extends HTMLElement {
+customElements.define('fhir-resource', class FhirResource extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });

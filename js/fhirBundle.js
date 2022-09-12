@@ -1,4 +1,4 @@
-import "./fhirJsonViewer.js";
+import "./fhirResource.js";
 import "./appDialog.js";
 import "./appLinearLoader.js";
 import "./appPagination.js";
@@ -70,11 +70,11 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
             document.body.appendChild(dialog);
             this._dialog = dialog;
 
-            let viewer = document.createElement('fhir-json-viewer');
+            let fhirResource = document.createElement('fhir-resource');
             this.fetchResource(this._resourceType, event.detail.resourceId).then(resource => {
-                viewer.source = resource;
+                fhirResource.source = resource;
             });
-            dialog.appendChild(viewer);
+            dialog.appendChild(fhirResource);
         });
     }
 

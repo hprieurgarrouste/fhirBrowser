@@ -51,7 +51,7 @@ customElements.define('fhir-resource-types', class FhirResourceTypes extends HTM
                     prev.classList.remove('selected');
                 }
                 event.target.classList.add('selected');
-                this.dispatchEvent(new CustomEvent("resourceSelected", {
+                this.dispatchEvent(new CustomEvent("resourceTypeSelected", {
                     bubbles: false,
                     cancelable: false,
                     'detail': {
@@ -67,7 +67,14 @@ customElements.define('fhir-resource-types', class FhirResourceTypes extends HTM
      * @param {object} metadata
      */
     set metadata(metadata) {
-        const ul = this._shadow.getElementById('list').firstElementChild;
+        this._shadow.getElementById('filter').clear();
+        const list = this._shadow.getElementById('list');
+        list.scrollTop = 0;
+        const ul = list.firstElementChild;
+        while (ul.firstChild) {
+            ul.removeChild(ul.lastChild);
+        }
+
         metadata.rest[0].resource.forEach(resource => {
             const li = document.createElement('li');
             li.id = resource.type;
@@ -76,11 +83,4 @@ customElements.define('fhir-resource-types', class FhirResourceTypes extends HTM
         })
     }
 
-    clear() {
-        const ul = this._shadow.getElementById('list').firstElementChild;
-        while (ul.firstChild) {
-            ul.removeChild(ul.lastChild);
-        }
-        this._shadow.getElementById('filter').clear();
-    }
 });
