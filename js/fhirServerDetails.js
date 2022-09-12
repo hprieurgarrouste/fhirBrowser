@@ -7,20 +7,23 @@ customElements.define('fhir-server-details', class FhirServerDetails extends HTM
                 #wrapper {
                     overflow-y: auto;
                 }
-                .item {
+                #wrapper > div {
                     padding: 0.5em 1em;
                 }
-                .item:hover {
+                #wrapper > div:hover {
                     background-color: var(--hover-color, rgba(0, 0, 0, 5%));
                 }
-                .primary {
+                span {
+                    display: block;
+                }
+                span:nth-of-type(1) {
                     text-overflow: ellipsis;
                     white-space: nowrap;
                     overflow: hidden;
                     text-transform: capitalize;
                     color: var(--text-color-normal, black);
                 }
-                .secondary {
+                span:nth-of-type(2) {
                     font-size: 0.875em;
                     color: rgba(var(--text-color, "0, 0, 0"), 54%);
                     overflow-wrap: break-word;
@@ -56,13 +59,10 @@ customElements.define('fhir-server-details', class FhirServerDetails extends HTM
         function make(name, value) {
             if (typeof value === "undefined") return;
             const item = document.createElement('div');
-            item.classList.add("item");
-            const line1 = document.createElement('div');
-            line1.classList.add("primary");
+            const line1 = document.createElement('span');
             line1.innerText = name;
             item.appendChild(line1);
-            const line2 = document.createElement('div');
-            line2.classList.add("secondary");
+            const line2 = document.createElement('span');
             line2.innerText = value;
             item.appendChild(line2);
             wrapper.appendChild(item);

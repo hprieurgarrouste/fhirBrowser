@@ -21,9 +21,6 @@ customElements.define('fhir-metadata', class FhirMetadata extends HTMLElement {
                     overflow: auto;
                     height:0;
                 }
-                #serverDetails {
-                    display:none;
-                }
             </style>
             <div id="wrapper">
                 <app-tabs id="tabs">
@@ -31,7 +28,7 @@ customElements.define('fhir-metadata', class FhirMetadata extends HTMLElement {
                     <app-tab id="tabDetails">Details</app-tab>
                 </app-tabs>
                 <fhir-resource-types id="resourceTypes"></fhir-resource-types>
-                <fhir-server-details id="serverDetails"></fhir-server-details>
+                <fhir-server-details id="serverDetails" hidden></fhir-server-details>
             </div>
         `;
         this._metadata = null;
@@ -39,8 +36,8 @@ customElements.define('fhir-metadata', class FhirMetadata extends HTMLElement {
     connectedCallback() {
         this._shadow.getElementById("tabs").addEventListener('click', (event) => {
             const tabId = event.detail.tabId;
-            this._shadow.getElementById("resourceTypes").style.display = (tabId == 'tabResources') ? 'block' : 'none';
-            this._shadow.getElementById("serverDetails").style.display = (tabId == 'tabDetails') ? 'block' : 'none';
+            this._shadow.getElementById("resourceTypes").hidden = (tabId !== 'tabResources');
+            this._shadow.getElementById("serverDetails").hidden = (tabId !== 'tabDetails');
         });
         this._shadow.getElementById("resourceTypes").addEventListener('resourceTypeSelected', (event) => {
             this.dispatchEvent(new CustomEvent("resourceTypeSelected", {
