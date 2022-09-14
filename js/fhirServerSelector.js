@@ -58,29 +58,74 @@ customElements.define('fhir-server-selector', class FhirServerSelector extends H
         this._conf = null;
         this._server = this._shadow.getElementById("server");
     }
+
     connectedCallback() {
+        this.loadConf().then(conf => {
+            this._conf = conf;
+            for (const key of Object.keys(conf).sort()) {
+                const opt = document.createElement('OPTION');
+                opt.setAttribute("value", key);
+                opt.appendChild(document.createTextNode(key));
+                this._server.appendChild(opt);
+            }
+        });
         this._server.addEventListener("change", () => {
-            this._shadow.getElementById("server-url").innerText = this._conf[this._server.value].url;
+            const server = this._conf[this._server.value];
+            this._shadow.getElementById("server-url").innerText = server.url;
+            this.connect(server);
+
             this.dispatchEvent(new CustomEvent("serverchanged", {
                 bubbles: false,
                 cancelable: false,
-                'detail': {
-                    server: this._server.value
+                "detail": {
+                    "server": server
                 }
             }));
         });
     }
-    /**
-     * @param {object} conf
-     */
-    setup(conf) {
-        this._conf = conf;
-        for (const key of Object.keys(conf).sort()) {
-            const opt = document.createElement('OPTION');
-            opt.setAttribute("value", key);
-            opt.appendChild(document.createTextNode(key));
-            this._server.appendChild(opt);
+
+    connect(server) {
+        if (server.auth) {
+            switch (server.auth.method) {
+                case "oauth2":
+                    this.oauth2_getToken(server.auth.setup).then(response => {
+                        server.headers.Authorization = `${response.token_type} ${response.access_token}`;
+                    });
+                    break;
+                case "basic":
+                    let auth = btoa(`${server.auth.setup.username}:${server.auth.setup.password}`);
+                    server.headers.Authorization = `Basic ${auth}`;
+                    break;
+                default:
+                    break;
+            }
         }
+    }
+
+    async oauth2_getToken(setup) {
+        let urlParams = {
+            "client_id": setup.client_id,
+            "client_secret": setup.client_secret,
+            "grant_type": setup.grant_type,
+            "username": setup.username,
+            "password": setup.password
+        }
+        let result = new URLSearchParams(urlParams);
+        const response = await fetch(setup.access_token_url, {
+            "headers": {
+                "Content-type": "application/x-www-form-urlencoded"
+            },
+            "method": "POST",
+            "body": result.toString()
+        });
+        return response.json();
+    }
+
+    async loadConf() {
+        const response = await fetch(`../conf.json`, {
+            "cache": "reload"
+        });
+        return response.json();
     }
 
 });

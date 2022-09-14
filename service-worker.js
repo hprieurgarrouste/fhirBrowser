@@ -20,7 +20,7 @@ const RUNTIME = "runtime";
 const PRECACHE_URLS = [
   "./", // Alias for index.html
   "./index.html",
-  "./conf.js",
+  "./conf.json",
   "./material.css",
   "./favicon.png",
   "./js/app.js",

@@ -1,4 +1,3 @@
-import conf from "../conf.js";
 import "./appBar.js";
 import "./fhirBundle.js";
 import "./fhirServerSelector.js";
@@ -90,8 +89,6 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             </div>
 		`;
         this._bdy = this._shadow.getElementById("bdy");
-        const serverSelector = this._shadow.getElementById("serverSelector");
-        serverSelector.setup(conf);
         this._server = null;
     }
     connectedCallback() {
@@ -112,63 +109,14 @@ customElements.define('fhir-browser', class App extends HTMLElement {
         });
 
         this._shadow.getElementById("serverSelector").addEventListener('serverchanged', (event) => {
-            const server = event.detail.server;
-            if (server && conf[server]) {
-                this.connect(conf[server]);
-            }
-        });
+            this._server = event.detail.server;
+            while (this._bdy.firstChild) this._bdy.removeChild(this._bdy.lastChild);
 
-    }
-
-    connect(server) {
-        this._server = server;
-        if (server.auth) {
-            switch (server.auth.method) {
-                case "oauth2":
-                    this.oauth2_getToken(server.auth.setup).then(response => {
-                        server.headers.Authorization = `${response.token_type} ${response.access_token}`;
-                        this.initialize();
-                    });
-                    break;
-                case "basic":
-                    let auth = btoa(`${server.auth.setup.username}:${server.auth.setup.password}`);
-                    server.headers.Authorization = `Basic ${auth}`;
-                    this.initialize();
-                    break;
-                default:
-                    break;
-            }
-        } else {
-            this.initialize();
-        }
-    }
-
-    async oauth2_getToken(setup) {
-        let urlParams = {
-            "client_id": setup.client_id,
-            "client_secret": setup.client_secret,
-            "grant_type": setup.grant_type,
-            "username": setup.username,
-            "password": setup.password
-        }
-        let result = new URLSearchParams(urlParams);
-        const response = await fetch(setup.access_token_url, {
-            "headers": {
-                "Content-type": "application/x-www-form-urlencoded"
-            },
-            "method": "POST",
-            "body": result.toString()
-        });
-        return response.json();
-    }
-
-    async initialize() {
-        while (this._bdy.firstChild) this._bdy.removeChild(this._bdy.lastChild);
-
-        this.loadMetadata().then(metadata => {
-            this._server.version = this._schemas[metadata.fhirVersion];
-            this._server.metadata = metadata;
-            this._shadow.getElementById("metadata").metadata = metadata;
+            this.loadMetadata().then(metadata => {
+                this._server.version = this._schemas[metadata.fhirVersion];
+                this._server.metadata = metadata;
+                this._shadow.getElementById("metadata").metadata = metadata;
+            });
         });
     }
 
@@ -178,21 +126,6 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             "headers": this._server.headers
         });
         return response.json();
-    }
-
-    async countAllResources(resources) {
-        const results = {};
-        let urls = [];
-        resources.forEach(resource => {
-            urls.push(`${this._server.url}/${resource.type}?_summary=count&_format=json`);
-        });
-        await Promise.all(urls.map(url => fetch(url, { "headers": this._server.headers })
-            .then(resp => resp.json())
-            .then(result => result.total)))
-            .then(counts => {
-                counts.map((item, i) => results[resources[i].type] = item);
-            })
-        return results;
     }
 
 });
