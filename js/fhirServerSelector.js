@@ -122,7 +122,7 @@ customElements.define('fhir-server-selector', class FhirServerSelector extends H
     }
 
     async loadConf() {
-        const response = await fetch(`../conf.json`, {
+        const response = await fetch(`./conf.json`, {
             "cache": "reload"
         });
         return response.json();
