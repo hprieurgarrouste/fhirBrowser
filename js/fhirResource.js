@@ -47,6 +47,7 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
                 <div id="content"></div>
             </div>
         `;
+        this._resource = null;
     }
     connectedCallback() {
         this._shadow.getElementById('download').addEventListener("click", () => {
@@ -83,10 +84,11 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
         });
     }
     /**
-     * @param {object} object
+     * @param {object} resource
      */
-    set source(object) {
-        parse(this._shadow.getElementById("content"), object);
+    set source(resource) {
+        this._resource = resource;
+        parse(this._shadow.getElementById("content"), resource);
         function parse(parent, obj) {
             let isArray = Array.isArray(obj);
             parent.appendChild(document.createTextNode(isArray ? '[' : '{'));
