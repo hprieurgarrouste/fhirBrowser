@@ -13,14 +13,13 @@ Copyright 2021 Google LLC
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-const PRECACHE = "firebrowser-v1";
+const PRECACHE = "firebrowser-v2";
 const RUNTIME = "runtime";
 
 // A list of local resources we always want to be cached.
 const PRECACHE_URLS = [
   "./", // Alias for index.html
   "./index.html",
-  "./conf.json",
   "./material.css",
   "./favicon.png",
   "./js/app.js",
