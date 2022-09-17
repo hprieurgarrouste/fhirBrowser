@@ -124,10 +124,9 @@ customElements.define('fhir-server-selector', class FhirServerSelector extends H
     async loadConf() {
         let conf = localStorage.getItem('conf');
         if (conf === null) {
-            conf = await fetch(`./conf.json`, { "cache": "reload" })
+            return await fetch(`./default.conf`, { "cache": "reload" })
                 .then(response => response.json())
-                .then(json => {
-                    conf = json;
+                .then(conf => {
                     localStorage.setItem('conf', JSON.stringify(conf));
                     return conf;
                 });
