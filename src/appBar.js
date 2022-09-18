@@ -1,7 +1,8 @@
 customElements.define('app-bar', class AppBar extends HTMLElement {
-    connectedCallback() {
-        let shadow = this.attachShadow({ mode: 'closed' });
-        shadow.innerHTML = `
+    constructor() {
+        super();
+        this._shadow = this.attachShadow({ mode: 'closed' });
+        this._shadow.innerHTML = `
             <link href="./material.css" rel="stylesheet"/>
             <style>
                 div {
@@ -20,7 +21,9 @@ customElements.define('app-bar', class AppBar extends HTMLElement {
             </style>
             <div><i id="menu" class="material-icons">menu</i><span>${this.getAttribute("title")}</span></div>
         `;
-        shadow.getElementById("menu").addEventListener("click", (event) => {
+    }
+    connectedCallback() {
+        this._shadow.getElementById("menu").addEventListener("click", (event) => {
             this.dispatchEvent(new CustomEvent("navigationClick", {
                 bubbles: false,
                 cancelable: false

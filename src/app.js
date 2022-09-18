@@ -57,7 +57,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     flex-direction: column;
                     height : 100%;
                 }
-                #bdy { 
+                #bdy {
                     padding:1em;
                     overflow: auto;
                     flex: 1 1 auto;
@@ -81,8 +81,8 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     <div>
                         <div id="leftPanel">
                             <fhir-server-selector id="serverSelector"></fhir-server-selector>
-                            <fhir-metadata id="metadata"></fhir-metadata>                            
-                        </div>                        
+                            <fhir-metadata id="metadata"></fhir-metadata>
+                        </div>
                         <div id="bdy"></div>
                     </div>
                 </div>
