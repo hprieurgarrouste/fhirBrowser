@@ -1,11 +1,3 @@
 {
-    "files.trimTrailingWhitespace": true,
-    "emeraldwalk.runonsave": {
-        "commands": [
-            {
-                "match": "\\.js$",
-                "cmd": "npx webpack"
-            }
-        ]
-    }
+    "files.trimTrailingWhitespace": true
 }

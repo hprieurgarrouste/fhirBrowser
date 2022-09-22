@@ -1,9 +1,14 @@
 const path = require('path');
 
 module.exports = {
+  watch: true,
   mode: 'production',
-  entry: './src/app.js',
+  entry: {
+    app: './src/app.js'
+  },
   output: {
-    filename: 'fhirBrowser.js'
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'fhirBrowser.js',
+    clean: true
   }
 };

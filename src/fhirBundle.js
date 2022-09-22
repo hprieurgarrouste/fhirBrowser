@@ -1,5 +1,3 @@
-import "./fhirResource.js";
-import "./appDialog.js";
 import "./appLinearLoader.js";
 import "./appPagination.js";
 import "./appDataTable.js";
@@ -20,22 +18,22 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
                     flex:1 1 auto;
                     height:0;
                 }
-                #title {
-                    margin: 0;
-                }
-                h2 {
+                .header {
                     margin-bottom: 1em;
-                    flex-basis: content;
+                    display: flex;
+                    align-items: center;
                 }
-                i {
-                    vertical-align: middle;
+                .header > * {
+                    margin-right: .5em;
+                }
+                #help {
                     color: var(--primary-color);
-                    margin-left: 1em;
                 }
             </style>
             <div>
                 <h2 class="header">
-                    <span id="title"></span><a id="help" href="#" target="_blank"><i class="material-icons">help</i></a>
+                    <span id="title"></span>
+                    <app-round-button id="help" title="Help">help</app-round-button>
                 </h2>
                 <app-linear-loader id="loader" style="visibility:hidden;"></app-linear-loader>
                 <data-table id="table">
@@ -50,38 +48,34 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._pagination = shadow.getElementById('pagination');
         this._server = null;
         this._resourceType = null;
-        this._dialog = null;
         this._skip = 0;
         this._pageSize = 20;
         this._link = null;
         this._count = null;
     }
     connectedCallback() {
+        this._help.addEventListener('click', (event) => {
+            const resourceDefinition = this._server.metadata.rest[0].resource.find(r => r.type == this._resourceType);
+            window.open(resourceDefinition.profile, "_blank");
+        });
         this._pagination.addEventListener("pagination", (event) => {
             this.loadPage(event.detail.button);
         });
+        this._dataTable.addColumn("id");
+        this._dataTable.addColumn("lastUpdated");
         this._dataTable.addEventListener('rowclick', (event) => {
-            let dialog = document.createElement('app-dialog');
-            dialog.setAttribute('dialog-title', this._resourceType);
-            dialog.addEventListener("close", () => {
-                this._dialog.remove();
-                this._dialog = null;
-            });
-            document.body.appendChild(dialog);
-            this._dialog = dialog;
-
-            let fhirResource = document.createElement('fhir-resource');
-            this.fetchResource(this._resourceType, event.detail.resourceId).then(resource => {
-                fhirResource.source = resource;
-            });
-            dialog.appendChild(fhirResource);
+            this.dispatchEvent(new CustomEvent("resourceSelected", {
+                bubbles: false,
+                cancelable: false,
+                'detail': {
+                    resourceType: this._resourceType,
+                    resourceId: event.detail.resourceId
+                }
+            }));
         });
     }
 
     load(server, resourceType) {
-        this._dataTable.addColumn("id");
-        this._dataTable.addColumn("lastUpdated");
-
         this._server = server;
         this._resourceType = resourceType;
 
@@ -189,13 +183,6 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
 
     async fetchPage(url) {
         const response = await fetch(url, {
-            "headers": this._server.headers
-        });
-        return response.json();
-    }
-
-    async fetchResource(resourceType, id) {
-        const response = await fetch(`${this._server.url}/${resourceType}/${id}?_format=json`, {
             "headers": this._server.headers
         });
         return response.json();

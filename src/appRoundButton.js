@@ -8,7 +8,7 @@ customElements.define('app-round-button', class AppRoundButton extends HTMLEleme
                     cursor:pointer;
                     text-align:center;
                     border:0 none;
-                    color:var(--text-color-normal, rgba(0, 0, 0, 87%));
+                    color: inherit;
                     background-color:transparent;
                 }
                 #wrapper:hover {
