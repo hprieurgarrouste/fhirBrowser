@@ -1,4 +1,7 @@
 import "./fhirResourceJson.js";
+import "./fhirResourceHtml.js";
+import "./appTabs.js";
+import "./appTitle.js";
 
 customElements.define('fhir-resource', class FhirResource extends HTMLElement {
     constructor() {
@@ -12,17 +15,6 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
                     flex-direction: column;
                     height : 100%;
                 }
-                .header {
-                    margin-bottom: 1em;
-                    display: flex;
-                    align-items: center;
-                }
-                .header > * {
-                    margin-right: .5em;
-                }
-                #help {
-                    color: var(--primary-color);
-                }
                 #tabs {
                     border-bottom:1px solid var(--border-color, gray);
                 }
@@ -33,20 +25,23 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
                 }
             </style>
             <div id="wrapper">
-                <h2 class="header">
-                    <app-round-button id="back" title="back">arrow_back</app-round-button>
-                    <span id="title"></span>
+                <app-title id="header">
+                    <app-round-button slot="left" id="back" title="back">arrow_back</app-round-button>
+                    <app-round-button id="share" title="Share">share</app-round-button>
+                    <app-round-button id="copy" title="Copy to clipboard">content_copy</app-round-button>
+                    <app-round-button id="download" title="Download">download</app-round-button>
                     <app-round-button id="help" title="Help">help</app-round-button>
-                </h2>
+                </app-title>
                 <app-tabs id="tabs">
                     <app-tab id="tabJson" selected>Json</app-tab>
-                    <app-tab id="tabMustache">Html</app-tab>
+                    <app-tab id="tabHtml">Html</app-tab>
                 </app-tabs>
-                <fhir-resource-json id="jsonView"/>
-                <div id="MustacheView"/>
+                <fhir-resource-json id="jsonView"></fhir-resource-json>
+                <fhir-resource-html id="htmlView" hidden></fhir-resource-html>
             </div>
         `;
         this._jsonView = this._shadow.getElementById('jsonView');
+        this._htmlView = this._shadow.getElementById('htmlView');
         this._server = null;
         this._resourceType = null;
         this._resourceId = null;
@@ -58,14 +53,51 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
                 cancelable: false
             }));
         });
+
         this._shadow.getElementById("help").addEventListener('click', (event) => {
             const resourceDefinition = this._server.metadata.rest[0].resource.find(r => r.type == this._resourceType);
             window.open(resourceDefinition.profile, "_blank");
         });
+
+        this._shadow.getElementById('download').addEventListener("click", () => {
+            const file = new File([JSON.stringify(this._resource)], this._resource.id, {
+                type: 'data:text/json;charset=utf-8',
+            });
+            const url = URL.createObjectURL(file);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${this._resource.resourceType}#${file.name}.json`;
+            this._shadow.appendChild(link);
+            link.click();
+            this._shadow.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        });
+
+        this._shadow.getElementById('copy').addEventListener("click", () => {
+            navigator.clipboard.writeText(JSON.stringify(this._resource)).then(function () {
+                console.log('Async: Copying to clipboard was successful!');
+            }, function (err) {
+                console.error('Async: Could not copy text: ', err);
+            });
+        });
+
+        this._shadow.getElementById('share').addEventListener("click", () => {
+            const fileName = `${this._resource.resourceType}.${this._resource.id}.txt`;
+            const file = new File([JSON.stringify(this._resource)], fileName, { type: 'text/plain' });
+            navigator.share({
+                "title": fileName,
+                "files": [file]
+            }).then(() => {
+                console.log('sharing was successful!');
+            }, (err) => {
+                console.error('Could not share resource: ', err);
+            });;
+        });
+
         this._shadow.getElementById("tabs").addEventListener('click', (event) => {
             const tabId = event.detail.tabId;
             this._shadow.getElementById("jsonView").hidden = (tabId !== 'tabJson');
-            this._shadow.getElementById("MustacheView").hidden = (tabId !== 'tabMustache');
+            this._shadow.getElementById("htmlView").hidden = (tabId !== 'tabHtml');
         });
     }
 
@@ -74,10 +106,12 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
         this._resourceType = resourceType;
         this._resourceId = resourceId;
 
-        this._shadow.getElementById('title').innerText = resourceType;
+        this._shadow.getElementById('header').setAttribute('caption', resourceType);
 
         this.fetchResource(server, resourceType, resourceId).then(resource => {
+            this._resource = resource;
             this._jsonView.source = resource;
+            this._htmlView.source = resource;
         });
     }
 

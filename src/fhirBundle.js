@@ -1,15 +1,16 @@
+import "./appDataTable.js";
 import "./appLinearLoader.js";
 import "./appPagination.js";
-import "./appDataTable.js";
+import "./appTitle.js";
 
 customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
     constructor() {
         super();
-        let shadow = this.attachShadow({ mode: 'closed' });
-        shadow.innerHTML = `
+        this._shadow = this.attachShadow({ mode: 'closed' });
+        this._shadow.innerHTML = `
             <link href="./material.css" rel="stylesheet"/>
             <style>
-                div {
+                #wrapper {
                     display:flex;
                     flex-direction:column;
                     height:100%;
@@ -18,34 +19,22 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
                     flex:1 1 auto;
                     height:0;
                 }
-                .header {
-                    margin-bottom: 1em;
+                #header {
+                    margin: 0.5em 0;
                     display: flex;
                     align-items: center;
                 }
-                .header > * {
-                    margin-right: .5em;
-                }
-                #help {
-                    color: var(--primary-color);
-                }
             </style>
-            <div>
-                <h2 class="header">
-                    <span id="title"></span>
+            <div id="wrapper">
+                <app-title id="title">
                     <app-round-button id="help" title="Help">help</app-round-button>
-                </h2>
+                </app-title>
                 <app-linear-loader id="loader" style="visibility:hidden;"></app-linear-loader>
                 <data-table id="table">
                     <data-table-pagination id="pagination" slot="footer"/>
                 </data-table>
             </div>
         `;
-        this._title = shadow.getElementById('title');
-        this._help = shadow.getElementById('help');
-        this._loader = shadow.getElementById('loader');
-        this._dataTable = shadow.getElementById('table');
-        this._pagination = shadow.getElementById('pagination');
         this._server = null;
         this._resourceType = null;
         this._skip = 0;
@@ -54,16 +43,17 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._count = null;
     }
     connectedCallback() {
-        this._help.addEventListener('click', (event) => {
+        this._shadow.getElementById('help').addEventListener('click', (event) => {
             const resourceDefinition = this._server.metadata.rest[0].resource.find(r => r.type == this._resourceType);
             window.open(resourceDefinition.profile, "_blank");
         });
-        this._pagination.addEventListener("pagination", (event) => {
+        this._shadow.getElementById('pagination').addEventListener("pagination", (event) => {
             this.loadPage(event.detail.button);
         });
-        this._dataTable.addColumn("id");
-        this._dataTable.addColumn("lastUpdated");
-        this._dataTable.addEventListener('rowclick', (event) => {
+        const dataTable = this._shadow.getElementById('table');
+        dataTable.addColumn("id");
+        dataTable.addColumn("lastUpdated");
+        dataTable.addEventListener('rowclick', (event) => {
             this.dispatchEvent(new CustomEvent("resourceSelected", {
                 bubbles: false,
                 cancelable: false,
@@ -79,10 +69,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._server = server;
         this._resourceType = resourceType;
 
-        const resourceDefinition = server.metadata.rest[0].resource.find(r => r.type == resourceType);
-        this._help.href = resourceDefinition.profile;
-
-        this._title.innerText = resourceType;
+        this._shadow.getElementById('title').setAttribute('caption', resourceType);
 
         this._skip = 0;
         this._link = {
@@ -109,30 +96,33 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
                 return;
         }
         const url = this._link[page];
-        this._dataTable.removeAll();
-        this._loader.style.visibility = "visible";
+        this._shadow.getElementById('table').removeAll();
+        const loader = this._shadow.getElementById('loader');
+        loader.style.visibility = "visible";
         this.fetchPage(url).then(data => {
 
             if (data.total) {
                 this._count = data.total;
                 this.parsePage(data);
-                this._loader.style.visibility = "hidden";
+                loader.style.visibility = "hidden";
             } else {
                 this.fetchCount().then(count => {
                     this._count = count.total;
                     this.parsePage(data);
-                    this._loader.style.visibility = "hidden";
+                    loader.style.visibility = "hidden";
                 });
             }
         });
     }
 
     parsePage(data) {
+        const dataTable = this._shadow.getElementById('table');
+        const pagination = this._shadow.getElementById('pagination');
         let range = '0';
         if (this._count != 0) {
             range = `${this._skip + 1}-${Math.min(this._skip + this._pageSize, this._count)}`;
         }
-        this._pagination.text = `${range} of ${this._count}`;
+        pagination.text = `${range} of ${this._count}`;
         if (data.entry) {
             data.entry.forEach(entry => {
                 if (entry.resource && entry.resource.resourceType == this._resourceType) {
@@ -140,7 +130,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
                         "id": entry.resource.id,
                         "lastupdated": formatDate(entry.resource.meta.lastUpdated)
                     }
-                    this._dataTable.addRow(entry.resource.id, row);
+                    dataTable.addRow(entry.resource.id, row);
                 }
                 function formatDate(dte) {
                     let date = new Date(dte);
@@ -155,24 +145,24 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
                 }
             });
             this._link = {};
-            this._pagination.first = false;
-            this._pagination.previous = false;
-            this._pagination.next = false;
-            this._pagination.last = false;
+            pagination.first = false;
+            pagination.previous = false;
+            pagination.next = false;
+            pagination.last = false;
             data.link.forEach(link => {
                 this._link[link.relation] = link.url;
                 switch (link.relation) {
                     case 'first':
-                        this._pagination.first = true;
+                        pagination.first = true;
                         break;
                     case 'previous':
-                        this._pagination.previous = true;
+                        pagination.previous = true;
                         break;
                     case 'next':
-                        this._pagination.next = true;
+                        pagination.next = true;
                         break;
                     case 'last':
-                        this._pagination.last = true;
+                        pagination.last = true;
                         break;
                     default:
                         break;
