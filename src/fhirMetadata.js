@@ -14,8 +14,8 @@ customElements.define('fhir-metadata', class FhirMetadata extends HTMLElement {
                     height : 100%;
                 }
                 #tabs {
-                    border-bottom:1px solid var(--border-color, gray);                    
-                }                
+                    border-bottom:1px solid var(--border-color, gray);
+                }
                 #resourceTypes, #serverDetails {
                     flex:1 1 auto;
                     overflow: auto;
@@ -33,21 +33,21 @@ customElements.define('fhir-metadata', class FhirMetadata extends HTMLElement {
         `;
         this._metadata = null;
     }
+
     connectedCallback() {
-        this._shadow.getElementById("tabs").addEventListener('click', (event) => {
-            const tabId = event.detail.tabId;
+        this._shadow.getElementById("tabs").addEventListener('click', ({ detail }) => {
+            const tabId = detail.tabId;
             this._shadow.getElementById("resourceTypes").hidden = (tabId !== 'tabResources');
             this._shadow.getElementById("serverDetails").hidden = (tabId !== 'tabDetails');
         });
-        this._shadow.getElementById("resourceTypes").addEventListener('resourceTypeSelected', (event) => {
+        this._shadow.getElementById("resourceTypes").addEventListener('resourceTypeSelected', ({ detail }) => {
             this.dispatchEvent(new CustomEvent("resourceTypeSelected", {
                 bubbles: false,
                 cancelable: false,
                 'detail': {
-                    resourceType: event.detail.resourceType
+                    "resourceType": detail.resourceType
                 }
             }));
-            event.stopPropagation();
         });
     }
 

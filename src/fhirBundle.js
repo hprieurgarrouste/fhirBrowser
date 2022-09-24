@@ -43,23 +43,22 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._count = null;
     }
     connectedCallback() {
-        this._shadow.getElementById('help').addEventListener('click', (event) => {
-            const resourceDefinition = this._server.metadata.rest[0].resource.find(r => r.type == this._resourceType);
-            window.open(resourceDefinition.profile, "_blank");
+        this._shadow.getElementById('help').addEventListener('click', () => {
+            window.open(this._resourceType.profile, "_blank");
         });
-        this._shadow.getElementById('pagination').addEventListener("pagination", (event) => {
-            this.loadPage(event.detail.button);
+        this._shadow.getElementById('pagination').addEventListener("pagination", ({ detail }) => {
+            this.loadPage(detail.button);
         });
         const dataTable = this._shadow.getElementById('table');
         dataTable.addColumn("id");
         dataTable.addColumn("lastUpdated");
-        dataTable.addEventListener('rowclick', (event) => {
+        dataTable.addEventListener('rowclick', ({ detail }) => {
             this.dispatchEvent(new CustomEvent("resourceSelected", {
                 bubbles: false,
                 cancelable: false,
                 'detail': {
                     resourceType: this._resourceType,
-                    resourceId: event.detail.resourceId
+                    resourceId: detail.resourceId
                 }
             }));
         });
@@ -69,11 +68,11 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._server = server;
         this._resourceType = resourceType;
 
-        this._shadow.getElementById('title').setAttribute('caption', resourceType);
+        this._shadow.getElementById('title').setAttribute('caption', resourceType.type);
 
         this._skip = 0;
         this._link = {
-            "first": `${this._server.url}/${this._resourceType}?_count=${this._pageSize}&_elements=entry.id,entry.lastupdated`
+            "first": `${this._server.url}/${this._resourceType.type}?_count=${this._pageSize}&_elements=entry.id,entry.lastupdated`
         };
         this.loadPage();
     }
@@ -125,7 +124,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         pagination.text = `${range} of ${this._count}`;
         if (data.entry) {
             data.entry.forEach(entry => {
-                if (entry.resource && entry.resource.resourceType == this._resourceType) {
+                if (entry.resource && entry.resource.resourceType == this._resourceType.type) {
                     let row = {
                         "id": entry.resource.id,
                         "lastupdated": formatDate(entry.resource.meta.lastUpdated)
@@ -179,7 +178,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
     }
 
     async fetchCount() {
-        const response = await fetch(`${this._server.url}/${this._resourceType}?_summary=count&_format=json`, {
+        const response = await fetch(`${this._server.url}/${this._resourceType.type}?_summary=count&_format=json`, {
             "headers": this._server.headers
         });
         return response.json();

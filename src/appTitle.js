@@ -8,7 +8,7 @@ customElements.define('app-title', class AppTitle extends HTMLElement {
                     align-items: center;
                     display: flex;
                     flex-direction: row;
-                    padding: 0.5em 0;
+                    padding: 0.5em;
                 }
                 #title {
                     flex-grow: 1;

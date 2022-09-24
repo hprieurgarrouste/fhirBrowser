@@ -11,6 +11,7 @@ customElements.define('fhir-resource-html', class FhirResourceHtml extends HTMLE
                     display:flex;
                     flex-direction:column;
                     height:100%;
+                    padding: 1em;
                 }
             </style>
             <div id="wrapper">

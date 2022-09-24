@@ -19,7 +19,7 @@ customElements.define('fhir-resource-json', class FhirResourceJson extends HTMLE
                     font-family: monospace;
                     height:0;
                     overflow: auto;
-                    padding: 0 8px;
+                    padding: 1em;
                     white-space: nowrap;
                 }
                 dl {

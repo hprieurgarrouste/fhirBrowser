@@ -47,16 +47,15 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
         this._resourceId = null;
     }
     connectedCallback() {
-        this._shadow.getElementById("back").addEventListener('click', (event) => {
+        this._shadow.getElementById("back").addEventListener('click', () => {
             this.dispatchEvent(new CustomEvent("back", {
                 bubbles: false,
                 cancelable: false
             }));
         });
 
-        this._shadow.getElementById("help").addEventListener('click', (event) => {
-            const resourceDefinition = this._server.metadata.rest[0].resource.find(r => r.type == this._resourceType);
-            window.open(resourceDefinition.profile, "_blank");
+        this._shadow.getElementById("help").addEventListener('click', () => {
+            window.open(this._resourceType.profile, "_blank");
         });
 
         this._shadow.getElementById('download').addEventListener("click", () => {
@@ -66,7 +65,7 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
             const url = URL.createObjectURL(file);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `${this._resource.resourceType}#${file.name}.json`;
+            link.download = `${this._resourceType.type}#${file.name}.json`;
             this._shadow.appendChild(link);
             link.click();
             this._shadow.removeChild(link);
@@ -82,7 +81,7 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
         });
 
         this._shadow.getElementById('share').addEventListener("click", () => {
-            const fileName = `${this._resource.resourceType}.${this._resource.id}.txt`;
+            const fileName = `${this._resourceType.type}.${this._resource.id}.txt`;
             const file = new File([JSON.stringify(this._resource)], fileName, { type: 'text/plain' });
             navigator.share({
                 "title": fileName,
@@ -94,8 +93,8 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
             });;
         });
 
-        this._shadow.getElementById("tabs").addEventListener('click', (event) => {
-            const tabId = event.detail.tabId;
+        this._shadow.getElementById("tabs").addEventListener('click', ({ detail }) => {
+            const tabId = detail.tabId;
             this._shadow.getElementById("jsonView").hidden = (tabId !== 'tabJson');
             this._shadow.getElementById("htmlView").hidden = (tabId !== 'tabHtml');
         });
@@ -106,7 +105,7 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
         this._resourceType = resourceType;
         this._resourceId = resourceId;
 
-        this._shadow.getElementById('header').setAttribute('caption', resourceType);
+        this._shadow.getElementById('header').setAttribute('caption', resourceType.type);
 
         this.fetchResource(server, resourceType, resourceId).then(resource => {
             this._resource = resource;
@@ -116,7 +115,7 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
     }
 
     async fetchResource(server, resourceType, id) {
-        const response = await fetch(`${server.url}/${resourceType}/${id}?_format=json`, {
+        const response = await fetch(`${server.url}/${resourceType.type}/${id}?_format=json`, {
             "headers": server.headers
         });
         return response.json();

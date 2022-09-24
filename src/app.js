@@ -1,4 +1,5 @@
 import "./appBar.js";
+import "./appLeftPanel.js";
 import "./fhirBundle.js";
 import "./fhirMetadata.js";
 import "./fhirResource.js";
@@ -17,12 +18,6 @@ if (window.matchMedia &&
 customElements.define('fhir-browser', class App extends HTMLElement {
     constructor() {
         super();
-        this._schemas = {
-            '4.3.0': 'R4B',
-            '4.0.1': 'R4',
-            '3.0.2': 'STU3'
-        }
-
         this._shadow = this.attachShadow({ mode: 'open' });
         this._shadow.innerHTML = `
             <link rel="stylesheet" href="./material.css">
@@ -53,19 +48,11 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                 }
                 #leftPanel {
                     border-right:1px solid var(--border-color, gray);
-                    width:300px;
-                    display:flex;
-                    flex-direction: column;
-                    height : 100%;
                 }
                 #bdy {
-                    overflow: auto;
+                    overflow: hidden;
                     flex: 1 1 auto;
                     width: 0;
-                }
-                #metadata {
-                    flex: 1 1 auto;
-                    height: 0;
                 }
                 @media (max-width:480px){
                     #leftPanel {
@@ -79,10 +66,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                 <app-bar id="header" title="FHIR Browser"></app-bar>
                 <div id="content">
                     <div>
-                        <div id="leftPanel">
-                            <fhir-server-selector id="serverSelector"></fhir-server-selector>
-                            <fhir-metadata id="metadata"></fhir-metadata>
-                        </div>
+                        <app-left-panel id="leftPanel"></app-left-panel>
                         <div id="bdy">
                             <fhir-bundle id="bundle" hidden></fhir-bundle>
                             <fhir-resource id="resource" hidden></fhir-resource>
@@ -91,62 +75,46 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                 </div>
             </div>
 		`;
-        this._bdy = this._shadow.getElementById("bdy");
         this._server = null;
-        this._dialog = null;
     }
     connectedCallback() {
         const leftPanel = this._shadow.getElementById("leftPanel");
         const bundle = this._shadow.getElementById("bundle");
         const resource = this._shadow.getElementById("resource");
 
-        this._shadow.getElementById("header").addEventListener('navigationClick', (event) => {
+        this._shadow.getElementById("header").addEventListener('navigationClick', () => {
             leftPanel.style.display = ('none' == leftPanel.style.display) ? 'flex' : 'none';
         });
 
-        this._shadow.getElementById("metadata").addEventListener('resourceTypeSelected', (event) => {
+        this._shadow.getElementById("leftPanel").addEventListener('resourceTypeSelected', ({ detail }) => {
             if (window.matchMedia("(max-width: 480px)").matches) {
                 leftPanel.style.display = 'none';
             }
             resource.hidden = true;
             bundle.hidden = false;
-            bundle.load(this._server, event.detail.resourceType);
+            bundle.load(this._server, detail.resourceType);
+        });
+        this._shadow.getElementById("leftPanel").addEventListener('serverchanged', ({ detail }) => {
+            this._server = detail.server;
+            bundle.hidden = true;
+            resource.hidden = true;
         });
 
-        resource.addEventListener('back', (event) => {
+        resource.addEventListener('back', () => {
             resource.hidden = true;
             bundle.hidden = false;
         });
 
-        bundle.addEventListener('resourceSelected', (event) => {
+        bundle.addEventListener('resourceSelected', ({ detail }) => {
             bundle.hidden = true;
             resource.hidden = false;
             resource.load({
                 "server": this._server,
-                "resourceType": event.detail.resourceType,
-                "resourceId": event.detail.resourceId
+                "resourceType": detail.resourceType,
+                "resourceId": detail.resourceId
             });
         });
 
-        this._shadow.getElementById("serverSelector").addEventListener('serverchanged', (event) => {
-            this._server = event.detail.server;
-            bundle.hidden = true;
-            resource.hidden = true;
-
-            this.fetchMetadata().then(metadata => {
-                this._server.version = this._schemas[metadata.fhirVersion];
-                this._server.metadata = metadata;
-                this._shadow.getElementById("metadata").metadata = metadata;
-            });
-        });
-    }
-
-    async fetchMetadata() {
-        const response = await fetch(`${this._server.url}/metadata?_format=json`, {
-            "cache": "reload",
-            "headers": this._server.headers
-        });
-        return response.json();
     }
 
 });

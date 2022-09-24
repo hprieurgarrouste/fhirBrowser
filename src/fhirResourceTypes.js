@@ -35,30 +35,32 @@ customElements.define('fhir-resource-types', class FhirResourceTypes extends HTM
                 <div id="list"><ul></ul></div>
             </div>
         `;
+        this._metadata = null;
     }
+
     connectedCallback() {
-        this._shadow.getElementById('filter').addEventListener("filterChanged", (event) => {
+        this._shadow.getElementById('filter').addEventListener("filterChanged", ({ detail }) => {
             const ul = this._shadow.getElementById('list').firstElementChild;
-            const filter = event.detail.text.toLowerCase();
+            const filter = detail.text.toLowerCase();
             ul.childNodes.forEach(li => {
                 li.hidden = !li.id.toLowerCase().startsWith(filter);
             });
         });
-        this._shadow.getElementById('list').onclick = (event) => {
-            if (event.target.nodeName === 'LI') {
+
+        this._shadow.getElementById('list').onclick = ({ target }) => {
+            if (target.nodeName === 'LI') {
                 let prev = this._shadow.querySelector(".selected");
                 if (prev) {
                     prev.classList.remove('selected');
                 }
-                event.target.classList.add('selected');
+                target.classList.add('selected');
                 this.dispatchEvent(new CustomEvent("resourceTypeSelected", {
                     bubbles: false,
                     cancelable: false,
                     'detail': {
-                        resourceType: event.target.id
+                        resourceType: this._metadata.rest[0].resource.filter(res => res.type === target.id)[0]
                     }
                 }));
-                event.stopPropagation();
             }
         };
     }
@@ -67,6 +69,7 @@ customElements.define('fhir-resource-types', class FhirResourceTypes extends HTM
      * @param {object} metadata
      */
     set metadata(metadata) {
+        this._metadata = metadata;
         this._shadow.getElementById('filter').clear();
         const list = this._shadow.getElementById('list');
         list.scrollTop = 0;
