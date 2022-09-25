@@ -17,6 +17,7 @@ customElements.define('fhir-resource-html', class FhirResourceHtml extends HTMLE
                     flex: 1 1 auto;
                     height:0;
                     overflow: auto;
+                    min-width: 50%;
                 }
                 #content pre {
                     background-color:#fff;
@@ -24,9 +25,8 @@ customElements.define('fhir-resource-html', class FhirResourceHtml extends HTMLE
                     box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
                     font-family: monospace;
                     padding: 0.5em;
-                }
-                #content pre code {
                     color: black;
+                    overflow:auto;
                 }
                 #content img {
                     background-color:#fff;
@@ -75,6 +75,9 @@ customElements.define('fhir-resource-html', class FhirResourceHtml extends HTMLE
                         source.data = window.atob(source.data);
                         break;
                     case 'image/jpeg':
+                    case 'image/png':
+                    case 'image/webp':
+                    case 'image/tiff':
                         template = templates.image;
                         break;
                     case 'text/plain':
