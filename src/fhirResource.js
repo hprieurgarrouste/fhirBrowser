@@ -20,7 +20,10 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
                 }
                 #jsonView {
                     flex:1 1 auto;
-                    overflow: auto;
+                    height:0;
+                }
+                #htmlView {
+                    flex:1 1 auto;
                     height:0;
                 }
             </style>
