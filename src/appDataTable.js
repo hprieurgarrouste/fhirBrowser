@@ -122,6 +122,10 @@ customElements.define('data-table', class DataTable extends HTMLElement {
             event.stopPropagation();
         }
     }
+    clear() {
+        while (this._header.firstChild) this._header.removeChild(this._header.lastChild);
+        this.removeAll();
+    }
     removeAll() {
         while (this._body.firstChild) this._body.removeChild(this._body.lastChild);
     }

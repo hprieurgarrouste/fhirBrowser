@@ -41,7 +41,13 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._pageSize = 20;
         this._link = null;
         this._count = null;
+        this._columns = null;
     }
+
+    clear() {
+
+    }
+
     connectedCallback() {
         this._shadow.getElementById('help').addEventListener('click', () => {
             window.open(this._resourceType.profile, "_blank");
@@ -50,8 +56,6 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
             this.loadPage(detail.button);
         });
         const dataTable = this._shadow.getElementById('table');
-        dataTable.addColumn("id");
-        dataTable.addColumn("lastUpdated");
         dataTable.addEventListener('rowclick', ({ detail }) => {
             this.dispatchEvent(new CustomEvent("resourceSelected", {
                 bubbles: false,
@@ -68,11 +72,35 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._server = server;
         this._resourceType = resourceType;
 
+        this._columns = [];
+        if (resourceType.type === "Binary") {
+            this._columns.push({
+                "label": "Content type",
+                "expression": "contentType",
+                "type": "string"
+            })
+        }
+        this._columns.push({
+            "label": "Id",
+            "expression": "id",
+            "type": "string"
+        }, {
+            "label": "Last updated",
+            "expression": "meta.lastUpdated",
+            "type": "date"
+        });
+
+        const dataTable = this._shadow.getElementById('table');
+        dataTable.clear();
+        this._columns.forEach(column => {
+            dataTable.addColumn(column.label);
+        });
+
         this._shadow.getElementById('title').setAttribute('caption', resourceType.type);
 
         this._skip = 0;
         this._link = {
-            "first": `${this._server.url}/${this._resourceType.type}?_count=${this._pageSize}&_elements=entry.id,entry.lastupdated`
+            "first": `${this._server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
         };
         this.loadPage();
     }
@@ -115,6 +143,9 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
     }
 
     parsePage(data) {
+        function evalColumn(resource, expression) {
+            return
+        }
         const dataTable = this._shadow.getElementById('table');
         const pagination = this._shadow.getElementById('pagination');
         let range = '0';
@@ -123,17 +154,20 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         }
         pagination.text = `${range} of ${this._count}`;
         if (data.entry) {
+            let value = "";
             data.entry.forEach(entry => {
                 if (entry.resource && entry.resource.resourceType == this._resourceType.type) {
-                    let row = {
-                        "id": entry.resource.id,
-                        "lastupdated": formatDate(entry.resource.meta.lastUpdated)
-                    }
+                    let row = {};
+                    this._columns.forEach(column => {
+                        value = eval("entry.resource." + column.expression);
+                        if (column.type === "date") value = formatDate(value);
+                        row[column.label] = value;
+                    });
                     dataTable.addRow(entry.resource.id, row);
                 }
                 function formatDate(dte) {
                     let date = new Date(dte);
-                    return date.toLocaleDateString("en", {
+                    return date.toLocaleDateString(navigator.language, {
                         year: 'numeric',
                         month: 'numeric',
                         day: 'numeric',
