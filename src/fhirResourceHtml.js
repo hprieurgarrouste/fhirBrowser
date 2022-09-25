@@ -25,6 +25,9 @@ customElements.define('fhir-resource-html', class FhirResourceHtml extends HTMLE
                     font-family: monospace;
                     padding: 0.5em;
                 }
+                #content pre code {
+                    color: black;
+                }
                 #content img {
                     background-color:#fff;
                     border-radius: 4px;
