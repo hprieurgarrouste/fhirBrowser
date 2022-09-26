@@ -57,6 +57,8 @@ customElements.define('data-table', class DataTable extends HTMLElement {
                     padding-left: 16px;
                     overflow:hidden;
                     text-overflow: ellipsis;
+                    direction: rtl;
+                    text-align: left;
                 }
                 tfoot {
                     border-top: 1px solid var(--border-color, gray);
