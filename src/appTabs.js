@@ -6,8 +6,8 @@ customElements.define('app-tabs', class AppTabs extends HTMLElement {
             <style>
                 #wrapper {
                     display:flex;
-                    flex-direction:row;            
-                    flex-wrap: nowrap;        
+                    flex-direction:row;
+                    flex-wrap: nowrap;
                 }
                 ::slotted(app-tab) {
                     flex-grow:1;
@@ -30,18 +30,26 @@ customElements.define('app-tabs', class AppTabs extends HTMLElement {
         this._shadow.appendChild(template.cloneNode(true));
         this._shadow.getElementById('wrapper').onclick = (event) => {
             if (event.target.nodeName === 'APP-TAB') {
-                this._shadow.querySelector('slot').assignedElements().forEach(tab => tab.removeAttribute('selected'));
-                event.target.setAttribute("selected", "selected");
-                this.dispatchEvent(new CustomEvent("click", {
-                    bubbles: false,
-                    cancelable: false,
-                    'detail': {
-                        tabId: event.target.id
-                    }
-                }));
+                this.select(event.target.id);
                 event.stopPropagation();
             }
         };
+    }
+
+    select(id) {
+        const tab = this._shadow.querySelector('slot').assignedElements().filter(tab => tab.id === id)[0];
+        if (tab) {
+            this._shadow.querySelector('slot').assignedElements().forEach(t => t.removeAttribute('selected'));
+            tab.setAttribute("selected", "selected");
+            this.dispatchEvent(new CustomEvent("click", {
+                bubbles: false,
+                cancelable: false,
+                'detail': {
+                    tabId: id
+                }
+            }));
+
+        }
     }
 });
 

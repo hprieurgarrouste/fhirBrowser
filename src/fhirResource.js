@@ -109,6 +109,7 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
         this._resourceId = resourceId;
 
         this._shadow.getElementById('header').setAttribute('caption', resourceType.type);
+        this._shadow.getElementById('tabs').select('tabJson');
 
         this.fetchResource(server, resourceType, resourceId).then(resource => {
             this._resource = resource;
