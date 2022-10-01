@@ -47,6 +47,7 @@ customElements.define('fhir-resource-json', class FhirResourceJson extends HTMLE
     set source(resource) {
         const content = this._shadow.getElementById("content");
         while (content.firstChild) content.removeChild(content.lastChild);
+        content.scrollTo(0, 0);
         parse(content, resource);
         function parse(parent, obj) {
             let isArray = Array.isArray(obj);
