@@ -127,6 +127,9 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
             this._resource = resource;
             this._jsonView.source = resource;
             this._htmlView.source = resource;
+            this._shadow.getElementById("share").hidden = false;
+            this._shadow.getElementById("copy").hidden = false;
+            this._shadow.getElementById("download").hidden = false;
         }).catch((e) => {
             header.classList.add('error');
             const error = this._shadow.getElementById("error");
@@ -135,6 +138,10 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
             tabs.hidden = true;
             this._shadow.getElementById("jsonView").hidden = true;
             this._shadow.getElementById("htmlView").hidden = true;
+            this._resource = null;
+            this._shadow.getElementById("share").hidden = true;
+            this._shadow.getElementById("copy").hidden = true;
+            this._shadow.getElementById("download").hidden = true;
         });
     }
 

@@ -36,7 +36,7 @@ customElements.define('app-title', class AppTitle extends HTMLElement {
         return ['caption'];
     }
     attributeChangedCallback(name, oldValue, newValue) {
-        if (name === 'caption' && this.isConnected) {
+        if (name === 'caption' && this.isConnected && this._shadow.getElementById('title')) {
             this._shadow.getElementById('title').innerText = newValue;
         }
     }
