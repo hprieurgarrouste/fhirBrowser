@@ -26,6 +26,12 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
                     flex:1 1 auto;
                     height:0;
                 }
+                #header.error {
+                    background-color: var(--background-error, transparent);
+                }
+                #error {
+                    padding: 1em;
+                }
             </style>
             <div id="wrapper">
                 <app-title id="header">
@@ -41,6 +47,7 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
                 </app-tabs>
                 <fhir-resource-json id="jsonView"></fhir-resource-json>
                 <fhir-resource-html id="htmlView" hidden></fhir-resource-html>
+                <span id="error"></span>
             </div>
         `;
         this._jsonView = this._shadow.getElementById('jsonView');
@@ -108,13 +115,26 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
         this._resourceType = resourceType;
         this._resourceId = resourceId;
 
-        this._shadow.getElementById('header').setAttribute('caption', resourceType.type);
-        this._shadow.getElementById('tabs').select('tabJson');
+        const header = this._shadow.getElementById('header');
+        header.setAttribute('caption', resourceType.type);
+        const tabs = this._shadow.getElementById('tabs');
 
         this.fetchResource(server, resourceType, resourceId).then(resource => {
+            header.classList.remove('error');
+            this._shadow.getElementById("error").hidden = true;
+            tabs.hidden = false;
+            tabs.select('tabJson');
             this._resource = resource;
             this._jsonView.source = resource;
             this._htmlView.source = resource;
+        }).catch((e) => {
+            header.classList.add('error');
+            const error = this._shadow.getElementById("error");
+            error.hidden = false;
+            error.innerText = e;
+            tabs.hidden = true;
+            this._shadow.getElementById("jsonView").hidden = true;
+            this._shadow.getElementById("htmlView").hidden = true;
         });
     }
 
