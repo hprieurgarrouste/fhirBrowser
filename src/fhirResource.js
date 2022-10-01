@@ -58,7 +58,7 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
         });
 
         this._shadow.getElementById("help").addEventListener('click', () => {
-            window.open(this._resourceType.profile, "_blank");
+            window.open(`${this._resourceType.profile}#resource`, "_blank");
         });
 
         this._shadow.getElementById('download').addEventListener("click", () => {
