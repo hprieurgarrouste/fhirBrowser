@@ -5,29 +5,7 @@ customElements.define('app-left-panel', class AppLeftPanel extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = `
-            <style>
-                #wrapper {
-                    height:100%;
-                }
-                #content {
-                    width:300px;
-                    display:flex;
-                    flex-direction: column;
-                    height : 100%;
-                }
-                #metadata {
-                    flex: 1 1 auto;
-                    height: 0;
-                }
-            </style>
-            <div id="wrapper">
-                <div id="content">
-                    <fhir-server-selector id="serverSelector"></fhir-server-selector>
-                    <fhir-metadata id="metadata"></fhir-metadata>
-                </div>
-            </div>
-        `;
+        this._shadow.appendChild(AppLeftPanelTemplate.content.cloneNode(true));
     }
     connectedCallback() {
         this._shadow.getElementById("serverSelector").addEventListener('serverchanged', ({ detail }) => {
@@ -64,3 +42,28 @@ customElements.define('app-left-panel', class AppLeftPanel extends HTMLElement {
     }
 
 });
+
+const AppLeftPanelTemplate = document.createElement('template');
+AppLeftPanelTemplate.innerHTML = `
+    <style>
+        #wrapper {
+            height:100%;
+        }
+        #content {
+            width:300px;
+            display:flex;
+            flex-direction: column;
+            height : 100%;
+        }
+        #metadata {
+            flex: 1 1 auto;
+            height: 0;
+        }
+    </style>
+    <div id="wrapper">
+        <div id="content">
+            <fhir-server-selector id="serverSelector"></fhir-server-selector>
+            <fhir-metadata id="metadata"></fhir-metadata>
+        </div>
+    </div>
+`;

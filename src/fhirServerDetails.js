@@ -2,35 +2,7 @@ customElements.define('fhir-server-details', class FhirServerDetails extends HTM
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = `
-            <style>
-                #wrapper {
-                    overflow-y: auto;
-                }
-                #wrapper > div {
-                    padding: 0.5em 1em;
-                }
-                #wrapper > div:hover {
-                    background-color: var(--hover-color, rgba(0, 0, 0, 5%));
-                }
-                span {
-                    display: block;
-                }
-                span:nth-of-type(1) {
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-transform: capitalize;
-                    color: var(--text-color-normal, black);
-                }
-                span:nth-of-type(2) {
-                    font-size: 0.875em;
-                    color: rgba(var(--text-color, "0, 0, 0"), 54%);
-                    overflow-wrap: break-word;
-                }
-            </style>
-            <div id="wrapper"></div>
-        `;
+        this._shadow.appendChild(FhirServerDetailsTemplate.content.cloneNode(true));
     }
 
     /**
@@ -70,3 +42,34 @@ customElements.define('fhir-server-details', class FhirServerDetails extends HTM
     }
 
 });
+
+const FhirServerDetailsTemplate = document.createElement('template');
+FhirServerDetailsTemplate.innerHTML = `
+    <style>
+        #wrapper {
+            overflow-y: auto;
+        }
+        #wrapper > div {
+            padding: 0.5em 1em;
+        }
+        #wrapper > div:hover {
+            background-color: var(--hover-color, rgba(0, 0, 0, 5%));
+        }
+        span {
+            display: block;
+        }
+        span:nth-of-type(1) {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            text-transform: capitalize;
+            color: var(--text-color-normal, black);
+        }
+        span:nth-of-type(2) {
+            font-size: 0.875em;
+            color: rgba(var(--text-color, "0, 0, 0"), 54%);
+            overflow-wrap: break-word;
+        }
+    </style>
+    <div id="wrapper"></div>
+`;

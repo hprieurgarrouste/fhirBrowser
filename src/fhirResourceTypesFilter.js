@@ -2,41 +2,7 @@ customElements.define('fhir-resource-types-filter', class FhirResourceTypesFilte
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = `
-            <link href="./material.css" rel="stylesheet"/>
-            <style>
-                #wrapper {
-                    background-color: rgba(var(--text-color, black), 4%);
-                    border: 1px solid transparent;
-                    display: flex;
-                    padding: 0.7em;
-                    font-size: smaller;
-                }
-                #wrapper:focus-within {
-                    border-bottom-color: var(--primary-color, black);
-                }
-                #text {
-                    background: none;
-                    border: 0 none;
-                    color: var(--text-color-normal);
-                    flex: 1 1 auto;
-                    font-family: inherit;
-                    font-size: inherit;
-                }
-                #text:focus {
-                    outline: none; 
-                }
-                #clear {
-                    cursor: pointer;
-                    font-size: inherit;
-                    line-height: unset;
-                }
-            </style>
-            <div id="wrapper">
-                <input id="text" type="text" placeholder="Type to filter"/>
-                <i id="clear" class="material-icons" title="clear">close</i>
-            </div>
-        `;
+        this._shadow.appendChild(FhirResourceTypesFilterTemplate.content.cloneNode(true));
     }
     connectedCallback() {
         const text = this._shadow.getElementById("text");
@@ -66,3 +32,40 @@ customElements.define('fhir-resource-types-filter', class FhirResourceTypesFilte
         this._shadow.getElementById("clear").click();
     }
 });
+
+const FhirResourceTypesFilterTemplate = document.createElement('template');
+FhirResourceTypesFilterTemplate.innerHTML = `
+    <link href="./material.css" rel="stylesheet"/>
+    <style>
+        #wrapper {
+            background-color: rgba(var(--text-color, black), 4%);
+            border: 1px solid transparent;
+            display: flex;
+            padding: 0.7em;
+            font-size: smaller;
+        }
+        #wrapper:focus-within {
+            border-bottom-color: var(--primary-color, black);
+        }
+        #text {
+            background: none;
+            border: 0 none;
+            color: var(--text-color-normal);
+            flex: 1 1 auto;
+            font-family: inherit;
+            font-size: inherit;
+        }
+        #text:focus {
+            outline: none;
+        }
+        #clear {
+            cursor: pointer;
+            font-size: inherit;
+            line-height: unset;
+        }
+    </style>
+    <div id="wrapper">
+        <input id="text" type="text" placeholder="Type to filter"/>
+        <i id="clear" class="material-icons" title="clear">close</i>
+    </div>
+`;

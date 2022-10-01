@@ -4,37 +4,7 @@ customElements.define('fhir-resource-types', class FhirResourceTypes extends HTM
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = `
-            <link href="./material.css" rel="stylesheet"/>
-            <style>
-                #wrapper {
-                    display: flex;
-                    flex-direction: column;
-                    height:100%;
-                }
-                #list {
-                    flex:1 1 auto;
-                    height:0;
-                    overflow:auto;
-                }
-                ul {
-                    list-style: none;
-                    padding: 0;
-                    margin: 0;
-                }
-                li {
-                    cursor: pointer;
-                    padding: 0.3em 1em;
-                }
-                li:hover, li.selected {
-                    background-color:var(--hover-color, lightgray);
-                }
-            </style>
-            <div id="wrapper">
-                <fhir-resource-types-filter id="filter"></fhir-resource-types-filter>
-                <div id="list"><ul></ul></div>
-            </div>
-        `;
+        this._shadow.appendChild(FhirResourceTypesTemplate.content.cloneNode(true));
         this._metadata = null;
     }
 
@@ -87,3 +57,36 @@ customElements.define('fhir-resource-types', class FhirResourceTypes extends HTM
     }
 
 });
+
+const FhirResourceTypesTemplate = document.createElement('template');
+FhirResourceTypesTemplate.innerHTML = `
+    <link href="./material.css" rel="stylesheet"/>
+    <style>
+        #wrapper {
+            display: flex;
+            flex-direction: column;
+            height:100%;
+        }
+        #list {
+            flex:1 1 auto;
+            height:0;
+            overflow:auto;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            cursor: pointer;
+            padding: 0.3em 1em;
+        }
+        li:hover, li.selected {
+            background-color:var(--hover-color, lightgray);
+        }
+    </style>
+    <div id="wrapper">
+        <fhir-resource-types-filter id="filter"></fhir-resource-types-filter>
+        <div id="list"><ul></ul></div>
+    </div>
+`;

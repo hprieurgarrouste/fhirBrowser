@@ -1,3 +1,4 @@
+import "./appTab.js";
 import "./appTabs.js";
 import "./fhirResourceTypes.js";
 import "./fhirServerDetails.js";
@@ -6,31 +7,7 @@ customElements.define('fhir-metadata', class FhirMetadata extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = `
-            <style>
-                #wrapper {
-                    display:flex;
-                    flex-direction: column;
-                    height : 100%;
-                }
-                #tabs {
-                    border-bottom:1px solid var(--border-color, gray);
-                }
-                #resourceTypes, #serverDetails {
-                    flex:1 1 auto;
-                    overflow: auto;
-                    height:0;
-                }
-            </style>
-            <div id="wrapper">
-                <app-tabs id="tabs">
-                    <app-tab id="tabResources" selected>Resource Types</app-tab>
-                    <app-tab id="tabDetails">Details</app-tab>
-                </app-tabs>
-                <fhir-resource-types id="resourceTypes"></fhir-resource-types>
-                <fhir-server-details id="serverDetails" hidden></fhir-server-details>
-            </div>
-        `;
+        this._shadow.appendChild(FhirMetadataTemplate.content.cloneNode(true));
         this._metadata = null;
     }
 
@@ -60,3 +37,30 @@ customElements.define('fhir-metadata', class FhirMetadata extends HTMLElement {
     }
 
 });
+
+const FhirMetadataTemplate = document.createElement('template');
+FhirMetadataTemplate.innerHTML = `
+    <style>
+        #wrapper {
+            display:flex;
+            flex-direction: column;
+            height : 100%;
+        }
+        #tabs {
+            border-bottom:1px solid var(--border-color, gray);
+        }
+        #resourceTypes, #serverDetails {
+            flex:1 1 auto;
+            overflow: auto;
+            height:0;
+        }
+    </style>
+    <div id="wrapper">
+        <app-tabs id="tabs">
+            <app-tab id="tabResources" selected>Resource Types</app-tab>
+            <app-tab id="tabDetails">Details</app-tab>
+        </app-tabs>
+        <fhir-resource-types id="resourceTypes"></fhir-resource-types>
+        <fhir-server-details id="serverDetails" hidden></fhir-server-details>
+    </div>
+`;

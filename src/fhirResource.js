@@ -1,58 +1,15 @@
-import "./fhirResourceJson.js";
-import "./fhirResourceHtml.js";
+import "./appRoundButton.js";
+import "./appTab.js";
 import "./appTabs.js";
 import "./appTitle.js";
+import "./fhirResourceJson.js";
+import "./fhirResourceHtml.js";
 
 customElements.define('fhir-resource', class FhirResource extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = `
-            <link rel="stylesheet" href="./material.css">
-            <style>
-                #wrapper {
-                    display:flex;
-                    flex-direction: column;
-                    height : 100%;
-                }
-                #tabs {
-                    border-bottom:1px solid var(--border-color, gray);
-                }
-                #jsonView {
-                    flex:1 1 auto;
-                    height:0;
-                }
-                #htmlView {
-                    flex:1 1 auto;
-                    height:0;
-                }
-                #header.error {
-                    background-color: var(--background-error, transparent);
-                }
-                #error {
-                    padding: 1em;
-                }
-            </style>
-            <div id="wrapper">
-                <app-title id="header">
-                    <app-round-button slot="left" id="back" title="back">arrow_back</app-round-button>
-                    <app-round-button id="share" title="Share">share</app-round-button>
-                    <app-round-button id="copy" title="Copy to clipboard">content_copy</app-round-button>
-                    <app-round-button id="download" title="Download">download</app-round-button>
-                    <app-round-button id="help" title="Help">help</app-round-button>
-                </app-title>
-                <app-tabs id="tabs">
-                    <app-tab id="tabJson" selected>Json</app-tab>
-                    <app-tab id="tabHtml">Html</app-tab>
-                </app-tabs>
-                <fhir-resource-json id="jsonView"></fhir-resource-json>
-                <fhir-resource-html id="htmlView" hidden></fhir-resource-html>
-                <span id="error"></span>
-            </div>
-        `;
-        this._jsonView = this._shadow.getElementById('jsonView');
-        this._htmlView = this._shadow.getElementById('htmlView');
-        this._server = null;
+        this._shadow.appendChild(FhirResourceTemplate.content.cloneNode(true));
         this._resourceType = null;
         this._resourceId = null;
     }
@@ -111,37 +68,41 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
     }
 
     load({ server, resourceType, resourceId }) {
-        this._server = server;
         this._resourceType = resourceType;
         this._resourceId = resourceId;
 
         const header = this._shadow.getElementById('header');
-        header.setAttribute('caption', resourceType.type);
         const tabs = this._shadow.getElementById('tabs');
+        const jsonView = this._shadow.getElementById('jsonView');
+        const htmlView = this._shadow.getElementById('htmlView');
+        const shareBtn = this._shadow.getElementById("share");
+        const copyBtn = this._shadow.getElementById("copy");
+        const downloadBtn = this._shadow.getElementById("download");
 
+        header.setAttribute('caption', resourceType.type);
         this.fetchResource(server, resourceType, resourceId).then(resource => {
             header.classList.remove('error');
             this._shadow.getElementById("error").hidden = true;
             tabs.hidden = false;
             tabs.select('tabJson');
             this._resource = resource;
-            this._jsonView.source = resource;
-            this._htmlView.source = resource;
-            this._shadow.getElementById("share").hidden = false;
-            this._shadow.getElementById("copy").hidden = false;
-            this._shadow.getElementById("download").hidden = false;
+            jsonView.source = resource;
+            htmlView.source = resource;
+            shareBtn.hidden = false;
+            copyBtn.hidden = false;
+            downloadBtn.hidden = false;
         }).catch((e) => {
             header.classList.add('error');
             const error = this._shadow.getElementById("error");
             error.hidden = false;
             error.innerText = e;
             tabs.hidden = true;
-            this._shadow.getElementById("jsonView").hidden = true;
-            this._shadow.getElementById("htmlView").hidden = true;
+            jsonView.hidden = true;
+            htmlView.hidden = true;
             this._resource = null;
-            this._shadow.getElementById("share").hidden = true;
-            this._shadow.getElementById("copy").hidden = true;
-            this._shadow.getElementById("download").hidden = true;
+            shareBtn.hidden = true;
+            copyBtn.hidden = true;
+            downloadBtn.hidden = true;
         });
     }
 
@@ -153,3 +114,48 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
     }
 
 });
+
+const FhirResourceTemplate = document.createElement('template');
+FhirResourceTemplate.innerHTML = `
+    <link rel="stylesheet" href="./material.css">
+    <style>
+        #wrapper {
+            display:flex;
+            flex-direction: column;
+            height : 100%;
+        }
+        #tabs {
+            border-bottom:1px solid var(--border-color, gray);
+        }
+        #jsonView {
+            flex:1 1 auto;
+            height:0;
+        }
+        #htmlView {
+            flex:1 1 auto;
+            height:0;
+        }
+        #header.error {
+            background-color: var(--background-error, transparent);
+        }
+        #error {
+            padding: 1em;
+        }
+    </style>
+    <div id="wrapper">
+        <app-title id="header">
+            <app-round-button slot="left" id="back" title="back">arrow_back</app-round-button>
+            <app-round-button id="share" title="Share">share</app-round-button>
+            <app-round-button id="copy" title="Copy to clipboard">content_copy</app-round-button>
+            <app-round-button id="download" title="Download">download</app-round-button>
+            <app-round-button id="help" title="Help">help</app-round-button>
+        </app-title>
+        <app-tabs id="tabs">
+            <app-tab id="tabJson" selected>Json</app-tab>
+            <app-tab id="tabHtml">Html</app-tab>
+        </app-tabs>
+        <fhir-resource-json id="jsonView"></fhir-resource-json>
+        <fhir-resource-html id="htmlView" hidden></fhir-resource-html>
+        <span id="error"></span>
+    </div>
+`;

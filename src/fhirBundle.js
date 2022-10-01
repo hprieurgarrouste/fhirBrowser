@@ -1,40 +1,14 @@
 import "./appDataTable.js";
+import "./appDataTablePagination.js";
 import "./appLinearLoader.js";
-import "./appPagination.js";
+import "./appDataTablePagination.js";
 import "./appTitle.js";
 
 customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = `
-            <link href="./material.css" rel="stylesheet"/>
-            <style>
-                #wrapper {
-                    display:flex;
-                    flex-direction:column;
-                    height:100%;
-                }
-                #table {
-                    flex:1 1 auto;
-                    height:0;
-                }
-                #header {
-                    margin: 0.5em 0;
-                    display: flex;
-                    align-items: center;
-                }
-            </style>
-            <div id="wrapper">
-                <app-title id="title">
-                    <app-round-button id="help" title="Help">help</app-round-button>
-                </app-title>
-                <app-linear-loader id="loader" style="visibility:hidden;"></app-linear-loader>
-                <data-table id="table">
-                    <data-table-pagination id="pagination" slot="footer"/>
-                </data-table>
-            </div>
-        `;
+        this._shadow.appendChild(FhirBundleTemplate.content.cloneNode(true));
         this._server = null;
         this._resourceType = null;
         this._skip = 0;
@@ -42,10 +16,6 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._link = null;
         this._count = null;
         this._columns = null;
-    }
-
-    clear() {
-
     }
 
     connectedCallback() {
@@ -218,3 +188,33 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         return response.json();
     }
 });
+
+const FhirBundleTemplate = document.createElement('template');
+FhirBundleTemplate.innerHTML = `
+    <link href="./material.css" rel="stylesheet"/>
+    <style>
+        #wrapper {
+            display:flex;
+            flex-direction:column;
+            height:100%;
+        }
+        #table {
+            flex:1 1 auto;
+            height:0;
+        }
+        #header {
+            margin: 0.5em 0;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+    <div id="wrapper">
+        <app-title id="title">
+            <app-round-button id="help" title="Help">help</app-round-button>
+        </app-title>
+        <app-linear-loader id="loader" style="visibility:hidden;"></app-linear-loader>
+        <app-data-table id="table">
+            <app-data-table-pagination id="pagination" slot="footer"/>
+        </app-data-table>
+    </div>
+`;

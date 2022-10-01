@@ -24,7 +24,7 @@ customElements.define('app-dialog', class AppDialog extends HTMLElement {
                     position: absolute;
                     top: 50%;
                     left: 50%;
-                    transform: translate(-50%, -50%);         
+                    transform: translate(-50%, -50%);
                     height: 80%;
                     width: 80%;
                     border-radius: 4px;
@@ -60,13 +60,13 @@ customElements.define('app-dialog', class AppDialog extends HTMLElement {
                         height: 100%;
                         width: 100%;
                     }
-                }                    
+                }
             </style>
             <template id="template">
                 <div id="mask"></div>
                 <div id="surface">
                     <div id="header">
-                        <app-round-button id="close" title="Back">arrow_back</app-round-button>
+                        <app-round-button id="close" title="Close">close</app-round-button>
                         <h2 id="title"></h2>
                     </div>
                     <div id="content">

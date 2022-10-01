@@ -4,45 +4,7 @@ customElements.define('fhir-resource-html', class FhirResourceHtml extends HTMLE
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = `
-            <link rel="stylesheet" href="./material.css">
-            <style>
-                #wrapper {
-                    display:flex;
-                    flex-direction:column;
-                    height:100%;
-                }
-                #content {
-                    padding: 1em;
-                    flex: 1 1 auto;
-                    height:0;
-                    overflow: auto;
-                    min-width: 50%;
-                }
-                #content pre {
-                    background-color:#fff;
-                    border-radius: 4px;
-                    box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
-                    font-family: monospace;
-                    padding: 0.5em;
-                    color: black;
-                    overflow:auto;
-                }
-                #content img {
-                    background-color:#fff;
-                    border-radius: 4px;
-                    box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
-                    max-width: 100%;
-                }
-            </style>
-            <div id="wrapper">
-                <div id="content"></div>
-            </div>
-        `;
-    }
-
-    connectedCallback() {
-
+        this._shadow.appendChild(FhirResourceHtmlTemplate.content.cloneNode(true));
     }
 
     /**
@@ -90,3 +52,41 @@ customElements.define('fhir-resource-html', class FhirResourceHtml extends HTMLE
         }
     }
 });
+
+
+const FhirResourceHtmlTemplate = document.createElement('template');
+FhirResourceHtmlTemplate.innerHTML = `
+    <link rel="stylesheet" href="./material.css">
+    <style>
+        #wrapper {
+            display:flex;
+            flex-direction:column;
+            height:100%;
+        }
+        #content {
+            padding: 1em;
+            flex: 1 1 auto;
+            height:0;
+            overflow: auto;
+            min-width: 50%;
+        }
+        #content pre {
+            background-color:#fff;
+            border-radius: 4px;
+            box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
+            font-family: monospace;
+            padding: 0.5em;
+            color: black;
+            overflow:auto;
+        }
+        #content img {
+            background-color:#fff;
+            border-radius: 4px;
+            box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
+            max-width: 100%;
+        }
+    </style>
+    <div id="wrapper">
+        <div id="content"></div>
+    </div>
+`;

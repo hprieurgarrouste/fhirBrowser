@@ -2,28 +2,7 @@ customElements.define('app-tabs', class AppTabs extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = `
-            <style>
-                #wrapper {
-                    display:flex;
-                    flex-direction:row;
-                    flex-wrap: nowrap;
-                }
-                ::slotted(app-tab) {
-                    flex-grow:1;
-                    border-bottom: 2px solid transparent;
-                }
-                ::slotted(app-tab:hover) {
-                    background-color:var(--hover-color, rgba(0, 0, 0, 5%));
-                }
-                ::slotted(app-tab[selected]) {
-                    border-bottom-color: var(--primary-color, #000);
-                }
-            </style>
-            <template id="template">
-                <div id="wrapper"><slot></slot></div>
-            </template>
-        `;
+        this._shadow.appendChild(AppTabsTemplate.content.cloneNode(true));
     }
     connectedCallback() {
         const template = this._shadow.getElementById('template').content;
@@ -53,26 +32,26 @@ customElements.define('app-tabs', class AppTabs extends HTMLElement {
     }
 });
 
-customElements.define('app-tab', class AppTab extends HTMLElement {
-    constructor() {
-        super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = `
-            <style>
-                button {
-                    background-color: transparent;
-                    border: 0 none;
-                    color: var(--text-color-normal, black);
-                    cursor: pointer;
-                    font-family: inherit;
-                    font-size: inherit;
-                    height: 3em;
-                    text-transform: uppercase;
-                    white-space: nowrap;
-                    width:100%;
-                }
-            </style>
-            <button>${this.innerHTML}</button>
-        `;
-    }
-});
+const AppTabsTemplate = document.createElement('template');
+AppTabsTemplate.innerHTML = `
+    <style>
+        #wrapper {
+            display:flex;
+            flex-direction:row;
+            flex-wrap: nowrap;
+        }
+        ::slotted(app-tab) {
+            flex-grow:1;
+            border-bottom: 2px solid transparent;
+        }
+        ::slotted(app-tab:hover) {
+            background-color:var(--hover-color, rgba(0, 0, 0, 5%));
+        }
+        ::slotted(app-tab[selected]) {
+            border-bottom-color: var(--primary-color, #000);
+        }
+    </style>
+    <template id="template">
+        <div id="wrapper"><slot></slot></div>
+    </template>
+`;
