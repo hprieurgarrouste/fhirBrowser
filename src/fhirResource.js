@@ -79,7 +79,7 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
         const copyBtn = this._shadow.getElementById("copy");
         const downloadBtn = this._shadow.getElementById("download");
 
-        header.setAttribute('caption', resourceType.type);
+        this._shadow.getElementById('title').innerText = resourceType.type;
         this.fetchResource(server, resourceType, resourceId).then(resource => {
             header.classList.remove('error');
             this._shadow.getElementById("error").hidden = true;
@@ -124,6 +124,9 @@ FhirResourceTemplate.innerHTML = `
             flex-direction: column;
             height : 100%;
         }
+        #title {
+            margin:0;
+        }
         #tabs {
             border-bottom:1px solid var(--border-color, gray);
         }
@@ -144,6 +147,7 @@ FhirResourceTemplate.innerHTML = `
     </style>
     <div id="wrapper">
         <app-bar id="header">
+            <h3 id="title" slot="title"></h3>
             <app-round-button slot="left" id="back" title="back">arrow_back</app-round-button>
             <app-round-button id="share" title="Share">share</app-round-button>
             <app-round-button id="copy" title="Copy to clipboard">content_copy</app-round-button>

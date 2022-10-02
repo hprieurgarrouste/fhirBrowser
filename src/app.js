@@ -29,9 +29,11 @@ AppTemplate.innerHTML = `
             color: var(--text-color-normal, rgb(0,0,0,87%));
         }
         #header {
-            min-height:56px;
             background-color: var(--primary-color, #000);
             color:#FFF;
+        }
+        h3 {
+            margin:0;
         }
         #content {
             flex:1 1 auto;
@@ -62,6 +64,7 @@ AppTemplate.innerHTML = `
     <div id="app">
         <app-bar id="header" caption="">
             <app-round-button slot="left" id="navigation" title="Menu">menu</app-round-button>
+            <h3 slot="title">FHIR Browser</h3>
         </app-bar>
         <div id="content">
             <div>
@@ -84,7 +87,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
     }
 
     connectedCallback() {
-        this._shadow.getElementById("header").setAttribute("caption", "FHIR Browser");
+        //this._shadow.getElementById("header").setAttribute("caption", "FHIR Browser");
         const leftPanel = this._shadow.getElementById("leftPanel");
         const bundle = this._shadow.getElementById("bundle");
         const resource = this._shadow.getElementById("resource");

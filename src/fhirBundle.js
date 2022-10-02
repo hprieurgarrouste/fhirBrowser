@@ -66,7 +66,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
             dataTable.addColumn(column.label);
         });
 
-        this._shadow.getElementById('title').setAttribute('caption', resourceType.type);
+        this._shadow.getElementById('title').innerText = resourceType.type;
 
         this._skip = 0;
         this._link = {
@@ -202,14 +202,13 @@ FhirBundleTemplate.innerHTML = `
             flex:1 1 auto;
             height:0;
         }
-        #header {
-            margin: 0.5em 0;
-            display: flex;
-            align-items: center;
+        #title {
+            margin:0;
         }
     </style>
     <div id="wrapper">
-        <app-bar id="title">
+        <app-bar>
+            <h3 id="title" slot="title"></h3>
             <app-round-button id="help" title="Help">help</app-round-button>
         </app-bar>
         <app-linear-loader id="loader" style="visibility:hidden;"></app-linear-loader>
