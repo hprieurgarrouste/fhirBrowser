@@ -1,7 +1,7 @@
+import "./appBar.js";
 import "./appRoundButton.js";
 import "./appTab.js";
 import "./appTabs.js";
-import "./appTitle.js";
 import "./fhirResourceJson.js";
 import "./fhirResourceHtml.js";
 
@@ -143,13 +143,13 @@ FhirResourceTemplate.innerHTML = `
         }
     </style>
     <div id="wrapper">
-        <app-title id="header">
+        <app-bar id="header">
             <app-round-button slot="left" id="back" title="back">arrow_back</app-round-button>
             <app-round-button id="share" title="Share">share</app-round-button>
             <app-round-button id="copy" title="Copy to clipboard">content_copy</app-round-button>
             <app-round-button id="download" title="Download">download</app-round-button>
             <app-round-button id="help" title="Help">help</app-round-button>
-        </app-title>
+        </app-bar>
         <app-tabs id="tabs">
             <app-tab id="tabJson" selected>Json</app-tab>
             <app-tab id="tabHtml">Html</app-tab>

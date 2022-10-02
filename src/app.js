@@ -30,6 +30,8 @@ AppTemplate.innerHTML = `
         }
         #header {
             min-height:56px;
+            background-color: var(--primary-color, #000);
+            color:#FFF;
         }
         #content {
             flex:1 1 auto;
@@ -58,7 +60,9 @@ AppTemplate.innerHTML = `
         }
     </style>
     <div id="app">
-        <app-bar id="header" title="FHIR Browser"></app-bar>
+        <app-bar id="header" caption="">
+            <app-round-button slot="left" id="navigation" title="Menu">menu</app-round-button>
+        </app-bar>
         <div id="content">
             <div>
                 <app-left-panel id="leftPanel"></app-left-panel>
@@ -80,11 +84,12 @@ customElements.define('fhir-browser', class App extends HTMLElement {
     }
 
     connectedCallback() {
+        this._shadow.getElementById("header").setAttribute("caption", "FHIR Browser");
         const leftPanel = this._shadow.getElementById("leftPanel");
         const bundle = this._shadow.getElementById("bundle");
         const resource = this._shadow.getElementById("resource");
 
-        this._shadow.getElementById("header").addEventListener('navigationClick', () => {
+        this._shadow.getElementById("navigation").addEventListener('click', () => {
             leftPanel.style.display = ('none' == leftPanel.style.display) ? 'flex' : 'none';
         });
 

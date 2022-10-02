@@ -1,8 +1,8 @@
+import "./appBar.js";
 import "./appDataTable.js";
 import "./appDataTablePagination.js";
 import "./appLinearLoader.js";
 import "./appDataTablePagination.js";
-import "./appTitle.js";
 
 customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
     constructor() {
@@ -209,9 +209,9 @@ FhirBundleTemplate.innerHTML = `
         }
     </style>
     <div id="wrapper">
-        <app-title id="title">
+        <app-bar id="title">
             <app-round-button id="help" title="Help">help</app-round-button>
-        </app-title>
+        </app-bar>
         <app-linear-loader id="loader" style="visibility:hidden;"></app-linear-loader>
         <app-data-table id="table">
             <app-data-table-pagination id="pagination" slot="footer"/>

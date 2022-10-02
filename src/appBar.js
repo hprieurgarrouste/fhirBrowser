@@ -1,6 +1,3 @@
-import "./appTitle.js";
-import "./appRoundButton.js";
-
 customElements.define('app-bar', class AppBar extends HTMLElement {
     constructor() {
         super();
@@ -8,33 +5,42 @@ customElements.define('app-bar', class AppBar extends HTMLElement {
         this._shadow.appendChild(AppBarTemplate.content.cloneNode(true));
     }
     connectedCallback() {
-        this._shadow.getElementById("title").setAttribute('caption', this.getAttribute("title"));
-        this._shadow.getElementById("navigation").addEventListener("click", (event) => {
-            this.dispatchEvent(new CustomEvent("navigationClick", {
-                bubbles: false,
-                cancelable: false
-            }));
-            event.stopPropagation();
-        });
+        const template = this._shadow.getElementById('template').content;
+        this._shadow.appendChild(template.cloneNode(true));
+        this._shadow.getElementById('title').innerText = this.getAttribute('caption');
+    }
+    static get observedAttributes() {
+        return ['caption'];
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (name === 'caption' && this.isConnected && this._shadow.getElementById('title')) {
+            this._shadow.getElementById('title').innerText = newValue;
+        }
     }
 });
 
 const AppBarTemplate = document.createElement('template');
 AppBarTemplate.innerHTML = `
-    <link href="./material.css" rel="stylesheet"/>
     <style>
-        div {
-            background-color: var(--primary-color, #000);
-            color:#FFF;
+        #wrapper {
+            align-items: center;
+            display: flex;
+            flex-direction: row;
+            padding: 0.5em;
         }
-        i {
-            margin-right: 1.3em;
-            cursor: pointer;
+        #title {
+            flex-grow: 1;
+            margin:0;
+            overflow: hidden;
+            padding-left: 0.5em;
+            text-overflow: ellipsis;
         }
     </style>
-    <div>
-        <app-title id="title" caption="">
-            <app-round-button slot="left" id="navigation" title="Menu">menu</app-round-button>
-        </app-title>
-    </div>
+    <template id="template">
+        <div id="wrapper">
+            <slot name="left"></slot>
+            <h3 id="title"></h3>
+            <slot></slot>
+        </h3>
+    </template>
 `;
