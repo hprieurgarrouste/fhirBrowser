@@ -87,7 +87,6 @@ customElements.define('fhir-browser', class App extends HTMLElement {
     }
 
     connectedCallback() {
-        //this._shadow.getElementById("header").setAttribute("caption", "FHIR Browser");
         const leftPanel = this._shadow.getElementById("leftPanel");
         const bundle = this._shadow.getElementById("bundle");
         const resource = this._shadow.getElementById("resource");

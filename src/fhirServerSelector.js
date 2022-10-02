@@ -16,20 +16,42 @@ customElements.define('fhir-server-selector', class FhirServerSelector extends H
                 opt.appendChild(document.createTextNode(key));
                 this._server.appendChild(opt);
             }
+            const lsp = localStorage.getItem('preferences');
+            if (lsp !== null) {
+                const preferences = JSON.parse(lsp);
+                if (preferences.server) {
+                    this._server.value = preferences.server;
+                    this.serverChanged();
+                }
+            }
         });
         this._server.addEventListener("change", () => {
-            const server = this._conf[this._server.value];
-            this._shadow.getElementById("server-url").innerText = server.url;
-            this.connect(server);
-
-            this.dispatchEvent(new CustomEvent("serverchanged", {
-                bubbles: false,
-                cancelable: false,
-                "detail": {
-                    "server": server
-                }
-            }));
+            this.serverChanged();
         });
+    }
+
+    serverChanged() {
+        const server = this._conf[this._server.value];
+        this._shadow.getElementById("server-url").innerText = server.url;
+        this.connect(server);
+
+        this.dispatchEvent(new CustomEvent("serverchanged", {
+            bubbles: false,
+            cancelable: false,
+            "detail": {
+                "server": server
+            }
+        }));
+
+        const lsp = localStorage.getItem('preferences');
+        let preferences = null;
+        if (lsp !== null) {
+            preferences = JSON.parse(lsp);
+        } else {
+            preferences = {};
+        }
+        preferences.server = this._server.value;
+        localStorage.setItem('preferences', JSON.stringify(preferences));
     }
 
     connect(server) {
