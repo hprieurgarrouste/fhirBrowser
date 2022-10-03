@@ -1,3 +1,5 @@
+import { Preferences } from "./appPreferences.js";
+
 customElements.define('fhir-server-selector', class FhirServerSelector extends HTMLElement {
     constructor() {
         super();
@@ -16,13 +18,10 @@ customElements.define('fhir-server-selector', class FhirServerSelector extends H
                 opt.appendChild(document.createTextNode(key));
                 this._server.appendChild(opt);
             }
-            const lsp = localStorage.getItem('preferences');
-            if (lsp !== null) {
-                const preferences = JSON.parse(lsp);
-                if (preferences.server) {
-                    this._server.value = preferences.server;
-                    this.serverChanged();
-                }
+            const preferedServer = Preferences.get("server");
+            if (preferedServer != null) {
+                this._server.value = preferedServer;
+                this.serverChanged();
             }
         });
         this._server.addEventListener("change", () => {
@@ -43,15 +42,7 @@ customElements.define('fhir-server-selector', class FhirServerSelector extends H
             }
         }));
 
-        const lsp = localStorage.getItem('preferences');
-        let preferences = null;
-        if (lsp !== null) {
-            preferences = JSON.parse(lsp);
-        } else {
-            preferences = {};
-        }
-        preferences.server = this._server.value;
-        localStorage.setItem('preferences', JSON.stringify(preferences));
+        Preferences.set("server", this._server.value);
     }
 
     connect(server) {
