@@ -209,7 +209,7 @@ FhirBundleTemplate.innerHTML = `
     <div id="wrapper">
         <app-bar>
             <h3 id="title" slot="title"></h3>
-            <app-round-button id="help" title="Help">help</app-round-button>
+            <app-round-button id="help" title="Help" app-icon="help"></app-round-button>
         </app-bar>
         <app-linear-loader id="loader" style="visibility:hidden;"></app-linear-loader>
         <app-data-table id="table">

@@ -1,16 +1,12 @@
 import "./appBar.js";
 import "./appLeftPanel.js";
+import { Preferences } from "./appPreferences.js";
 import "./fhirBundle.js";
 import "./fhirResource.js";
 
 /* Only register a service worker if it's supported */
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./service-worker.js');
-}
-
-if (window.matchMedia &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    document.body.setAttribute('color-scheme', 'dark');
 }
 
 const AppTemplate = document.createElement('template');
@@ -63,8 +59,9 @@ AppTemplate.innerHTML = `
     </style>
     <div id="app">
         <app-bar id="header" caption="">
-            <app-round-button slot="left" id="navigation" title="Menu">menu</app-round-button>
+            <app-round-button slot="left" id="navigation" title="Menu" app-icon="menu"></app-round-button>
             <h3 slot="title">FHIR Browser</h3>
+            <app-round-button id="colorScheme" title="Theme" app-icon="brightness_auto"></app-round-button>
         </app-bar>
         <div id="content">
             <div>
@@ -125,6 +122,53 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             });
         });
 
+        this.setColorScheme(Preferences.get("colorScheme", "auto"));
+
+        this._shadow.getElementById("colorScheme").addEventListener('click', () => {
+            let colorScheme = Preferences.get("colorScheme", "auto");
+            switch (colorScheme) {
+                case "dark":
+                    colorScheme = "auto";
+                    break;
+                case "light":
+                    colorScheme = "dark";
+                    break;
+                case "auto":
+                default:
+                    colorScheme = "light";
+                    break;
+            }
+            Preferences.set("colorScheme", colorScheme);
+            this.setColorScheme(colorScheme);
+        });
+    }
+
+    setColorScheme(colorScheme) {
+        let colorSchemeIcon = "";
+        let scheme = colorScheme;
+        switch (colorScheme) {
+            case "dark":
+                colorSchemeIcon = "brightness_4";
+                break;
+            case "light":
+                colorSchemeIcon = "light_mode";
+                break;
+            case "auto":
+            default:
+                if ("auto" === colorScheme) {
+                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        scheme = "dark";
+                    } else {
+                        scheme = "light";
+                    }
+                }
+                colorSchemeIcon = "brightness_auto";
+                break;
+        }
+        const themeButton = this._shadow.getElementById("colorScheme");
+        themeButton.setAttribute("app-icon", colorSchemeIcon);
+        themeButton.title = `Theme ${colorScheme}`;
+        document.body.setAttribute("color-scheme", scheme);
     }
 
 });

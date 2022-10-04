@@ -5,7 +5,15 @@ customElements.define('app-round-button', class AppRoundButton extends HTMLEleme
         this._shadow.appendChild(AppRoundButtonTemplate.content.cloneNode(true));
     }
     connectedCallback() {
-        this._shadow.getElementById('wrapper').innerHTML = this.innerHTML;
+        //this._shadow.getElementById('wrapper').innerText = this.getAttribute('app-icon');
+    }
+
+    static get observedAttributes() { return ['app-icon']; }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (name === "app-icon") {
+            this._shadow.getElementById('wrapper').innerText = newValue;
+        }
     }
 });
 

@@ -66,7 +66,7 @@ customElements.define('app-dialog', class AppDialog extends HTMLElement {
                 <div id="mask"></div>
                 <div id="surface">
                     <div id="header">
-                        <app-round-button id="close" title="Close">close</app-round-button>
+                        <app-round-button id="close" title="Close" app-icon="close"></app-round-button>
                         <h2 id="title"></h2>
                     </div>
                     <div id="content">
