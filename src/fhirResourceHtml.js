@@ -11,7 +11,7 @@ customElements.define('fhir-resource-html', class FhirResourceHtml extends HTMLE
      * @param {Object} resource
      */
     set source(resource) {
-        let result = "<i>Work in progress : Mustache template</i>";
+        let result = "<i>Work in progress</i>";
         if (resource.resourceType === 'Binary') {
             result = parseBinary();
         }

@@ -43,12 +43,15 @@ AppTabsTemplate.innerHTML = `
         ::slotted(app-tab) {
             flex-grow:1;
             border-bottom: 2px solid transparent;
+            font-size: smaller;
         }
         ::slotted(app-tab:hover) {
             background-color:var(--hover-color, rgba(0, 0, 0, 5%));
         }
         ::slotted(app-tab[selected]) {
             border-bottom-color: var(--primary-color, #000);
+            font-weight: bold;
+            color: var(--primary-color, #000);
         }
     </style>
     <template id="template">

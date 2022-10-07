@@ -15,10 +15,9 @@ AppTabTemplate.innerHTML = `
         button {
             background-color: transparent;
             border: 0 none;
-            color: var(--text-color-normal, black);
+            color: inherit;
             cursor: pointer;
-            font-family: inherit;
-            font-size: inherit;
+            font: inherit;
             height: 3em;
             text-transform: uppercase;
             white-space: nowrap;
