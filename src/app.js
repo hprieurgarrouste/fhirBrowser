@@ -63,11 +63,11 @@ AppTemplate.innerHTML = `
             <app-round-button slot="left" id="navigation" title="Menu" app-icon="menu"></app-round-button>
             <h3 slot="title">FHIR Browser</h3>
             <app-round-button id="colorScheme" title="Theme" app-icon="brightness_auto"></app-round-button>
-            <app-round-button id="serverSelectorToggle" title="Server" app-icon="public"></app-round-button>
+            <app-round-button id="serverSelectorToggle" title="Connections" app-icon="public"></app-round-button>
         </app-bar>
         <div id="content">
             <div>
-                <app-left-panel id="leftPanel"></app-left-panel>
+                <app-left-panel id="leftPanel" hidden></app-left-panel>
                 <div id="bdy">
                     <fhir-bundle id="bundle" hidden></fhir-bundle>
                     <fhir-resource id="resource" hidden></fhir-resource>

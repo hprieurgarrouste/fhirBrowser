@@ -68,7 +68,7 @@ AppLeftPanelTemplate.innerHTML = `
     </style>
     <div id="wrapper">
         <div id="content">
-            <app-circular-loader id="waiting"></app-circular-loader>
+            <app-circular-loader id="waiting" hidden></app-circular-loader>
             <fhir-metadata id="metadata"></fhir-metadata>
         </div>
     </div>

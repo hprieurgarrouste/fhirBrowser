@@ -50,6 +50,8 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
             }
             if (preferedServer != null) {
                 this.serverChanged(preferedServer);
+            } else {
+                this.hidden = false;
             }
         });
     }
@@ -196,11 +198,11 @@ FhirServerTemplate.innerHTML = `
         <div id="surface">
             <app-bar id="header">
                 <app-round-button id="close" title="Close" app-icon="close" slot="left"></app-round-button>
-                <h3 id="title" slot="title">Server list</h3>
+                <h3 id="title" slot="title">Connections</h3>
             </app-bar>
             <div id="content"></div>
             <div id="actions">
-                <input type="button" value="Add a server"></input>
+                <input type="button" value="New connection"></input>
             <div>
         </div>
     </div>

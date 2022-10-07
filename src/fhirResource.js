@@ -140,6 +140,7 @@ FhirResourceTemplate.innerHTML = `
         }
         #header.error {
             background-color: var(--background-error, transparent);
+            color: white;
         }
         #error {
             padding: 1em;
