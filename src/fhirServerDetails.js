@@ -1,3 +1,5 @@
+import "./appListItem.js"
+
 customElements.define('fhir-server-details', class FhirServerDetails extends HTMLElement {
     constructor() {
         super();
@@ -30,14 +32,17 @@ customElements.define('fhir-server-details', class FhirServerDetails extends HTM
         }
         function make(name, value) {
             if (typeof value === "undefined") return;
-            const item = document.createElement('div');
-            const line1 = document.createElement('span');
-            line1.innerText = name;
-            item.appendChild(line1);
-            const line2 = document.createElement('span');
-            line2.innerText = value;
-            item.appendChild(line2);
-            wrapper.appendChild(item);
+
+            const row = document.createElement('app-list-item');
+            const title = document.createElement("span");
+            title.appendChild(document.createTextNode(name));
+            title.slot = "title";
+            row.appendChild(title);
+            const subTitle = document.createElement("span");
+            subTitle.appendChild(document.createTextNode(value));
+            subTitle.slot = "subTitle";
+            row.appendChild(subTitle);
+            wrapper.appendChild(row);
         }
     }
 
@@ -51,24 +56,6 @@ FhirServerDetailsTemplate.innerHTML = `
         }
         #wrapper > div {
             padding: 0.5em 1em;
-        }
-        #wrapper > div:hover {
-            background-color: var(--hover-color, rgba(0, 0, 0, 5%));
-        }
-        span {
-            display: block;
-        }
-        span:nth-of-type(1) {
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-            text-transform: capitalize;
-            color: var(--text-color-normal, black);
-        }
-        span:nth-of-type(2) {
-            font-size: 0.875em;
-            color: rgba(var(--text-color, "0, 0, 0"), 54%);
-            overflow-wrap: break-word;
         }
     </style>
     <div id="wrapper"></div>

@@ -1,5 +1,5 @@
+import "./appCircularLoader.js";
 import "./fhirMetadata.js";
-import "./fhirServerSelector.js";
 
 customElements.define('app-left-panel', class AppLeftPanel extends HTMLElement {
     constructor() {
@@ -8,20 +8,6 @@ customElements.define('app-left-panel', class AppLeftPanel extends HTMLElement {
         this._shadow.appendChild(AppLeftPanelTemplate.content.cloneNode(true));
     }
     connectedCallback() {
-        this._shadow.getElementById("serverSelector").addEventListener('serverchanged', ({ detail }) => {
-            const server = detail.server;
-            this.dispatchEvent(new CustomEvent("serverchanged", {
-                bubbles: false,
-                cancelable: false,
-                "detail": {
-                    "server": server
-                }
-            }));
-            this.fetchMetadata(server).then(metadata => {
-                this._shadow.getElementById("metadata").metadata = metadata;
-            });
-        });
-
         this._shadow.getElementById("metadata").addEventListener('resourceTypeSelected', ({ detail }) => {
             this.dispatchEvent(new CustomEvent("resourceTypeSelected", {
                 bubbles: false,
@@ -30,6 +16,21 @@ customElements.define('app-left-panel', class AppLeftPanel extends HTMLElement {
                     "resourceType": detail.resourceType
                 }
             }));
+        });
+    }
+
+    /**
+     * @param {any} server
+     */
+    set server(server) {
+        const metadata = this._shadow.getElementById("metadata");
+        const loader = this._shadow.getElementById("waiting");
+        metadata.hidden = true;
+        loader.hidden = false;
+        this.fetchMetadata(server).then(data => {
+            metadata.metadata = data;
+            loader.hidden = true;
+            metadata.hidden = false;
         });
     }
 
@@ -59,10 +60,15 @@ AppLeftPanelTemplate.innerHTML = `
             flex: 1 1 auto;
             height: 0;
         }
+        app-circular-loader {
+            font-size: 2em;
+            text-align: center;
+            padding-top: 1em;
+        }
     </style>
     <div id="wrapper">
         <div id="content">
-            <fhir-server-selector id="serverSelector"></fhir-server-selector>
+            <app-circular-loader id="waiting"></app-circular-loader>
             <fhir-metadata id="metadata"></fhir-metadata>
         </div>
     </div>
