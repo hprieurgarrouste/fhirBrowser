@@ -5,15 +5,14 @@ customElements.define('app-data-table-pagination', class AppDataTablePagination 
         this._shadow.appendChild(AppDataTablePaginationTemplate.content.cloneNode(true));
     }
     connectedCallback() {
-        this._shadow.getElementById('wrapper').addEventListener('click', (event) => {
-            let target = event.target;
-            while (target && target.nodeName !== 'BUTTON') target = target.parentNode;
-            if (target && !target.disabled) {
+        this._shadow.querySelector('main').addEventListener('click', ({ target }) => {
+            const btn = target.closest("i");
+            if (btn && !btn.hasAttribute("disabled")) {
                 this.dispatchEvent(new CustomEvent("pagination", {
                     bubbles: false,
                     cancelable: false,
                     "detail": {
-                        "button": target.id
+                        "button": btn.id
                     }
                 }))
             }
@@ -23,31 +22,41 @@ customElements.define('app-data-table-pagination', class AppDataTablePagination 
      * @param {boolean} enable
      */
     set first(enable) {
-        this._shadow.getElementById('first').disabled = !enable;
+        this.setDisabled('first', !enable);
     }
     /**
      * @param {boolean} enable
      */
     set previous(enable) {
-        this._shadow.getElementById('previous').disabled = !enable;
+        this.setDisabled('previous', !enable);
     }
     /**
      * @param {boolean} enable
      */
     set next(enable) {
-        this._shadow.getElementById('next').disabled = !enable;
+        this.setDisabled('next', !enable);
     }
     /**
      * @param {boolean} enable
      */
     set last(enable) {
-        this._shadow.getElementById('last').disabled = !enable;
+        this.setDisabled('last', !enable);
     }
+
     /**
      * @param {string} text
      */
     set text(text) {
         this._shadow.getElementById('text').innerText = text;
+    }
+
+    setDisabled(name, value) {
+        const elm = this._shadow.getElementById(name);
+        if (value) {
+            elm.setAttribute('disabled', '');
+        } else {
+            elm.removeAttribute('disabled');
+        }
     }
 });
 
@@ -55,32 +64,41 @@ const AppDataTablePaginationTemplate = document.createElement('template');
 AppDataTablePaginationTemplate.innerHTML = `
     <link rel="stylesheet" href="./material.css">
     <style>
-        #wrapper {
-            padding: 12px;
+        main {
+            align-items: center;
+            display: flex;
+            flex-direction:row;
             font-family: inherit;
             font-size: .875rem;
+            padding: 0.5em;
         }
-        button {
-            border:0;
+        i {
             background:none;
-            vertical-align:middle;
-            cursor:pointer;
+            border:0;
             color:var(--text-color-normal);
+            padding:8px;
+            text-align:center;
         }
-        button[disabled] {
-            cursor: default;
+        i:not([disabled]):hover {
+            background-color:var(--hover-color, rgba(0,0,0,5%));
+            border-radius: 50%;
+            cursor:pointer;
+        }
+        i[disabled] {
             color:var(--text-color-disabled);
+            cursor: default;
         }
         span {
             vertical-align:middle;
             margin: 0 24px;
+            flex: auto;
         }
     </style>
-    <div id="wrapper">
+    <main>
         <span id="text"></span>
-        <button id="first" title="first" disabled><i class="material-icons">first_page</i></button>
-        <button id="previous" title="previous" disabled><i class="material-icons">chevron_left</i></button>
-        <button id="next" title="next" disabled><i class="material-icons">chevron_right</i></button>
-        <button id="last" title="last" disabled><i class="material-icons">last_page</i></button>
-    </div>
+        <i id="first" title="first" disabled class="material-icons">first_page</i>
+        <i id="previous" title="previous" disabled class="material-icons">chevron_left</i>
+        <i id="next" title="next" disabled class="material-icons">chevron_right</i>
+        <i id="last" title="last" disabled class="material-icons">last_page</i>
+    </main>
 `;

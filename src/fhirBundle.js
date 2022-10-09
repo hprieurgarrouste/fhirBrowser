@@ -209,6 +209,7 @@ FhirBundleTemplate.innerHTML = `
     <div id="wrapper">
         <app-bar>
             <h3 slot="middle" id="title"></h3>
+            <app-round-button slot="right" id="filter" title="Filter" disabled app-icon="filter_list"></app-round-button>
             <app-round-button slot="right" id="help" title="Help" app-icon="help"></app-round-button>
         </app-bar>
         <app-linear-progress id="loader" style="visibility:hidden;"></app-linear-progress>
