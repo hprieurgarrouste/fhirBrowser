@@ -1,4 +1,4 @@
-import "./appCircularLoader.js";
+import "./appCircularProgress.js";
 import "./fhirMetadata.js";
 
 customElements.define('app-left-panel', class AppLeftPanel extends HTMLElement {
@@ -47,7 +47,7 @@ customElements.define('app-left-panel', class AppLeftPanel extends HTMLElement {
 const AppLeftPanelTemplate = document.createElement('template');
 AppLeftPanelTemplate.innerHTML = `
     <style>
-        #wrapper {
+        main {
             height:100%;
         }
         #content {
@@ -60,16 +60,16 @@ AppLeftPanelTemplate.innerHTML = `
             flex: 1 1 auto;
             height: 0;
         }
-        app-circular-loader {
+        app-circular-progress {
             font-size: 2em;
             text-align: center;
             padding-top: 1em;
         }
     </style>
-    <div id="wrapper">
+    <main>
         <div id="content">
-            <app-circular-loader id="waiting" hidden></app-circular-loader>
+            <app-circular-progress id="waiting" hidden></app-circular-progress>
             <fhir-metadata id="metadata"></fhir-metadata>
         </div>
-    </div>
+    </main>
 `;

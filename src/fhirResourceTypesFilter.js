@@ -12,7 +12,7 @@ customElements.define('fhir-resource-types-filter', class FhirResourceTypesFilte
                 fireChange.call(this);
             }
         });
-        this._shadow.getElementById("wrapper").addEventListener('mousedown', (event) => {
+        this._shadow.querySelector("main").addEventListener('mousedown', (event) => {
             event.preventDefault();
             event.stopPropagation();
             text.focus();
@@ -37,14 +37,14 @@ const FhirResourceTypesFilterTemplate = document.createElement('template');
 FhirResourceTypesFilterTemplate.innerHTML = `
     <link href="./material.css" rel="stylesheet"/>
     <style>
-        #wrapper {
+        main {
             background-color: rgba(var(--text-color, black), 4%);
             border: 1px solid transparent;
             display: flex;
             padding: 0.7em;
             font-size: smaller;
         }
-        #wrapper:focus-within {
+        main:focus-within {
             border-bottom-color: var(--primary-color, black);
         }
         #text {
@@ -64,8 +64,8 @@ FhirResourceTypesFilterTemplate.innerHTML = `
             line-height: unset;
         }
     </style>
-    <div id="wrapper">
+    <main>
         <input id="text" type="text" placeholder="Type to filter"/>
         <i id="clear" class="material-icons" title="clear">close</i>
-    </div>
+    </main>
 `;

@@ -5,24 +5,25 @@ customElements.define('app-tab', class AppTab extends HTMLElement {
         this._shadow.appendChild(AppTabTemplate.content.cloneNode(true));
     }
     connectedCallback() {
-        this._shadow.getElementById('wrapper').innerHTML = this.innerHTML;
+        this._shadow.querySelector("main").innerHTML = this.innerHTML;
     }
 });
 
 const AppTabTemplate = document.createElement('template');
 AppTabTemplate.innerHTML = `
     <style>
-        button {
+        main {
             background-color: transparent;
-            border: 0 none;
             color: inherit;
             cursor: pointer;
             font: inherit;
             height: 3em;
+            line-height: 3em;
             text-transform: uppercase;
+            text-align: center;
             white-space: nowrap;
             width:100%;
         }
     </style>
-    <button id="wrapper"></button>
+    <main></main>
 `;

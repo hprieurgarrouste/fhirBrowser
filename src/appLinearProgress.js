@@ -1,14 +1,14 @@
-customElements.define('app-linear-loader', class AppLinearLoader extends HTMLElement {
+customElements.define('app-linear-progress', class AppLinearProgress extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'closed' }).appendChild(AppLinearLoaderTemplate.content.cloneNode(true));
+        this.attachShadow({ mode: 'closed' }).appendChild(AppLinearProgressTemplate.content.cloneNode(true));
     }
 });
 
-const AppLinearLoaderTemplate = document.createElement('template');
-AppLinearLoaderTemplate.innerHTML = `
+const AppLinearProgressTemplate = document.createElement('template');
+AppLinearProgressTemplate.innerHTML = `
     <style>
-        .track {
+        main {
             background-color: var(--border-color);
             overflow: hidden;
         }
@@ -25,7 +25,7 @@ AppLinearLoaderTemplate.innerHTML = `
             to {transform:translateX(400%)}
         }
     </style>
-    <div class="track">
+    <main>
         <div class="thumb" />
-    </div>
+    </main>
 `;

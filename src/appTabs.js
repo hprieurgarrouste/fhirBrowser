@@ -5,9 +5,7 @@ customElements.define('app-tabs', class AppTabs extends HTMLElement {
         this._shadow.appendChild(AppTabsTemplate.content.cloneNode(true));
     }
     connectedCallback() {
-        const template = this._shadow.getElementById('template').content;
-        this._shadow.appendChild(template.cloneNode(true));
-        this._shadow.getElementById('wrapper').onclick = (event) => {
+        this._shadow.querySelector("main").onclick = (event) => {
             if (event.target.nodeName === 'APP-TAB') {
                 this.select(event.target.id);
                 event.stopPropagation();
@@ -35,7 +33,7 @@ customElements.define('app-tabs', class AppTabs extends HTMLElement {
 const AppTabsTemplate = document.createElement('template');
 AppTabsTemplate.innerHTML = `
     <style>
-        #wrapper {
+        main {
             display:flex;
             flex-direction:row;
             flex-wrap: nowrap;
@@ -54,7 +52,5 @@ AppTabsTemplate.innerHTML = `
             color: var(--primary-color, #000);
         }
     </style>
-    <template id="template">
-        <div id="wrapper"><slot></slot></div>
-    </template>
+    <main><slot></slot></main>
 `;

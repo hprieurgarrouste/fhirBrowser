@@ -47,7 +47,7 @@ const FhirResourceJsonTemplate = document.createElement('template');
 FhirResourceJsonTemplate.innerHTML = `
     <link rel="stylesheet" href="./material.css">
     <style>
-        #wrapper {
+        main {
             display:flex;
             flex-direction:column;
             height:100%;
@@ -76,7 +76,7 @@ FhirResourceJsonTemplate.innerHTML = `
             color: var(--json-viewer-values-color, black);
         }
     </style>
-    <div id="wrapper">
+    <main>
         <div id="content"></div>
-    </div>
+    </main>
 `;

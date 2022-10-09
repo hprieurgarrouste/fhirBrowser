@@ -9,11 +9,11 @@ customElements.define('app-list-item', class AppListItem extends HTMLElement {
 const AppListItemTemplate = document.createElement('template');
 AppListItemTemplate.innerHTML = `
     <style>
-        #wrapper {
+        main {
             padding: 0.5em 1em;
             background-color: inherit;
         }
-        #wrapper:hover {
+        main:hover {
             background-color: var(--hover-color, rgba(0, 0, 0, 5%));
         }
         #title {
@@ -29,8 +29,8 @@ AppListItemTemplate.innerHTML = `
             overflow-wrap: break-word;
         }
     </style>
-    <div id="wrapper">
+    <main>
         <div id="title"><slot name="title"></slot></div>
         <div id="subTitle"><slot name="subTitle"></slot></div>
-    </div>
+    </main>
 `;

@@ -1,14 +1,14 @@
-customElements.define('app-circular-loader', class AppCircularLoader extends HTMLElement {
+customElements.define('app-circular-progress', class AppCircularProgress extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'closed' }).appendChild(AppCircularLoaderTemplate.content.cloneNode(true));
+        this.attachShadow({ mode: 'closed' }).appendChild(AppCircularProgressTemplate.content.cloneNode(true));
     }
 });
 
-const AppCircularLoaderTemplate = document.createElement('template');
-AppCircularLoaderTemplate.innerHTML = `
+const AppCircularProgressTemplate = document.createElement('template');
+AppCircularProgressTemplate.innerHTML = `
     <style>
-        div {
+        main {
             height: 0.70em;
             width: 0.70em;
             color: var(--primary-color);
@@ -24,5 +24,5 @@ AppCircularLoaderTemplate.innerHTML = `
             100% {transform: rotate(360deg);}
         }
     </style>
-    <div></div>
+    <main/>
 `;

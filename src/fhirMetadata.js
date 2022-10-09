@@ -41,7 +41,7 @@ customElements.define('fhir-metadata', class FhirMetadata extends HTMLElement {
 const FhirMetadataTemplate = document.createElement('template');
 FhirMetadataTemplate.innerHTML = `
     <style>
-        #wrapper {
+        main {
             display:flex;
             flex-direction: column;
             height : 100%;
@@ -55,12 +55,12 @@ FhirMetadataTemplate.innerHTML = `
             height:0;
         }
     </style>
-    <div id="wrapper">
+    <main>
         <app-tabs id="tabs">
             <app-tab id="tabResources" selected>Resource Types</app-tab>
             <app-tab id="tabDetails">Details</app-tab>
         </app-tabs>
         <fhir-resource-types id="resourceTypes"></fhir-resource-types>
         <fhir-server-details id="serverDetails" hidden></fhir-server-details>
-    </div>
+    </main>
 `;

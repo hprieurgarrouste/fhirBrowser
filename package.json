@@ -1,0 +1,28 @@
+{
+  "name": "fhirbrowser",
+  "version": "1.0.0",
+  "description": "FHIR Browser",
+  "main": "index.html",
+  "scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch --mode=development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hprieurgarrouste/fhirBrowser.git"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Herve Prieur-Garrouste ",
+    "email": "h.prieurgarrouste@gmail.com",
+    "url": "https://github.com/hprieurgarrouste"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hprieurgarrouste/fhirBrowser/issues"
+  },
+  "homepage": "https://github.com/hprieurgarrouste/fhirBrowser#readme",
+  "devDependencies": {
+    "webpack-dev-server": "^4.11.1"
+  }
+}

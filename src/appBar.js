@@ -9,13 +9,13 @@ customElements.define('app-bar', class AppBar extends HTMLElement {
 const AppBarTemplate = document.createElement('template');
 AppBarTemplate.innerHTML = `
     <style>
-        #barWrapper {
+        main {
             align-items: center;
             display: flex;
             flex-direction: row;
             padding: 0.5em;
         }
-        #barTitle {
+        #barMiddle {
             flex-grow: 1;
             margin:0;
             overflow: hidden;
@@ -26,9 +26,9 @@ AppBarTemplate.innerHTML = `
             white-space: nowrap;
         }
     </style>
-    <div id="barWrapper">
+    <main>
         <div id="barLeft"><slot name="left"></slot></div>
-        <div id="barTitle"><slot name="title"></slot></div>
-        <div id="barRight"><slot></slot></div>
-    </div>
+        <div id="barMiddle"><slot name="middle"></slot></div>
+        <div id="barRight"><slot name="right"></slot></div>
+    </main>
 `;

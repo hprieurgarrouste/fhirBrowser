@@ -61,9 +61,9 @@ AppTemplate.innerHTML = `
     <div id="app">
         <app-bar id="header" caption="">
             <app-round-button slot="left" id="navigation" title="Menu" app-icon="menu"></app-round-button>
-            <h3 slot="title">FHIR Browser</h3>
-            <app-round-button id="colorScheme" title="Theme" app-icon="brightness_auto"></app-round-button>
-            <app-round-button id="serverSelectorToggle" title="Connections" app-icon="public"></app-round-button>
+            <h3 slot="middle">FHIR Browser</h3>
+            <app-round-button slot="right" id="colorScheme" title="Theme" app-icon="brightness_auto"></app-round-button>
+            <app-round-button slot="right" id="serverSelectorToggle" title="Connections" app-icon="public"></app-round-button>
         </app-bar>
         <div id="content">
             <div>

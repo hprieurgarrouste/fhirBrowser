@@ -58,7 +58,7 @@ const FhirResourceHtmlTemplate = document.createElement('template');
 FhirResourceHtmlTemplate.innerHTML = `
     <link rel="stylesheet" href="./material.css">
     <style>
-        #wrapper {
+        main {
             display:flex;
             flex-direction:column;
             height:100%;
@@ -86,7 +86,7 @@ FhirResourceHtmlTemplate.innerHTML = `
             max-width: 100%;
         }
     </style>
-    <div id="wrapper">
+    <main>
         <div id="content"></div>
-    </div>
+    </main>
 `;

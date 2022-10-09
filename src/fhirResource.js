@@ -148,12 +148,12 @@ FhirResourceTemplate.innerHTML = `
     </style>
     <div id="wrapper">
         <app-bar id="header">
-            <h3 id="title" slot="title"></h3>
             <app-round-button slot="left" id="back" title="back" app-icon="arrow_back"></app-round-button>
-            <app-round-button id="share" title="Share" app-icon="share"></app-round-button>
-            <app-round-button id="copy" title="Copy to clipboard" app-icon="content_copy"></app-round-button>
-            <app-round-button id="download" title="Download" app-icon="download"></app-round-button>
-            <app-round-button id="help" title="Help" app-icon="help"></app-round-button>
+            <h3 slot="middle" id="title"></h3>
+            <app-round-button slot="right" id="share" title="Share" app-icon="share"></app-round-button>
+            <app-round-button slot="right" id="copy" title="Copy to clipboard" app-icon="content_copy"></app-round-button>
+            <app-round-button slot="right" id="download" title="Download" app-icon="download"></app-round-button>
+            <app-round-button slot="right" id="help" title="Help" app-icon="help"></app-round-button>
         </app-bar>
         <app-tabs id="tabs">
             <app-tab id="tabJson" selected>Json</app-tab>

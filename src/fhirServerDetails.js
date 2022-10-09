@@ -11,7 +11,7 @@ customElements.define('fhir-server-details', class FhirServerDetails extends HTM
      * @param {object} metadata
      */
     set metadata(metadata) {
-        const wrapper = this._shadow.getElementById('wrapper');
+        const wrapper = this._shadow.querySelector("main");
         while (wrapper.firstChild) wrapper.removeChild(wrapper.lastChild);
 
         make("copyright", metadata.copyright);
@@ -51,12 +51,9 @@ customElements.define('fhir-server-details', class FhirServerDetails extends HTM
 const FhirServerDetailsTemplate = document.createElement('template');
 FhirServerDetailsTemplate.innerHTML = `
     <style>
-        #wrapper {
+        main {
             overflow-y: auto;
         }
-        #wrapper > div {
-            padding: 0.5em 1em;
-        }
     </style>
-    <div id="wrapper"></div>
+    <main/>
 `;

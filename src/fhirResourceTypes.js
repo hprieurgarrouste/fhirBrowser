@@ -13,7 +13,7 @@ customElements.define('fhir-resource-types', class FhirResourceTypes extends HTM
             const ul = this._shadow.getElementById('list').firstElementChild;
             const filter = detail.text.toLowerCase();
             ul.childNodes.forEach(li => {
-                li.hidden = !li.id.toLowerCase().startsWith(filter);
+                li.hidden = !li.innerText.toLowerCase().startsWith(filter);
             });
         });
 
@@ -28,7 +28,7 @@ customElements.define('fhir-resource-types', class FhirResourceTypes extends HTM
                     bubbles: false,
                     cancelable: false,
                     'detail': {
-                        resourceType: this._metadata.rest[0].resource.filter(res => res.type === target.id)[0]
+                        resourceType: this._metadata.rest[0].resource.filter(res => res.type === target.dataset.type)[0]
                     }
                 }));
             }
@@ -50,7 +50,7 @@ customElements.define('fhir-resource-types', class FhirResourceTypes extends HTM
 
         metadata.rest[0].resource.forEach(resource => {
             const li = document.createElement('li');
-            li.id = resource.type;
+            li.setAttribute("data-type", resource.type);
             li.innerHTML = resource.type;
             ul.appendChild(li);
         })
@@ -62,7 +62,7 @@ const FhirResourceTypesTemplate = document.createElement('template');
 FhirResourceTypesTemplate.innerHTML = `
     <link href="./material.css" rel="stylesheet"/>
     <style>
-        #wrapper {
+        main {
             display: flex;
             flex-direction: column;
             height:100%;
@@ -85,8 +85,8 @@ FhirResourceTypesTemplate.innerHTML = `
             background-color:var(--hover-color, lightgray);
         }
     </style>
-    <div id="wrapper">
+    <main>
         <fhir-resource-types-filter id="filter"></fhir-resource-types-filter>
         <div id="list"><ul></ul></div>
-    </div>
+    </main>
 `;

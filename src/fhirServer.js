@@ -13,10 +13,10 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
         this._shadow.getElementById('close').addEventListener("click", () => {
             this.hidden = true;
         });
-        this._shadow.getElementById('wrapper').addEventListener("click", () => {
+        this._shadow.querySelector("main").addEventListener("click", () => {
             this.hidden = true;
         });
-        this._shadow.getElementById('surface').addEventListener("click", (event) => {
+        this._shadow.querySelector('.surface').addEventListener("click", (event) => {
             event.stopPropagation();
         });
         content.addEventListener("click", ({ target }) => {
@@ -25,7 +25,7 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
                 const prev = content.querySelector(".selected");
                 if (prev) prev.classList.remove('selected');
                 row.classList.add('selected');
-                this.serverChanged(row.id);
+                this.serverChanged(row.dataset.id);
                 this.hidden = true;
             }
         });
@@ -36,7 +36,7 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
             const content = this._shadow.getElementById('content');
             for (const key of Object.keys(conf).sort()) {
                 const row = document.createElement('app-list-item');
-                row.setAttribute("id", key);
+                row.setAttribute("data-id", key);
                 if (key === preferedServer) row.classList.add("selected");
                 const title = document.createElement("span");
                 title.appendChild(document.createTextNode(key));
@@ -128,7 +128,7 @@ const FhirServerTemplate = document.createElement('template');
 FhirServerTemplate.innerHTML = `
     <link rel="stylesheet" href="./material.css">
     <style>
-        #wrapper {
+        main {
             position: absolute;
             top: 0;
             left:0;
@@ -136,20 +136,22 @@ FhirServerTemplate.innerHTML = `
             min-height: 100%;
             min-width: 100%;
         }
-        #surface {
-            font-family: Roboto, Arial, monospace;
+        .surface {
             background-color: var(--background-color, white);
-            color:var(--text-color-normal, white);
+            border-radius: 4px;
+            height: 50%;
+            min-width: 20%;
             position: absolute;
             top: 60px;
             right: 1em;
-            height: 50%;
-            min-width: 20%;
-            border-radius: 4px;
-            background-color: var(--background-color, white);
-            box-shadow: 0px 11px 15px -7px rgb(0 0 0 / 20%), 0px 24px 38px 3px rgb(0 0 0 / 14%), 0px 9px 46px 8px rgb(0 0 0 / 12%);
+        }
+        .overlay {
+            background-color: rgba(255,255,255,4%);
+            color:var(--text-color-normal, white);
             display:flex;
             flex-direction: column;
+            font-family: Roboto, Arial, monospace;
+            height: 100%;
         }
         app-bar {
             border-bottom: 1px solid var(--border-color);
@@ -166,6 +168,7 @@ FhirServerTemplate.innerHTML = `
             background-color: var(--hover-color, rgba(0, 0, 0, 5%));
         }
         #actions {
+            border-top: 1px solid var(--border-color);
             padding: 0.5em 1em;
             text-align: center;
             overflow: hidden;
@@ -184,7 +187,7 @@ FhirServerTemplate.innerHTML = `
             background-color: var(--hover-color);
         }
         @media (max-width:480px){
-            #surface {
+            .surface {
                 top:0;
                 left:0;
                 height: 100%;
@@ -192,18 +195,23 @@ FhirServerTemplate.innerHTML = `
                 max-width: unset;
                 max-height: unset;
             }
+            .overlay {
+                background-color: transparent;
+            }
         }
     </style>
-    <div id="wrapper">
-        <div id="surface">
-            <app-bar id="header">
-                <app-round-button id="close" title="Close" app-icon="close" slot="left"></app-round-button>
-                <h3 id="title" slot="title">Connections</h3>
-            </app-bar>
-            <div id="content"></div>
-            <div id="actions">
-                <input type="button" value="New connection"></input>
-            <div>
+    <main>
+        <div class="surface">
+            <div class="overlay">
+                <app-bar id="header">
+                    <app-round-button id="close" title="Close" app-icon="close" slot="left"></app-round-button>
+                    <h3 id="title" slot="middle">Connections</h3>
+                </app-bar>
+                <div id="content"></div>
+                <div id="actions">
+                    <input type="button" value="New connection"></input>
+                <div>
+            </div>
         </div>
-    </div>
+    </main>
 `;
