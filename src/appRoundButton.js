@@ -5,12 +5,27 @@ customElements.define('app-round-button', class AppRoundButton extends HTMLEleme
         this._shadow.appendChild(AppRoundButtonTemplate.content.cloneNode(true));
     }
 
-    static get observedAttributes() { return ['app-icon']; }
+    static get observedAttributes() { return ["app-icon", "disabled"]; }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        if (name === "app-icon") {
-            this._shadow.querySelector("main").innerText = newValue;
+        const elm = this._shadow.querySelector("main");
+        if ("app-icon" === name) {
+            elm.innerText = newValue;
+        } else if ("disabled" === name) {
+            if (null === newValue) {
+                elm.removeAttribute("disabled");
+            } else {
+                elm.setAttribute("disabled", "");
+            }
         }
+    }
+
+    connectedCallback() {
+        this._shadow.querySelector('main').addEventListener('click', (event) => {
+            if (event.target.hasAttribute("disabled")) {
+                event.stopPropagation();
+            }
+        });
     }
 });
 
@@ -26,9 +41,13 @@ AppRoundButtonTemplate.innerHTML = `
             color: inherit;
             background-color:transparent;
         }
-        main:hover {
+        main:not([disabled]):hover {
             background-color:var(--hover-color, rgba(0,0,0,5%));
             border-radius: 50%;
+        }
+        main[disabled] {
+            color:var(--text-color-disabled);
+            cursor: default;
         }
     </style>
     <main class="material-icons"/>
