@@ -1,3 +1,5 @@
+import "./appRoundButton.js";
+
 customElements.define('app-data-table-pagination', class AppDataTablePagination extends HTMLElement {
     constructor() {
         super();
@@ -6,8 +8,8 @@ customElements.define('app-data-table-pagination', class AppDataTablePagination 
     }
     connectedCallback() {
         this._shadow.querySelector('main').addEventListener('click', ({ target }) => {
-            const btn = target.closest("i");
-            if (btn && !btn.hasAttribute("disabled")) {
+            const btn = target.closest("app-round-button");
+            if (btn) {
                 this.dispatchEvent(new CustomEvent("pagination", {
                     bubbles: false,
                     cancelable: false,
@@ -72,33 +74,16 @@ AppDataTablePaginationTemplate.innerHTML = `
             font-size: .875rem;
             padding: 0.5em;
         }
-        i {
-            background:none;
-            border:0;
-            color:var(--text-color-normal);
-            padding:8px;
-            text-align:center;
-        }
-        i:not([disabled]):hover {
-            background-color:var(--hover-color, rgba(0,0,0,5%));
-            border-radius: 50%;
-            cursor:pointer;
-        }
-        i[disabled] {
-            color:var(--text-color-disabled);
-            cursor: default;
-        }
         span {
-            vertical-align:middle;
             margin: 0 24px;
             flex: auto;
         }
     </style>
     <main>
         <span id="text"></span>
-        <i id="first" title="first" disabled class="material-icons">first_page</i>
-        <i id="previous" title="previous" disabled class="material-icons">chevron_left</i>
-        <i id="next" title="next" disabled class="material-icons">chevron_right</i>
-        <i id="last" title="last" disabled class="material-icons">last_page</i>
+        <app-round-button id="first" title="first" disabled app-icon="first_page"></app-round-button>
+        <app-round-button id="previous" title="previous" disabled app-icon="chevron_left"></app-round-button>
+        <app-round-button id="next" title="next" disabled app-icon="chevron_right"></app-round-button>
+        <app-round-button id="last" title="last" disabled app-icon="last_page"></app-round-button>
     </main>
 `;
