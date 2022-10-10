@@ -2,7 +2,8 @@ import "./appBar.js";
 import "./appDataTable.js";
 import "./appDataTablePagination.js";
 import "./appLinearProgress.js";
-import "./appDataTablePagination.js";
+
+import "./fhirSearch.js";
 
 customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
     constructor() {
@@ -16,6 +17,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._link = null;
         this._count = null;
         this._columns = null;
+        this._filters = null;
     }
 
     connectedCallback() {
@@ -36,11 +38,24 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
                 }
             }));
         });
+        this._shadow.getElementById('searchToggle').addEventListener('click', () => {
+            this._shadow.getElementById('search').hidden = false;
+        });
+        this._shadow.getElementById('search').addEventListener('apply', ({ detail }) => {
+            this._filters = detail.parameters;
+            this._link = {
+                "first": `${this._server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
+            };
+            this.loadPage();
+        });
     }
 
     load(server, resourceType) {
         this._server = server;
         this._resourceType = resourceType;
+        this._filters = null;
+
+        this._shadow.getElementById("search").metadata = resourceType;
 
         this._columns = [];
         if (resourceType.type === "Binary") {
@@ -68,7 +83,6 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
 
         this._shadow.getElementById('title').innerText = resourceType.type;
 
-        this._skip = 0;
         this._link = {
             "first": `${this._server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
         };
@@ -174,7 +188,13 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         }
     }
 
-    async fetchPage(url) {
+    async fetchPage(base) {
+        const url = new URL(base);
+        if (this._filters) {
+            Object.entries(this._filters).forEach(([key, definition]) => {
+                url.searchParams.append(key, definition.value);
+            });
+        }
         const response = await fetch(url, {
             "headers": this._server.headers
         });
@@ -182,7 +202,13 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
     }
 
     async fetchCount() {
-        const response = await fetch(`${this._server.url}/${this._resourceType.type}?_summary=count&_format=json`, {
+        const url = new URL(`${this._server.url}/${this._resourceType.type}?_summary=count&_format=json`);
+        if (this._filters) {
+            Object.entries(this._filters).forEach(([key, definition]) => {
+                url.searchParams.append(key, definition.value);
+            });
+        }
+        const response = await fetch(url, {
             "headers": this._server.headers
         });
         return response.json();
@@ -209,7 +235,7 @@ FhirBundleTemplate.innerHTML = `
     <div id="wrapper">
         <app-bar>
             <h3 slot="middle" id="title"></h3>
-            <app-round-button slot="right" id="filter" title="Filter" disabled app-icon="filter_list"></app-round-button>
+            <app-round-button slot="right" id="searchToggle" title="Filter" app-icon="filter_list"></app-round-button>
             <app-round-button slot="right" id="help" title="Help" app-icon="help"></app-round-button>
         </app-bar>
         <app-linear-progress id="loader" style="visibility:hidden;"></app-linear-progress>
@@ -217,4 +243,5 @@ FhirBundleTemplate.innerHTML = `
             <app-data-table-pagination id="pagination" slot="footer"/>
         </app-data-table>
     </div>
+    <fhir-search id="search" hidden></fhir-seach>
 `;
