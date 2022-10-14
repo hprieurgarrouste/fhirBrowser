@@ -77,6 +77,7 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
             switch (server.auth.method) {
                 case "oauth2":
                     this.oauth2_getToken(server.auth.setup).then(response => {
+                        if (!server.headers) server.headers = {};
                         server.headers.Authorization = `${response.token_type} ${response.access_token}`;
                     });
                     break;
