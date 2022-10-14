@@ -44,6 +44,7 @@ AppTemplate.innerHTML = `
         }
         #leftPanel {
             border-right:1px solid var(--border-color, gray);
+            width:300px;
         }
         #bdy {
             overflow: hidden;
@@ -55,6 +56,7 @@ AppTemplate.innerHTML = `
                 height: calc(100% - 56px - 1px);
                 position: absolute;
                 background-color: var(--background-color, rgb(255,255,255));
+                width:100%;
             }
         }
     </style>

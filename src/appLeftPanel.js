@@ -51,7 +51,6 @@ AppLeftPanelTemplate.innerHTML = `
             height:100%;
         }
         #content {
-            width:300px;
             display:flex;
             flex-direction: column;
             height : 100%;

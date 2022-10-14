@@ -22,7 +22,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
 
     connectedCallback() {
         this._shadow.getElementById('help').addEventListener('click', () => {
-            window.open(this._resourceType.profile, "_blank");
+            window.open(this._resourceType.profile, "FhirBrowserHelp");
         });
         this._shadow.getElementById('pagination').addEventListener("pagination", ({ detail }) => {
             this.loadPage(detail.button);
@@ -235,7 +235,7 @@ FhirBundleTemplate.innerHTML = `
     <div id="wrapper">
         <app-bar>
             <h3 slot="middle" id="title"></h3>
-            <app-round-button slot="right" id="searchToggle" title="Filter" app-icon="filter_list"></app-round-button>
+            <app-round-button slot="right" id="searchToggle" title="Search" app-icon="search"></app-round-button>
             <app-round-button slot="right" id="help" title="Help" app-icon="help"></app-round-button>
         </app-bar>
         <app-linear-progress id="loader" style="visibility:hidden;"></app-linear-progress>
