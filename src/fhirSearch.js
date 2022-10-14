@@ -26,9 +26,6 @@ customElements.define('fhir-search', class FhirSearch extends HTMLElement {
                 field.value = ""
             });
         });
-        this._shadow.getElementById('help').addEventListener('click', () => {
-            window.open("https://hl7.org/fhir/search.html", "FhirBrowserHelp");
-        });
         this._shadow.getElementById("apply").addEventListener("click", () => {
             const fields = content.querySelectorAll("input");
             let parameters = {};
@@ -53,89 +50,50 @@ customElements.define('fhir-search', class FhirSearch extends HTMLElement {
      */
     set metadata(metadata) {
         const content = this._shadow.getElementById("content");
-        content.scrollTop = 0;
+
         while (content.firstChild) content.removeChild(content.lastChild);
 
+        /**
+         *  <div class="item">
+         *    <div class="field">
+         *       <label for=""></label>
+         *       <input type=""></input>
+         *    </div>
+         *    <span></span>
+         *  </div>
+         **/
         const sorted = metadata.searchParam.sort((s1, s2) => s1.name < s2.name ? -1 : s1.name > s2.name ? 1 : 0);
         sorted.forEach(search => {
-            let fields = null;
-            let inputs = null;
-            switch (search.type) {
-                case "string":
-                case "code":
-                case "markdown":
-                case "id":
-                case "reference":
-                    fields = FhirSearchFieldTextTemplate.content.cloneNode(true);
-                    inputs = fields.querySelectorAll("input");
-                    inputs.forEach(field => {
-                        field.name = search.name + field.name;
-                    })
-                    break;
-                case "date":
-                    fields = FhirSearchFieldDateTemplate.content.cloneNode(true);
-                    inputs = fields.querySelectorAll("input");
-                    inputs.forEach(field => {
-                        field.name = search.name + field.name;
-                    })
-                default:
-                    break;
-            }
+            if ("string" === search.type) {
+                const itm = document.createElement('div');
+                itm.className = "item";
+                content.appendChild(itm);
 
-            if (fields) {
-                const item = FhirSearchFieldTemplate.content.cloneNode(true);
-                item.querySelector(".helper").innerText = search.documentation;
-                item.querySelector("legend").innerText = search.name;
-                item.querySelector("fieldset").appendChild(fields);
-                content.appendChild(item);
+                const field = document.createElement('div');
+                field.className = "field";
+                itm.appendChild(field);
+
+                const lbl = document.createElement('label');
+                lbl.setAttribute("for", search.name);
+                lbl.innerText = search.name;
+                content.appendChild(lbl);
+                field.appendChild(lbl);
+
+                const txt = document.createElement('input');
+                txt.setAttribute("name", search.name);
+                txt.setAttribute("type", "text");
+                field.appendChild(txt);
+
+
+                const hlp = document.createElement('span');
+                hlp.innerText = search.documentation;
+                content.appendChild(hlp);
+                itm.appendChild(hlp);
             }
         });
     }
 
 });
-
-const FhirSearchFieldTemplate = document.createElement('template');
-FhirSearchFieldTemplate.innerHTML = `
-    <div class="item">
-        <fieldset>
-            <legend></legend>
-        </fieldset>
-        <span class="helper"></span>
-    </div>
-`;
-
-const FhirSearchFieldTextTemplate = document.createElement('template');
-FhirSearchFieldTextTemplate.innerHTML = `
-    <div style="flex:none"><div class="field">
-        <input name="" placeholder="Modifier" list="FhirSearchFieldTextList"></input>
-        <datalist id="FhirSearchFieldTextList">
-            <option value="exact"></option>
-            <option value="contains"></option>
-        </datalist>
-    </div></div>
-    <div class="field">
-        <input name="" type="text">
-    </div>
-`;
-
-const FhirSearchFieldDateTemplate = document.createElement('template');
-FhirSearchFieldDateTemplate.innerHTML = `
-    <div style="flex:none"><div class="field">
-        <input class="modifier" name="_prefix" placeholder="Prefix" list="FhirSearchFieldDateList"></input>
-        <datalist id="FhirSearchFieldDateList">
-            <option value="eq">Is equal to</option>
-            <option value="ne">is not equal to</option>
-            <option value="gt">is greater than</option>
-            <option value="lt">is less than</option>
-            <option value="ge">is greater or equal to</option>
-            <option value="le">is less or equal to</option>
-        </datalist>
-    </div></div>
-    <div class="field">
-        <input name="_date" type="date"></input>
-        <input name="_time" type="time"></input>
-    </div>
-`;
 
 const FhirSearchTemplate = document.createElement('template');
 FhirSearchTemplate.innerHTML = `
@@ -152,11 +110,11 @@ FhirSearchTemplate.innerHTML = `
         .surface {
             background-color: var(--background-color, white);
             border-radius: 4px;
-            height: 100%;
+            height: 50%;
             width: 50%;
             position: absolute;
-            top: 0;
-            right: 0;
+            top: 60px;
+            right: 1em;
         }
         .overlay {
             background-color: rgba(255,255,255,4%);
@@ -165,6 +123,8 @@ FhirSearchTemplate.innerHTML = `
             flex-direction: column;
             font-family: Roboto, Arial, monospace;
             height: 100%;
+        }
+        app-bar {
         }
         #content {
             border-bottom: 1px solid var(--border-color);
@@ -192,61 +152,54 @@ FhirSearchTemplate.innerHTML = `
         #actions input[type=button]:hover {
             background-color: var(--hover-color);
         }
-
-        .item {
-            margin-bottom: 1em;
+        div.item {
+            display:flex;
+            flex-direction: column;
+            margin-bottom: 0.5em;
         }
-        fieldset {
-            display: flex;
-            flex-direction: row;
-            border: none;
-            padding: 0;
-            gap: 1em;
+        div.item span {
+            color: var(-text-color-disabled);
+            font-size: small;
+            padding-left: 1em;
         }
-        fieldset:focus-within legend {
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-        fieldset:focus-within div.field,
-        fieldset:focus-within div.field input {
+        div.item:focus-within {
             border-color: var(--primary-color);
         }
-
-        .helper {
-            color: var(--text-color-disabled);
-            font-size: small;
+        div.item:focus-within label {
+            color: var(--primary-color);
+        }
+        div.item:focus-within input {
+            border-color: var(--primary-color);
         }
         div.field {
             background-color: var(--hover-color);
             border-bottom: 1px solid gray;
-            flex: auto;
             display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
+            position: relative;
+        }
+        div.field label {
+            left: 1em;
+            position: absolute;
+            top: 0.2em;
+            font-size: smaller;
         }
         div.field input {
-            background: none;
+            padding: 25px 1em 5px 1em;
+            flex: auto;
             border: 0 none;
+            background: none;
+            font: inherit;
             border-bottom: 1px solid transparent;
             color: var(--text-color-normal);
-            flex: auto;
-            font: inherit;
-            padding: 0.5em;
-            width: 90px;
-        }
-        div.field input[type=date],
-        div.field input[type=time] {
-            max-width: 120px;
-            min-width: 100px;
         }
         div.field input:focus {
             outline: none;
         }
-
         @media (max-width:480px){
             .surface {
+                top:0;
                 left:0;
-                right: unset;
+                height: 100%;
                 width:100%;
                 max-width: unset;
                 max-height: unset;
@@ -263,7 +216,6 @@ FhirSearchTemplate.innerHTML = `
                     <app-round-button id="close" title="Close" app-icon="close" slot="left"></app-round-button>
                     <h3 id="title" slot="middle">Search</h3>
                     <app-round-button id="clear" title="Clear" app-icon="clear_all" slot="right"></app-round-button>
-                    <app-round-button id="help" title="Help" app-icon="help" slot="right"></app-round-button>
                 </app-bar>
                 <div id="content"></div>
                 <div id="actions">
