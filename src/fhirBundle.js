@@ -144,7 +144,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
                     let row = {};
                     this._columns.forEach(column => {
                         value = eval("entry.resource." + column.expression);
-                        if (column.type === "date") value = formatDate(value);
+                        //if (column.type === "date") value = formatDate(value);
                         row[column.label] = value;
                     });
                     dataTable.addRow(entry.resource.id, row);
@@ -191,8 +191,8 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
     async fetchPage(base) {
         const url = new URL(base);
         if (this._filters) {
-            Object.entries(this._filters).forEach(([key, definition]) => {
-                url.searchParams.append(key, definition.value);
+            this._filters.forEach(filter => {
+                url.searchParams.append(filter.name, filter.value);
             });
         }
         const response = await fetch(url, {
@@ -204,8 +204,8 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
     async fetchCount() {
         const url = new URL(`${this._server.url}/${this._resourceType.type}?_summary=count&_format=json`);
         if (this._filters) {
-            Object.entries(this._filters).forEach(([key, definition]) => {
-                url.searchParams.append(key, definition.value);
+            this._filters.forEach(filter => {
+                url.searchParams.append(filter.name, filter.value);
             });
         }
         const response = await fetch(url, {
