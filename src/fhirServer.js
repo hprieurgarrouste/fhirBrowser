@@ -83,6 +83,7 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
                     break;
                 case "basic":
                     let auth = btoa(`${server.auth.setup.username}:${server.auth.setup.password}`);
+                    if (!server.headers) server.headers = {};
                     server.headers.Authorization = `Basic ${auth}`;
                     break;
                 default:
