@@ -9,14 +9,12 @@ customElements.define('app-data-table', class AppDataTable extends HTMLElement {
         shadow.appendChild(AppDataTableTemplate.content.cloneNode(true));
         this._header = shadow.getElementById("header");
         this._body = shadow.getElementById("body");
-        this._footerCell = shadow.getElementById("footer");
     }
     addColumn(title) {
         let cell = document.createElement("th");
         let cellText = document.createTextNode(title);
         cell.appendChild(cellText);
         this._header.appendChild(cell);
-        this._footerCell.colSpan = this._header.childElementCount;
     }
     addRow(id, columns) {
         let row = document.createElement("tr");
@@ -61,38 +59,25 @@ AppDataTableTemplate.innerHTML = `
     <style>
         div {
             background-color: var(--background-color, white);
-            border: 1px solid var(--border-color, gray);
-            border-radius: 4px;
-            height:100%;
-        }
-        table {
-            border: 0;
-            white-space: nowrap;
-            border-collapse: collapse;
             display:flex;
             flex-direction:column;
             height:100%;
+            overflow:auto;
         }
-        thead, tbody tr, tfoot {
-            display:table;
-            width:100%;
-            table-layout:fixed;
+        table {
+            white-space: nowrap;
+            border-collapse: collapse;
         }
         thead {
-            width: calc( 100% - 5px );
+            background-color: var(--background-color);
+            position: sticky;
+            top: 0;
+            box-shadow: 0 2px 4px var(--border-color);
         }
-        th {
-            text-align: left;
+        th, td {
             height: 56px;
-            padding-right: 16px;
-            padding-left: 16px;
-            overflow:hidden;
-        }
-        tbody {
-            border-top: 1px solid var(--border-color, gray);
-            display:block;
-            overflow-y:auto;
-            flex: 1 1 auto;
+            text-align: left;
+            padding: 1px 16px;
         }
         tbody tr {
             cursor:pointer;
@@ -101,37 +86,13 @@ AppDataTableTemplate.innerHTML = `
         tbody tr:hover, tbody tr.selected {
             background-color: var(--hover-color, rgba(0, 0, 0, 5%));
         }
-        tbody td {
-            height: 52px;
-            padding-right: 16px;
-            padding-left: 16px;
-            overflow:hidden;
-            text-overflow: ellipsis;
-            direction: rtl;
-            text-align: left;
-        }
-        tfoot {
-            border-top: 1px solid var(--border-color, gray);
-        }
-        tfoot td {
-            text-align: right;
-            overflow: hidden;
-        }
     </style>
     <div>
         <table>
             <thead>
                 <tr id="header"></tr>
             </thead>
-            <tbody id="body">
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td id="footer">
-                        <slot name="footer"/>
-                    </td>
-                </tr>
-            </tfoot>
+            <tbody id="body"></tbody>
         </table>
     </div>
 `;

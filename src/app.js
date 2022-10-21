@@ -14,7 +14,7 @@ const AppTemplate = document.createElement('template');
 AppTemplate.innerHTML = `
     <link rel="stylesheet" href="./material.css">
     <style>
-        #app {
+        :host {
             display: flex;
             flex-direction: column;
             height: 100vh;
@@ -25,19 +25,19 @@ AppTemplate.innerHTML = `
             background-color: var(--background-color, rgb(255,255,255));
             color: var(--text-color-normal, rgb(0,0,0,87%));
         }
-        #header {
+        header {
             background-color: var(--primary-color, #000);
             color:#FFF;
         }
         h3 {
             margin:0;
         }
-        #content {
+        main {
             flex:1 1 auto;
             overflow: auto;
             height : 0;
         }
-        #content > div {
+        main > div {
             display:flex;
             flex-direction: row;
             height : 100%;
@@ -60,23 +60,23 @@ AppTemplate.innerHTML = `
             }
         }
     </style>
-    <div id="app">
+    <header>
         <app-bar id="header" caption="">
             <app-round-button slot="left" id="navigation" title="Menu" app-icon="menu"></app-round-button>
             <h3 slot="middle">FHIR Browser</h3>
             <app-round-button slot="right" id="colorScheme" title="Theme" app-icon="brightness_auto"></app-round-button>
             <app-round-button slot="right" id="serverSelectorToggle" title="Connections" app-icon="public"></app-round-button>
         </app-bar>
-        <div id="content">
-            <div>
-                <app-left-panel id="leftPanel" hidden></app-left-panel>
-                <div id="bdy">
-                    <fhir-bundle id="bundle" hidden></fhir-bundle>
-                    <fhir-resource id="resource" hidden></fhir-resource>
-                </div>
+    </header>
+    <main>
+        <div>
+            <app-left-panel id="leftPanel" hidden></app-left-panel>
+            <div id="bdy">
+                <fhir-bundle id="bundle" hidden></fhir-bundle>
+                <fhir-resource id="resource" hidden></fhir-resource>
             </div>
         </div>
-    </div>
+    </main>
     <fhir-server id="serverSelector" hidden></fhir-server>
 `;
 

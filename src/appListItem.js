@@ -16,21 +16,22 @@ AppListItemTemplate.innerHTML = `
         main:hover {
             background-color: var(--hover-color, rgba(0, 0, 0, 5%));
         }
-        #title {
+        slot[name="title"] {
+            display:block;
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;
             text-transform: capitalize;
             color: var(--text-color-normal, black);
         }
-        #subTitle {
-            font-size: 0.875em;
+        slot[name="subTitle"] {
+            font-size: smaller;
             color: rgba(var(--text-color, "0, 0, 0"), 54%);
             overflow-wrap: break-word;
         }
     </style>
     <main>
-        <div id="title"><slot name="title"></slot></div>
-        <div id="subTitle"><slot name="subTitle"></slot></div>
+        <slot name="title"></slot>
+        <slot name="subTitle"></slot>
     </main>
 `;

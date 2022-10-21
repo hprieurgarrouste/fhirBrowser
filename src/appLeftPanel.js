@@ -48,12 +48,9 @@ const AppLeftPanelTemplate = document.createElement('template');
 AppLeftPanelTemplate.innerHTML = `
     <style>
         main {
-            height:100%;
-        }
-        #content {
-            display:flex;
+            display: flex;
             flex-direction: column;
-            height : 100%;
+            height: 100%;
         }
         #metadata {
             flex: 1 1 auto;
@@ -66,9 +63,7 @@ AppLeftPanelTemplate.innerHTML = `
         }
     </style>
     <main>
-        <div id="content">
-            <app-circular-progress id="waiting" hidden></app-circular-progress>
-            <fhir-metadata id="metadata"></fhir-metadata>
-        </div>
+        <app-circular-progress id="waiting" hidden></app-circular-progress>
+        <fhir-metadata id="metadata"></fhir-metadata>
     </main>
 `;

@@ -1,7 +1,6 @@
 import "./appBar.js";
 import "./appDataTable.js";
 import "./appDataTablePagination.js";
-import "./appLinearProgress.js";
 
 import "./fhirSearch.js";
 
@@ -58,7 +57,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._shadow.getElementById("search").metadata = resourceType;
 
         this._columns = [];
-        if (resourceType.type === "Binary") {
+        if ("Binary" === resourceType.type) {
             this._columns.push({
                 "label": "Content type",
                 "expression": "contentType",
@@ -224,24 +223,37 @@ FhirBundleTemplate.innerHTML = `
             flex-direction:column;
             height:100%;
         }
-        #table {
+        main {
             flex:1 1 auto;
             height:0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
         }
         #title {
             margin:0;
         }
+        progress {
+            margin: 0 1em;
+            accent-color: var(--primary-color);
+            width: calc(100% - 2em);
+            height: 10px;
+        }
     </style>
     <div id="wrapper">
-        <app-bar>
-            <h3 slot="middle" id="title"></h3>
-            <app-round-button slot="right" id="searchToggle" title="Search" app-icon="search"></app-round-button>
-            <app-round-button slot="right" id="help" title="Help" app-icon="help"></app-round-button>
-        </app-bar>
-        <app-linear-progress id="loader" style="visibility:hidden;"></app-linear-progress>
-        <app-data-table id="table">
-            <app-data-table-pagination id="pagination" slot="footer"/>
-        </app-data-table>
+        <header>
+            <app-bar>
+                <h3 slot="middle" id="title"></h3>
+                <app-round-button slot="right" id="searchToggle" title="Search" app-icon="search"></app-round-button>
+                <app-round-button slot="right" id="help" title="Help" app-icon="help"></app-round-button>
+            </app-bar>
+            <progress id="loader"></progress>
+        </header>
+        <main>
+            <app-data-table id="table"></app-data-table>
+        </main>
+        <footer>
+            <app-data-table-pagination id="pagination"/>
+        </footer>
     </div>
     <fhir-search id="search" hidden></fhir-seach>
 `;

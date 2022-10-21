@@ -73,6 +73,8 @@ AppDataTablePaginationTemplate.innerHTML = `
             font-family: inherit;
             font-size: .875rem;
             padding: 0.5em;
+            text-align:right;
+            white-space: nowrap;
         }
         span {
             margin: 0 24px;
