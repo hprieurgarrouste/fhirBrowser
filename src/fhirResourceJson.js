@@ -4,6 +4,17 @@ customElements.define('fhir-resource-json', class FhirResourceJson extends HTMLE
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.appendChild(FhirResourceJsonTemplate.content.cloneNode(true));
     }
+    connectedCallback() {
+        this._shadow.getElementById("content").addEventListener('click', ({ target }) => {
+            const dt = target.closest('dt');
+            if (dt) {
+                const dl = dt.querySelector('dl');
+                if (dl) {
+                    dl.hidden = !dl.hidden;
+                }
+            }
+        });
+    }
     /**
      * @param {object} resource
      */
@@ -69,11 +80,26 @@ FhirResourceJsonTemplate.innerHTML = `
         dt {
             list-style-type: none;
         }
+        span {
+            color: var(--json-viewer-values-color, black);
+            cursor: inherit;
+        }
         span:first-of-type {
             color: var(--json-viewer-properties-color, black);
         }
-        span {
-            color: var(--json-viewer-values-color, black);
+        dt:has(>dl) {
+            cursor: pointer;
+        }
+        dt:has(>dl) > span::before {
+            content: 'expand_less';
+            font-family: 'Material Icons';
+            font-weight: bold;
+        }
+        dt:has(>dl[hidden]) > span::before {
+            content: 'expand_more';
+        }
+        dt:not(:has(>dl)) > span {
+            margin-left: 1em;
         }
     </style>
     <main>
