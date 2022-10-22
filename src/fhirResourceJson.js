@@ -31,9 +31,8 @@ customElements.define('fhir-resource-json', class FhirResourceJson extends HTMLE
                 const dt = document.createElement('dt');
                 if (!isArray) {
                     const elm = document.createElement('span');
-                    elm.innerText = `"${key}"`;
+                    elm.innerText = `"${key}": `;
                     dt.appendChild(elm);
-                    dt.appendChild(document.createTextNode(": "));
                 }
                 if (typeof value === 'object') {
                     parse(dt, value);
@@ -94,6 +93,8 @@ FhirResourceJsonTemplate.innerHTML = `
             content: 'expand_less';
             font-family: 'Material Icons';
             font-weight: bold;
+            line-height: inherit;
+            vertical-align: middle;
         }
         dt:has(>dl[hidden]) > span::before {
             content: 'expand_more';

@@ -40,10 +40,10 @@ AppRoundButtonTemplate.innerHTML = `
             border:0 none;
             color: inherit;
             background-color:transparent;
+            border-radius: 50%;
         }
         main:not([disabled]):hover {
-            background-color:var(--hover-color, rgba(0,0,0,5%));
-            border-radius: 50%;
+            background-color:var(--hover-color, rgb(0 0 0 /5%));
         }
         main[disabled] {
             color:var(--text-color-disabled);

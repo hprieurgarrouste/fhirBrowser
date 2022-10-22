@@ -14,13 +14,13 @@
     <style>
         :root {
             --primary-color: #1A67E5;
-            --text-color: 0, 0, 0;
-            --text-color-normal: rgba(var(--text-color), 87%);
-            --text-color-disabled: rgba(var(--text-color), 38%);
+            --text-color: 0 0 0;
+            --text-color-normal: rgb(var(--text-color) / 87%);
+            --text-color-disabled: rgb(var(--text-color) / 50%);
             --background-color: rgb(255, 255, 255);
             --background-error: rgb(176, 0, 32);
-            --border-color: rgba(0, 0, 0, 12%);
-            --hover-color: rgba(0, 0, 0, 5%);
+            --border-color: rgb(var(--text-color) / 12%);
+            --hover-color: rgb(var(--text-color) / 4%);
             --scroll-color: var(--primary-color);
             --json-viewer-properties-color: #1F50A4;
             --json-viewer-values-color: #9D100C;
@@ -28,13 +28,13 @@
 
         [color-scheme="dark"] {
             --primary-color: #1A67E5;
-            --text-color: 255, 255, 255;
-            --text-color-normal: rgba(var(--text-color), 100%);
-            --text-color-disabled: rgba(var(--text-color), 50%);
+            --text-color: 255 255 255;
+            --text-color-normal: rgb(var(--text-color) / 87%);
+            --text-color-disabled: rgb(var(--text-color) / 50%);
             --background-color: rgb(16, 16, 16);
             --background-error: rgb(176, 0, 32);
-            --border-color: rgba(255, 255, 255, 12%);
-            --hover-color: rgba(255, 255, 255, 10%);
+            --border-color: rgb(var(--text-color) / 12%);
+            --hover-color: rgb(var(--text-color) / 10%);
             --scroll-color: var(--primary-color);
             --json-viewer-properties-color: #88DCF0;
             --json-viewer-values-color: #CA9178;

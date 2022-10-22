@@ -82,7 +82,7 @@ AppDataTableTemplate.innerHTML = `
             cursor:pointer;
         }
         tbody tr:hover, tbody tr.selected {
-            background-color: var(--hover-color, rgba(0, 0, 0, 5%));
+            background-color: var(--hover-color, rgb(0 0 0 / 4%));
         }
     </style>
     <div>

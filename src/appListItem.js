@@ -26,7 +26,7 @@ AppListItemTemplate.innerHTML = `
         }
         slot[name="subTitle"] {
             font-size: smaller;
-            color: rgba(var(--text-color, "0, 0, 0"), 54%);
+            color: var(--text-color-disabled);
             overflow-wrap: break-word;
         }
     </style>
