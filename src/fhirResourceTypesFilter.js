@@ -38,8 +38,6 @@ FhirResourceTypesFilterTemplate.innerHTML = `
     <link href="./material.css" rel="stylesheet"/>
     <style>
         main {
-            background-color: rgba(var(--text-color, black), 4%);
-            border: 1px solid transparent;
             display: flex;
             padding: 0.7em;
             font-size: smaller;

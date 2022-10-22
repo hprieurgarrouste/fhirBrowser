@@ -15,15 +15,15 @@ AppTemplate.innerHTML = `
     <link rel="stylesheet" href="./material.css">
     <style>
         :host {
+            background-color: var(--background-color, rgb(255,255,255));
+            color: var(--text-color-normal, rgb(0,0,0,87%));
             display: flex;
             flex-direction: column;
-            height: 100vh;
             font-family: Roboto, Arial, monospace;
             font-size: 1rem;
             font-weight: 400;
+            height: 100vh;
             line-height: 1.5;
-            background-color: var(--background-color, rgb(255,255,255));
-            color: var(--text-color-normal, rgb(0,0,0,87%));
         }
         header {
             background-color: var(--primary-color, #000);
@@ -34,8 +34,8 @@ AppTemplate.innerHTML = `
         }
         main {
             flex:1 1 auto;
-            overflow: auto;
             height : 0;
+            overflow: auto;
         }
         main > div {
             display:flex;
@@ -47,15 +47,14 @@ AppTemplate.innerHTML = `
             width:300px;
         }
         #bdy {
-            overflow: hidden;
             flex: 1 1 auto;
+            overflow: hidden;
             width: 0;
         }
         @media (max-width:480px){
             #leftPanel {
-                height: calc(100% - 56px - 1px);
-                position: absolute;
                 background-color: var(--background-color, rgb(255,255,255));
+                position: static;
                 width:100%;
             }
         }

@@ -237,13 +237,15 @@ FhirBundleTemplate.innerHTML = `
             accent-color: var(--primary-color);
             width: calc(100% - 2em);
             height: 10px;
+            position: fixed;
+            top: 100px;
         }
     </style>
     <div id="wrapper">
         <header>
             <app-bar>
                 <h3 slot="middle" id="title"></h3>
-                <app-round-button slot="right" id="searchToggle" title="Search" app-icon="search"></app-round-button>
+                <app-round-button slot="right" id="searchToggle" title="Search" app-icon="filter_list"></app-round-button>
                 <app-round-button slot="right" id="help" title="Help" app-icon="help"></app-round-button>
             </app-bar>
             <progress id="loader"></progress>

@@ -58,30 +58,28 @@ AppDataTableTemplate.innerHTML = `
     <link href="./material.css" rel="stylesheet"/>
     <style>
         div {
-            background-color: var(--background-color, white);
-            display:flex;
-            flex-direction:column;
             height:100%;
             overflow:auto;
         }
         table {
-            white-space: nowrap;
             border-collapse: collapse;
+            min-width: 100%;
+            white-space: nowrap;
         }
         thead {
             background-color: var(--background-color);
+            box-shadow: 0 2px 4px var(--border-color);
             position: sticky;
             top: 0;
-            box-shadow: 0 2px 4px var(--border-color);
         }
         th, td {
             height: 56px;
-            text-align: left;
             padding: 1px 16px;
+            text-align: left;
         }
         tbody tr {
-            cursor:pointer;
             border-bottom: 1px solid var(--border-color, gray);
+            cursor:pointer;
         }
         tbody tr:hover, tbody tr.selected {
             background-color: var(--hover-color, rgba(0, 0, 0, 5%));

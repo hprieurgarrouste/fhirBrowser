@@ -84,6 +84,9 @@ FhirResourceTypesTemplate.innerHTML = `
         li:hover, li.selected {
             background-color:var(--hover-color, lightgray);
         }
+        fhir-resource-types-filter {
+            box-shadow: 0 2px 4px var(--border-color);
+        }
     </style>
     <main>
         <fhir-resource-types-filter id="filter"></fhir-resource-types-filter>

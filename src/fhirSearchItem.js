@@ -60,7 +60,7 @@ customElements.define('fhir-search-item', class FhirSearchItem extends HTMLEleme
     init(search) {
         this._search = search;
         this._shadow.querySelector("legend").innerText = search.name;
-        this._shadow.querySelector("span").innerText = search.documentation;
+        this._shadow.querySelector("span").innerText = search.documentation || '';
         const content = this._shadow.querySelector("fieldset");
 
         let field;
