@@ -7,12 +7,8 @@ customElements.define('fhir-resource-json', class FhirResourceJson extends HTMLE
     connectedCallback() {
         this._shadow.getElementById("content").addEventListener('click', ({ target }) => {
             const dt = target.closest('dt');
-            if (dt) {
-                const dl = dt.querySelector('dl');
-                if (dl) {
-                    dl.hidden = !dl.hidden;
-                }
-            }
+            if (dt && (dt.classList.contains("array") || dt.classList.contains("object")))
+                dt.classList.toggle("collapsed");
         });
     }
     /**
@@ -20,35 +16,34 @@ customElements.define('fhir-resource-json', class FhirResourceJson extends HTMLE
      */
     set source(resource) {
         const content = this._shadow.getElementById("content");
-        while (content.firstChild) content.removeChild(content.lastChild);
         content.scrollTo(0, 0);
-        parse(content, resource);
-        function parse(parent, obj) {
-            let isArray = Array.isArray(obj);
-            parent.appendChild(document.createTextNode(isArray ? '[' : '{'));
+        content.innerHTML = "";
+        content.appendChild(parse(resource));
+
+        function parse(obj) {
             let dl = document.createElement('dl');
             for (const [key, value] of Object.entries(obj)) {
                 const dt = document.createElement('dt');
-                if (!isArray) {
-                    const elm = document.createElement('span');
-                    elm.innerText = `"${key}": `;
-                    dt.appendChild(elm);
+
+                const keyElm = document.createElement('span');
+                keyElm.className = "key";
+                keyElm.innerText = key;
+                dt.appendChild(keyElm);
+
+                const valueElm = document.createElement('span');
+                valueElm.classList.add("value");
+                if ("string" === typeof (value)) {
+                    valueElm.classList.add("string");
+                    valueElm.innerText = value;
+                } else if ("object" === typeof (value)) {
+                    dt.classList.add(Array.isArray(value) ? "array" : "object");
+                    valueElm.appendChild(parse(value));
                 }
-                if (typeof value === 'object') {
-                    parse(dt, value);
-                } else {
-                    const elm = document.createElement('span');
-                    elm.innerText = (typeof (value) === 'string' ? `"${value}"` : value);
-                    dt.appendChild(elm);
-                }
-                const prev = dl.lastElementChild;
-                if (prev && prev.nodeName == dt.nodeName) {
-                    prev.appendChild(document.createTextNode(","));
-                }
+                dt.appendChild(valueElm);
+
                 dl.appendChild(dt);
             }
-            parent.appendChild(dl);
-            parent.appendChild(document.createTextNode(isArray ? ']' : '}'));
+            return dl;
         }
     }
 });
@@ -83,24 +78,70 @@ FhirResourceJsonTemplate.innerHTML = `
             color: var(--json-viewer-values-color, black);
             cursor: inherit;
         }
-        span:first-of-type {
+        span.key {
             color: var(--json-viewer-properties-color, black);
         }
-        dt:has(>dl) {
-            cursor: pointer;
+        span.key::before {
+            content: '"';
         }
-        dt:has(>dl) > span::before {
+        span.key::after {
+            content: '": ';
+        }
+        span.value::before {
+            content: '"';
+        }
+        span.value::after {
+            content: '"';
+        }
+        dt.array > span.value::before {
+            content: '[';
+        }
+        dt.array > span.value::after {
+            content: ']';
+        }
+        dt.object > span.value::before {
+            content: '{';
+        }
+        dt.object > span.value::after {
+            content: '}';
+        }
+        dt.array > span.value::after,
+        dt.object > span.value::after {
+            padding-left: 1em;
+        }
+        dt {
+            padding-left: 1em;
+        }
+        dt.array,
+        dt.object {
+            cursor: pointer;
+            padding-left: 0;
+        }
+        dt.array::before,
+        dt.object::before {
             content: 'expand_less';
             font-family: 'Material Icons';
             font-weight: bold;
             line-height: inherit;
             vertical-align: middle;
+            color: var(--text-color-disabled, black);
         }
-        dt:has(>dl[hidden]) > span::before {
+        dt:not(:last-child)::after {
+            content: ",";
+        }
+        dt.collapsed::before {
             content: 'expand_more';
         }
-        dt:not(:has(>dl)) > span {
-            margin-left: 1em;
+        dt.collapsed > span dl {
+            display: none;
+        }
+        dt.array.collapsed span.value::after {
+            content: '...]';
+            padding-left: 0;
+        }
+        dt.object.collapsed span.value::after {
+            content: '...}';
+            padding-left: 0;
         }
     </style>
     <main>
