@@ -1,6 +1,7 @@
 import "./appBar.js";
 import "./appDataTable.js";
 import "./appDataTablePagination.js";
+import "./appLinearProgress.js";
 
 import "./fhirSearch.js";
 
@@ -233,10 +234,6 @@ FhirBundleTemplate.innerHTML = `
             margin:0;
         }
         progress {
-            margin: 0 1em;
-            accent-color: var(--primary-color);
-            width: calc(100% - 2em);
-            height: 10px;
             position: fixed;
             top: 100px;
         }
@@ -248,7 +245,7 @@ FhirBundleTemplate.innerHTML = `
                 <app-round-button slot="right" id="searchToggle" title="Search" app-icon="filter_list"></app-round-button>
                 <app-round-button slot="right" id="help" title="Help" app-icon="help"></app-round-button>
             </app-bar>
-            <progress id="loader"></progress>
+            <app-linear-progress id="loader"></app-linear-progress>
         </header>
         <main>
             <app-data-table id="table"></app-data-table>

@@ -44,18 +44,30 @@ AppTemplate.innerHTML = `
         }
         #leftPanel {
             border-right:1px solid var(--border-color, gray);
+            flex: none;
+            position:relative;
+            transition: all 0.5s;
+            margin-left: 0;
             width:300px;
+        }
+        #leftPanel.hidden {
+            transition: all 0.5s;
+            margin-left: -300px;
         }
         #bdy {
             flex: 1 1 auto;
             overflow: hidden;
             width: 0;
+            position: relative;
         }
         @media (max-width:480px){
             #leftPanel {
                 background-color: var(--background-color, rgb(255,255,255));
                 position: static;
                 width:100%;
+            }
+            #leftPanel.hidden {
+                margin-left: -100%;
             }
         }
     </style>
@@ -69,7 +81,7 @@ AppTemplate.innerHTML = `
     </header>
     <main>
         <div>
-            <app-left-panel id="leftPanel" hidden></app-left-panel>
+            <app-left-panel id="leftPanel"></app-left-panel>
             <div id="bdy">
                 <fhir-bundle id="bundle" hidden></fhir-bundle>
                 <fhir-resource id="resource" hidden></fhir-resource>
@@ -93,12 +105,12 @@ customElements.define('fhir-browser', class App extends HTMLElement {
         const resource = this._shadow.getElementById("resource");
 
         this._shadow.getElementById("navigation").addEventListener('click', () => {
-            leftPanel.hidden = !leftPanel.hidden;
+            leftPanel.classList.toggle("hidden");
         });
 
         this._shadow.getElementById("leftPanel").addEventListener('resourceTypeSelected', ({ detail }) => {
             if (window.matchMedia("(max-width: 480px)").matches) {
-                leftPanel.hidden = true;
+                leftPanel.classList.add("hidden");
             }
             resource.hidden = true;
             bundle.hidden = false;
@@ -108,7 +120,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
         this._shadow.getElementById("serverSelector").addEventListener('serverchanged', ({ detail }) => {
             this._server = detail.server;
             leftPanel.server = detail.server;
-            leftPanel.hidden = false;
+            leftPanel.classList.remove("hidden");
             bundle.hidden = true;
             resource.hidden = true;
         });

@@ -18,7 +18,9 @@ customElements.define('fhir-resource-json', class FhirResourceJson extends HTMLE
         const content = this._shadow.getElementById("content");
         content.scrollTo(0, 0);
         content.innerHTML = "";
+        content.appendChild(document.createTextNode("{"));
         content.appendChild(parse(resource));
+        content.appendChild(document.createTextNode("}"));
 
         function parse(obj) {
             let dl = document.createElement('dl');
