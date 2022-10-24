@@ -45,7 +45,6 @@ AppTemplate.innerHTML = `
         #leftPanel {
             border-right:1px solid var(--border-color, gray);
             flex: none;
-            position:relative;
             transition: all 0.5s;
             margin-left: 0;
             width:300px;
@@ -58,7 +57,6 @@ AppTemplate.innerHTML = `
             flex: 1 1 auto;
             overflow: hidden;
             width: 0;
-            position: relative;
         }
         @media (max-width:480px){
             #leftPanel {
