@@ -14,8 +14,11 @@ customElements.define('fhir-metadata', class FhirMetadata extends HTMLElement {
     connectedCallback() {
         this._shadow.getElementById("tabs").addEventListener('click', ({ detail }) => {
             const tabId = detail.tabId;
-            this._shadow.getElementById("resourceTypes").hidden = (tabId !== 'tabResources');
-            this._shadow.getElementById("serverDetails").hidden = (tabId !== 'tabDetails');
+            if (tabId === "tabResources") {
+                this._shadow.getElementById("resourceTypes").classList.remove("hidden");
+            } else {
+                this._shadow.getElementById("resourceTypes").classList.add("hidden");
+            }
         });
         this._shadow.getElementById("resourceTypes").addEventListener('resourceTypeSelected', ({ detail }) => {
             this.dispatchEvent(new CustomEvent("resourceTypeSelected", {
@@ -50,9 +53,22 @@ FhirMetadataTemplate.innerHTML = `
             border-bottom:1px solid var(--border-color, gray);
         }
         #resourceTypes, #serverDetails {
-            flex:1 1 auto;
+            flex: auto;
             overflow: auto;
-            height:0;
+            height: 100%;
+            min-width: 100%;
+            transition: all 0.3s;
+        }
+        #tabsBody {
+            display:flex;
+            flex-direction:row;
+            flex: auto;
+            height: 0;
+            overflow:hidden;
+        }
+        #resourceTypes.hidden {
+            margin-left: -100%;
+            transition: all 0.3s;
         }
     </style>
     <main>
@@ -60,7 +76,9 @@ FhirMetadataTemplate.innerHTML = `
             <app-tab id="tabResources" selected>Resource Types</app-tab>
             <app-tab id="tabDetails">Details</app-tab>
         </app-tabs>
-        <fhir-resource-types id="resourceTypes"></fhir-resource-types>
-        <fhir-server-details id="serverDetails" hidden></fhir-server-details>
+        <div id="tabsBody">
+            <fhir-resource-types id="resourceTypes"></fhir-resource-types>
+            <fhir-server-details id="serverDetails"></fhir-server-details>
+        </div>
     </main>
 `;

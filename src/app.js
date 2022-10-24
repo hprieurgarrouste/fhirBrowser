@@ -129,13 +129,13 @@ customElements.define('fhir-browser', class App extends HTMLElement {
         });
 
         bundle.addEventListener('resourceSelected', ({ detail }) => {
-            bundle.hidden = true;
-            resource.hidden = false;
             resource.load({
                 "server": this._server,
                 "resourceType": detail.resourceType,
                 "resourceId": detail.resourceId
             });
+            bundle.hidden = true;
+            resource.hidden = false;
         });
 
         this.setColorScheme(Preferences.get("colorScheme", "auto"));
