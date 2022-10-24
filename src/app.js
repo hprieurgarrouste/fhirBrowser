@@ -45,12 +45,12 @@ AppTemplate.innerHTML = `
         #leftPanel {
             border-right:1px solid var(--border-color, gray);
             flex: none;
-            transition: all 0.5s;
+            transition: all 0.3s;
             margin-left: 0;
             width:300px;
         }
         #leftPanel.hidden {
-            transition: all 0.5s;
+            transition: all 0.3s;
             margin-left: -300px;
         }
         #bdy {

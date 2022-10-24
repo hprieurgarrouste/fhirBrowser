@@ -145,6 +145,11 @@ FhirResourceJsonTemplate.innerHTML = `
             content: '...}';
             padding-left: 0;
         }
+        @media (max-width:480px){
+            #content {
+                line-height: 2em;
+            }
+        }
     </style>
     <main>
         <div id="content"></div>

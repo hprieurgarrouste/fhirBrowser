@@ -80,6 +80,7 @@ FhirResourceTypesTemplate.innerHTML = `
         li {
             cursor: pointer;
             padding: 0.3em 1em;
+            line-height: 2em;
         }
         li:hover, li.selected {
             background-color:var(--hover-color, lightgray);
