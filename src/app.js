@@ -57,6 +57,16 @@ AppTemplate.innerHTML = `
             flex: 1 1 auto;
             overflow: hidden;
             width: 0;
+            display: flex;
+            flex-direction: row;
+        }
+        fhir-bundle, fhir-resource {
+            flex: auto;
+            min-width: 100%;
+            transition: all 0.2s ease-in-out;
+        }
+        fhir-bundle.hidden {
+            margin-left: -100%;
         }
         @media (max-width:480px){
             #leftPanel {
@@ -80,9 +90,9 @@ AppTemplate.innerHTML = `
     <main>
         <div>
             <app-left-panel id="leftPanel"></app-left-panel>
-            <div id="bdy">
-                <fhir-bundle id="bundle" hidden></fhir-bundle>
-                <fhir-resource id="resource" hidden></fhir-resource>
+            <div id="bdy" style="visibility:hidden;">
+                <fhir-bundle id="bundle"></fhir-bundle>
+                <fhir-resource id="resource"></fhir-resource>
             </div>
         </div>
     </main>
@@ -101,6 +111,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
         const leftPanel = this._shadow.getElementById("leftPanel");
         const bundle = this._shadow.getElementById("bundle");
         const resource = this._shadow.getElementById("resource");
+        const bdy = this._shadow.getElementById("bdy");
 
         this._shadow.getElementById("navigation").addEventListener('click', () => {
             leftPanel.classList.toggle("hidden");
@@ -110,22 +121,20 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             if (window.matchMedia("(max-width: 480px)").matches) {
                 leftPanel.classList.add("hidden");
             }
-            resource.hidden = true;
-            bundle.hidden = false;
+            bundle.classList.remove("hidden");
             bundle.load(this._server, detail.resourceType);
+            bdy.style.visibility = "visible";
         });
 
         this._shadow.getElementById("serverSelector").addEventListener('serverchanged', ({ detail }) => {
             this._server = detail.server;
             leftPanel.server = detail.server;
             leftPanel.classList.remove("hidden");
-            bundle.hidden = true;
-            resource.hidden = true;
+            bdy.style.visibility = "hidden";
         });
 
         resource.addEventListener('back', () => {
-            resource.hidden = true;
-            bundle.hidden = false;
+            bundle.classList.remove("hidden");
         });
 
         bundle.addEventListener('resourceSelected', ({ detail }) => {
@@ -134,8 +143,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                 "resourceType": detail.resourceType,
                 "resourceId": detail.resourceId
             });
-            bundle.hidden = true;
-            resource.hidden = false;
+            bundle.classList.add("hidden");
         });
 
         this.setColorScheme(Preferences.get("colorScheme", "auto"));

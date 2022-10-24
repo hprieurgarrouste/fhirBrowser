@@ -59,14 +59,15 @@ customElements.define('fhir-search', class FhirSearch extends HTMLElement {
         const content = this._shadow.getElementById("content");
         content.scrollTop = 0;
         while (content.firstChild) content.removeChild(content.lastChild);
-
-        const sorted = metadata.searchParam.sort((s1, s2) => s1.name < s2.name ? -1 : s1.name > s2.name ? 1 : 0);
-        sorted.forEach(search => {
-            const item = document.createElement("fhir-search-item");
-            if (item.init(search)) {
-                content.appendChild(item);
-            }
-        });
+        if (metadata.searchParam) {
+            const sorted = metadata.searchParam.sort((s1, s2) => s1.name < s2.name ? -1 : s1.name > s2.name ? 1 : 0);
+            sorted.forEach(search => {
+                const item = document.createElement("fhir-search-item");
+                if (item.init(search)) {
+                    content.appendChild(item);
+                }
+            });
+        }
     }
 
 });
