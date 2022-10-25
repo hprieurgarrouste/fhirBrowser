@@ -60,7 +60,6 @@ FhirResourceJsonTemplate.innerHTML = `
             height:100%;
         }
         #content {
-            background-color: var(--background-color, inherit);
             color: var(--text-color-normal, black);
             flex: 1 1 auto;
             font-family: monospace;

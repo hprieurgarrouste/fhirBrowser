@@ -128,7 +128,7 @@ FhirResourceTemplate.innerHTML = `
             margin:0;
         }
         #tabs {
-            border-bottom:1px solid var(--border-color, gray);
+            box-shadow: 0 2px 4px var(--border-color);
         }
         #jsonView {
             flex:1 1 auto;
