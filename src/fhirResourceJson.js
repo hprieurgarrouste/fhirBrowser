@@ -40,6 +40,8 @@ customElements.define('fhir-resource-json', class FhirResourceJson extends HTMLE
                 } else if ("object" === typeof (value)) {
                     dt.classList.add(Array.isArray(value) ? "array" : "object");
                     valueElm.appendChild(parse(value));
+                } else {
+                    valueElm.innerText = value;
                 }
                 dt.appendChild(valueElm);
 
@@ -55,6 +57,7 @@ FhirResourceJsonTemplate.innerHTML = `
     <link rel="stylesheet" href="./material.css">
     <style>
         main {
+            --indent: 1.3em;
             display:flex;
             flex-direction:column;
             height:100%;
@@ -70,7 +73,7 @@ FhirResourceJsonTemplate.innerHTML = `
         }
         dl {
             margin: 0;
-            padding-left: 1.5em;
+            padding-left: var(--indent);
         }
         dt {
             list-style-type: none;
@@ -88,10 +91,16 @@ FhirResourceJsonTemplate.innerHTML = `
         span.key::after {
             content: '": ';
         }
-        span.value::before {
+        dt.array > span.value > dl > dt > span.key::before {
+            content: '';
+        }
+        dt.array > span.value > dl > dt > span.key::after {
+            content: ': ';
+        }
+        span.value.string::before {
             content: '"';
         }
-        span.value::after {
+        span.value.string::after {
             content: '"';
         }
         dt.array > span.value::before {
@@ -106,12 +115,10 @@ FhirResourceJsonTemplate.innerHTML = `
         dt.object > span.value::after {
             content: '}';
         }
+        dt,
         dt.array > span.value::after,
         dt.object > span.value::after {
-            padding-left: 1em;
-        }
-        dt {
-            padding-left: 1em;
+            padding-left: var(--indent);
         }
         dt.array,
         dt.object {
@@ -120,7 +127,7 @@ FhirResourceJsonTemplate.innerHTML = `
         }
         dt.array::before,
         dt.object::before {
-            content: 'expand_less';
+            content: 'expand_less ';
             font-family: 'Material Icons';
             font-weight: bold;
             line-height: inherit;
@@ -131,7 +138,7 @@ FhirResourceJsonTemplate.innerHTML = `
             content: ",";
         }
         dt.collapsed::before {
-            content: 'expand_more';
+            content: 'expand_more ';
         }
         dt.collapsed > span dl {
             display: none;
