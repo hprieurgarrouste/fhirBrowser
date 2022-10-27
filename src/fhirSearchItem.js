@@ -58,6 +58,9 @@ customElements.define('fhir-search-item', class FhirSearchItem extends HTMLEleme
     }
 
     init(search) {
+        //remove format selector, only json supported
+        if ("_format" === search.name) return false;
+
         this._search = search;
         this._shadow.querySelector("legend").innerText = search.name;
         this._shadow.querySelector("span").innerText = search.documentation || '';
