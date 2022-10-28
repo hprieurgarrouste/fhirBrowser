@@ -1,6 +1,7 @@
 import "./appBar.js";
 import "./appLeftPanel.js";
 import { Preferences } from "./appPreferences.js";
+import { Snackbars } from "./appSnackbars.js";
 import "./fhirBundle.js";
 import "./fhirResource.js";
 import "./fhirServer.js";
@@ -35,7 +36,7 @@ AppTemplate.innerHTML = `
         main {
             flex:1 1 auto;
             height : 0;
-            overflow: auto;
+            overflow: hidden;
         }
         main > div {
             display:flex;
@@ -108,6 +109,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
     }
 
     connectedCallback() {
+        Snackbars.container = this._shadow;
         const leftPanel = this._shadow.getElementById("leftPanel");
         const bundle = this._shadow.getElementById("bundle");
         const resource = this._shadow.getElementById("resource");
@@ -128,6 +130,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
 
         this._shadow.getElementById("serverSelector").addEventListener('serverchanged', ({ detail }) => {
             this._server = detail.server;
+            Snackbars.show(`Connected to "${detail.serverCode}" server.`);
             leftPanel.server = detail.server;
             leftPanel.classList.remove("hidden");
             bdy.style.visibility = "hidden";

@@ -5,6 +5,8 @@ import "./appTabs.js";
 import "./fhirResourceJson.js";
 import "./fhirResourceHtml.js";
 
+import { Snackbars } from "./appSnackbars.js";
+
 customElements.define('fhir-resource', class FhirResource extends HTMLElement {
     constructor() {
         super();
@@ -41,7 +43,7 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
 
         this._shadow.getElementById('copy').addEventListener("click", () => {
             navigator.clipboard.writeText(JSON.stringify(this._resource)).then(function () {
-                console.log('Async: Copying to clipboard was successful!');
+                Snackbars.show("Copying to clipboard was successful");
             }, function (err) {
                 console.error('Async: Could not copy text: ', err);
             });
