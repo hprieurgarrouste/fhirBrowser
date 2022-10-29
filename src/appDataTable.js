@@ -55,7 +55,7 @@ customElements.define('app-data-table', class AppDataTable extends HTMLElement {
 
 const AppDataTableTemplate = document.createElement('template');
 AppDataTableTemplate.innerHTML = `
-    <link href="./material.css" rel="stylesheet"/>
+    <link href="./assets/material.css" rel="stylesheet"/>
     <style>
         div {
             height:100%;

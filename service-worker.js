@@ -20,11 +20,11 @@ const RUNTIME = "runtime";
 const PRECACHE_URLS = [
   "./", // Alias for index.html
   "./index.html",
-  "./material.css",
-  "./favicon.png",
-  "./dist/fhirBrowser.js",
-  "./fonts/MaterialIcons.woff2",
-  "./fonts/Roboto-Regular.ttf",
+  "./fhirBrowser.js",
+  "./assets/material.css",
+  "./assets/favicon.png",
+  "./assets/MaterialIcons.woff2",
+  "./assets/Roboto-Regular.ttf",
 ];
 
 // The install handler takes care of precaching the resources we always need.

@@ -74,7 +74,7 @@ customElements.define('fhir-search', class FhirSearch extends HTMLElement {
 
 const FhirSearchTemplate = document.createElement('template');
 FhirSearchTemplate.innerHTML = `
-    <link rel="stylesheet" href="./material.css">
+    <link rel="stylesheet" href="./assets/material.css">
     <style>
         main {
             position: absolute;

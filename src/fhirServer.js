@@ -129,7 +129,7 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
 
 const FhirServerTemplate = document.createElement('template');
 FhirServerTemplate.innerHTML = `
-    <link rel="stylesheet" href="./material.css">
+    <link rel="stylesheet" href="./assets/material.css">
     <style>
         main {
             position: absolute;

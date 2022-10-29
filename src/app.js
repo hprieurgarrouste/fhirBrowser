@@ -13,7 +13,7 @@ if ('serviceWorker' in navigator) {
 
 const AppTemplate = document.createElement('template');
 AppTemplate.innerHTML = `
-    <link rel="stylesheet" href="./material.css">
+    <link rel="stylesheet" href="./assets/material.css">
     <style>
         :host {
             background-color: var(--background-color, rgb(255,255,255));

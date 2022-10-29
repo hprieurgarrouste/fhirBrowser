@@ -189,7 +189,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
 
 const FhirBundleTemplate = document.createElement('template');
 FhirBundleTemplate.innerHTML = `
-    <link href="./material.css" rel="stylesheet"/>
+    <link href="./assets/material.css" rel="stylesheet"/>
     <style>
         #wrapper {
             display:flex;

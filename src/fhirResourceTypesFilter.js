@@ -35,7 +35,7 @@ customElements.define('fhir-resource-types-filter', class FhirResourceTypesFilte
 
 const FhirResourceTypesFilterTemplate = document.createElement('template');
 FhirResourceTypesFilterTemplate.innerHTML = `
-    <link href="./material.css" rel="stylesheet"/>
+    <link href="./assets/material.css" rel="stylesheet"/>
     <style>
         main {
             display: flex;

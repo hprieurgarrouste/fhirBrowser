@@ -54,7 +54,7 @@ customElements.define('fhir-resource-json', class FhirResourceJson extends HTMLE
 
 const FhirResourceJsonTemplate = document.createElement('template');
 FhirResourceJsonTemplate.innerHTML = `
-    <link rel="stylesheet" href="./material.css">
+    <link rel="stylesheet" href="./assets/material.css">
     <style>
         main {
             --indent: 1.3em;

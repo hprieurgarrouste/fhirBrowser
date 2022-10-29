@@ -6,7 +6,7 @@
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: local("Roboto"), local("Roboto-Regular"), url(./fonts/Roboto-Regular.ttf) format("truetype")
+    src: local("Roboto"), local("Roboto-Regular"), url(./Roboto-Regular.ttf) format("truetype")
 }
 
 /* Material Icons
@@ -17,7 +17,7 @@
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url(./fonts/MaterialIcons.woff2) format('woff2');
+    src: url(./MaterialIcons.woff2) format('woff2');
 }
 
 .material-icons {

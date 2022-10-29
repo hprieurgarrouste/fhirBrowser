@@ -64,7 +64,7 @@ customElements.define('app-data-table-pagination', class AppDataTablePagination 
 
 const AppDataTablePaginationTemplate = document.createElement('template');
 AppDataTablePaginationTemplate.innerHTML = `
-    <link rel="stylesheet" href="./material.css">
+    <link rel="stylesheet" href="./assets/material.css">
     <style>
         main {
             align-items: center;

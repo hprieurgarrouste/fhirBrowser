@@ -31,7 +31,7 @@ customElements.define('app-round-button', class AppRoundButton extends HTMLEleme
 
 const AppRoundButtonTemplate = document.createElement('template');
 AppRoundButtonTemplate.innerHTML = `
-    <link href="./material.css" rel="stylesheet"/>
+    <link href="./assets/material.css" rel="stylesheet"/>
     <style>
         main {
             padding:8px;

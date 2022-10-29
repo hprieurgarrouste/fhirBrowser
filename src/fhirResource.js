@@ -111,7 +111,7 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
 
 const FhirResourceTemplate = document.createElement('template');
 FhirResourceTemplate.innerHTML = `
-    <link rel="stylesheet" href="./material.css">
+    <link rel="stylesheet" href="./assets/material.css">
     <style>
         #wrapper {
             display:flex;

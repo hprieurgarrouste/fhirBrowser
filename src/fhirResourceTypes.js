@@ -60,7 +60,7 @@ customElements.define('fhir-resource-types', class FhirResourceTypes extends HTM
 
 const FhirResourceTypesTemplate = document.createElement('template');
 FhirResourceTypesTemplate.innerHTML = `
-    <link href="./material.css" rel="stylesheet"/>
+    <link href="./assets/material.css" rel="stylesheet"/>
     <style>
         main {
             display: flex;

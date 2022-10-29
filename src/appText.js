@@ -2,7 +2,7 @@ customElements.define('app-text', class AppText extends HTMLElement {
     connectedCallback() {
         let shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = `
-            <link href="./material.css" rel="stylesheet"/>
+            <link href="./assets/material.css" rel="stylesheet"/>
             <style>
                 div {
                     font-size: 1em;
@@ -22,10 +22,10 @@ customElements.define('app-text', class AppText extends HTMLElement {
                 }
                 input:focus {
                     outline: none;
-                    padding: 1.6em 1em 1em 1em;            
+                    padding: 1.6em 1em 1em 1em;
                 }
                 input::placeholder {
-                    font-size: 1em;                    
+                    font-size: 1em;
                     color:var(--text-color-disabled, black);
                 }
                 input:focus::placeholder {

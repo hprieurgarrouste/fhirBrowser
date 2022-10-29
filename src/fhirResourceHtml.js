@@ -14,7 +14,7 @@ customElements.define('fhir-resource-html', class FhirResourceHtml extends HTMLE
 
 const FhirResourceHtmlTemplate = document.createElement('template');
 FhirResourceHtmlTemplate.innerHTML = `
-    <link rel="stylesheet" href="./material.css">
+    <link rel="stylesheet" href="./assets/material.css">
     <style>
         main {
             display:flex;
