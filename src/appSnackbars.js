@@ -2,7 +2,14 @@ export class Snackbars {
 
     // TODO : Add message queuing
 
-    static container = document.body;
+    static {
+        this._container = document.body;
+    }
+
+    static set container(cnt) {
+        this._container = cnt;
+    }
+
     static show(message, action, delay = 4000) {
         let bar = document.createElement("app-snackbars");
         bar.appendChild(document.createTextNode(message));
@@ -10,7 +17,7 @@ export class Snackbars {
             action.setAttribute("slot", "right");
             bar.appendChild(action);
         }
-        Snackbars.container.appendChild(bar);
+        this._container.appendChild(bar);
         // TODO : disable timeout if action present
         setTimeout(() => {
             bar.remove();

@@ -1,7 +1,10 @@
 export class Preferences {
-    static KEY = 'preferences';
+    static {
+        this.KEY = 'preferences';
+    }
+
     static get(key, defaultValue = null) {
-        const lsp = localStorage.getItem(Preferences.KEY);
+        const lsp = localStorage.getItem(this.KEY);
         let preferences = null;
         if (lsp !== null) {
             preferences = JSON.parse(lsp);
@@ -10,8 +13,9 @@ export class Preferences {
         }
         return preferences[key] || defaultValue;
     }
+
     static set(key, value) {
-        const lsp = localStorage.getItem(Preferences.KEY);
+        const lsp = localStorage.getItem(this.KEY);
         let preferences = null;
         if (lsp !== null) {
             preferences = JSON.parse(lsp);
@@ -19,6 +23,6 @@ export class Preferences {
             preferences = {};
         }
         preferences[key] = value;
-        localStorage.setItem(Preferences.KEY, JSON.stringify(preferences));
+        localStorage.setItem(this.KEY, JSON.stringify(preferences));
     }
 }

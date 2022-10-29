@@ -4,6 +4,7 @@
   "description": "FHIR Browser",
   "main": "index.html",
   "scripts": {
+    "start": "webpack serve -open",
     "build": "webpack",
     "watch": "webpack --watch --mode=development"
   },
@@ -21,8 +22,5 @@
   "bugs": {
     "url": "https://github.com/hprieurgarrouste/fhirBrowser/issues"
   },
-  "homepage": "https://github.com/hprieurgarrouste/fhirBrowser#readme",
-  "devDependencies": {
-    "webpack-dev-server": "^4.11.1"
-  }
+  "homepage": "https://github.com/hprieurgarrouste/fhirBrowser#readme"
 }
