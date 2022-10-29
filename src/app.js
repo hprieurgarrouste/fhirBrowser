@@ -105,7 +105,6 @@ customElements.define('fhir-browser', class App extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.appendChild(AppTemplate.content.cloneNode(true));
-        this._server = null;
     }
 
     connectedCallback() {
@@ -124,14 +123,13 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                 leftPanel.classList.add("hidden");
             }
             bundle.classList.remove("hidden");
-            bundle.load(this._server, detail.resourceType);
+            bundle.load(detail.resourceType);
             bdy.style.visibility = "visible";
         });
 
         this._shadow.getElementById("serverSelector").addEventListener('serverchanged', ({ detail }) => {
-            this._server = detail.server;
             Snackbars.show(`Connected to "${detail.serverCode}" server.`);
-            leftPanel.server = detail.server;
+            leftPanel.load();
             leftPanel.classList.remove("hidden");
             bdy.style.visibility = "hidden";
         });
@@ -142,7 +140,6 @@ customElements.define('fhir-browser', class App extends HTMLElement {
 
         bundle.addEventListener('resourceSelected', ({ detail }) => {
             resource.load({
-                "server": this._server,
                 "resourceType": detail.resourceType,
                 "resourceId": detail.resourceId
             });

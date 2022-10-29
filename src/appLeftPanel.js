@@ -1,5 +1,6 @@
 import "./appCircularProgress.js";
 import "./fhirMetadata.js";
+import { Fhir } from "./fhir.js";
 
 customElements.define('app-left-panel', class AppLeftPanel extends HTMLElement {
     constructor() {
@@ -19,27 +20,16 @@ customElements.define('app-left-panel', class AppLeftPanel extends HTMLElement {
         });
     }
 
-    /**
-     * @param {any} server
-     */
-    set server(server) {
+    load() {
         const metadata = this._shadow.getElementById("metadata");
         const loader = this._shadow.getElementById("waiting");
         metadata.hidden = true;
         loader.hidden = false;
-        this.fetchMetadata(server).then(data => {
+        Fhir.capabilities().then(data => {
             metadata.metadata = data;
             loader.hidden = true;
             metadata.hidden = false;
         });
-    }
-
-    async fetchMetadata(server) {
-        const response = await fetch(`${server.url}/metadata?_format=json`, {
-            "cache": "reload",
-            "headers": server.headers
-        });
-        return response.json();
     }
 
 });

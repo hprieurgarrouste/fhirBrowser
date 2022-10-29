@@ -1,6 +1,7 @@
 import "./appRoundButton.js"
 import "./appListItem.js"
 import { Preferences } from "./appPreferences.js";
+import { Fhir } from "./fhir.js";
 
 customElements.define('fhir-server', class FhirServer extends HTMLElement {
     constructor() {
@@ -59,7 +60,7 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
     serverChanged(serverKey) {
         const server = this._conf[serverKey];
         this.connect(server);
-
+        Fhir.server = server;
         this.dispatchEvent(new CustomEvent("serverchanged", {
             bubbles: false,
             cancelable: false,

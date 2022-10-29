@@ -2,6 +2,7 @@ import "./appBar.js";
 import "./appDataTable.js";
 import "./appDataTablePagination.js";
 import "./appLinearProgress.js";
+import { Fhir } from "./fhir.js";
 
 import "./fhirSearch.js";
 
@@ -10,14 +11,13 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.appendChild(FhirBundleTemplate.content.cloneNode(true));
-        this._server = null;
         this._resourceType = null;
         this._skip = 0;
         this._pageSize = 20;
         this._link = null;
         this._count = null;
         this._columns = null;
-        this._filters = null;
+        this._filters = [];
     }
 
     connectedCallback() {
@@ -44,16 +44,15 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._shadow.getElementById('search').addEventListener('apply', ({ detail }) => {
             this._filters = detail.parameters;
             this._link = {
-                "first": `${this._server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
+                "first": `${Fhir.server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
             };
             this.loadPage();
         });
     }
 
-    load(server, resourceType) {
-        this._server = server;
+    load(resourceType) {
         this._resourceType = resourceType;
-        this._filters = null;
+        this._filters = [];
 
         this._shadow.getElementById("search").metadata = resourceType;
 
@@ -84,7 +83,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._shadow.getElementById('title').innerText = resourceType.type;
 
         this._link = {
-            "first": `${this._server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
+            "first": `${Fhir.server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
         };
         this.loadPage();
     }
@@ -106,18 +105,16 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
             default:
                 return;
         }
-        const url = this._link[page];
         this._shadow.getElementById('table').removeAll();
         const loader = this._shadow.getElementById('loader');
         loader.style.visibility = "visible";
-        this.fetchPage(url).then(data => {
-
+        Fhir.searchByLink(this._link[page], this._filters).then(data => {
             if (data.total) {
                 this._count = data.total;
                 this.parsePage(data);
                 loader.style.visibility = "hidden";
             } else {
-                this.fetchCount().then(count => {
+                Fhir.searchCount(this._resourceType.type, this._filters).then(count => {
                     this._count = count.total;
                     this.parsePage(data);
                     loader.style.visibility = "hidden";
@@ -188,31 +185,6 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         }
     }
 
-    async fetchPage(base) {
-        const url = new URL(base);
-        if (this._filters) {
-            this._filters.forEach(filter => {
-                url.searchParams.append(filter.name, filter.value);
-            });
-        }
-        const response = await fetch(url, {
-            "headers": this._server.headers
-        });
-        return response.json();
-    }
-
-    async fetchCount() {
-        const url = new URL(`${this._server.url}/${this._resourceType.type}?_summary=count&_format=json`);
-        if (this._filters) {
-            this._filters.forEach(filter => {
-                url.searchParams.append(filter.name, filter.value);
-            });
-        }
-        const response = await fetch(url, {
-            "headers": this._server.headers
-        });
-        return response.json();
-    }
 });
 
 const FhirBundleTemplate = document.createElement('template');

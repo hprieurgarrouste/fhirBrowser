@@ -5,6 +5,7 @@ import "./appTabs.js";
 import "./fhirResourceJson.js";
 import "./fhirResourceHtml.js";
 
+import { Fhir } from "./fhir.js";
 import { Snackbars } from "./appSnackbars.js";
 
 customElements.define('fhir-resource', class FhirResource extends HTMLElement {
@@ -13,7 +14,6 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.appendChild(FhirResourceTemplate.content.cloneNode(true));
         this._resourceType = null;
-        this._resourceId = null;
     }
     connectedCallback() {
         this._shadow.getElementById("back").addEventListener('click', () => {
@@ -69,9 +69,8 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
         });
     }
 
-    load({ server, resourceType, resourceId }) {
+    load({ resourceType, resourceId }) {
         this._resourceType = resourceType;
-        this._resourceId = resourceId;
 
         const header = this._shadow.getElementById('header');
         const tabs = this._shadow.getElementById('tabs');
@@ -82,7 +81,7 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
         const downloadBtn = this._shadow.getElementById("download");
 
         this._shadow.getElementById('title').innerText = resourceType.type;
-        this.fetchResource(server, resourceType, resourceId).then(resource => {
+        Fhir.read(resourceType.type, resourceId).then(resource => {
             header.classList.remove('error');
             this._shadow.getElementById("error").hidden = true;
             tabs.hidden = false;
@@ -106,13 +105,6 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
             copyBtn.hidden = true;
             downloadBtn.hidden = true;
         });
-    }
-
-    async fetchResource(server, resourceType, id) {
-        const response = await fetch(`${server.url}/${resourceType.type}/${id}?_format=json`, {
-            "headers": server.headers
-        });
-        return response.json();
     }
 
 });
