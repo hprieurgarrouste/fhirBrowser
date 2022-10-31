@@ -121,13 +121,19 @@ FhirSearchItemTemplate.innerHTML = `
         span {
             color: var(--text-color-disabled);
             font-size: small;
+            display: -webkit-box;
+            text-overflow: ellipsis;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow:hidden;
+            padding-top: 2px;
         }
     </style>
     <main>
         <fieldset>
-            <legend></legend>
+            <legend inert></legend>
             <slot></slot>
         </fieldset>
-        <span></span>
+        <span inert></span>
     </main>
 `;
