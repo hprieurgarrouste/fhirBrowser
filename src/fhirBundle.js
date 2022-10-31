@@ -274,8 +274,8 @@ FhirBundleTemplate.innerHTML = `
             <header>
                 <app-bar>
                     <h3 slot="middle" id="title"></h3>
-                    <round-button slot="right" id="searchToggle" title="Search" app-icon="filter_list"></round-button>
-                    <round-button slot="right" id="help" title="Help" app-icon="help"></round-button>
+                    <round-button slot="right" id="searchToggle" title="Search" data-icon="search"></round-button>
+                    <round-button slot="right" id="help" title="Help" data-icon="help"></round-button>
                 </app-bar>
                 <linear-progress></linear-progress>
             </header>
@@ -285,10 +285,10 @@ FhirBundleTemplate.innerHTML = `
             <footer>
                 <data-table-pagination id="pagination">
                     <span slot="rows" id="paginationRows"></span>
-                    <round-button slot="arrows" id="paginationFirst" title="first" app-icon="first_page" disabled></round-button>
-                    <round-button slot="arrows" id="paginationPrevious" title="previous" app-icon="chevron_left" disabled></round-button>
-                    <round-button slot="arrows" id="paginationNext" title="next" app-icon="chevron_right" disabled></round-button>
-                    <round-button slot="arrows" id="paginationLast" title="last" app-icon="last_page" disabled/>
+                    <round-button slot="arrows" id="paginationFirst" title="first" data-icon="first_page" disabled></round-button>
+                    <round-button slot="arrows" id="paginationPrevious" title="previous" data-icon="chevron_left" disabled></round-button>
+                    <round-button slot="arrows" id="paginationNext" title="next" data-icon="chevron_right" disabled></round-button>
+                    <round-button slot="arrows" id="paginationLast" title="last" data-icon="last_page" disabled/>
                 </data-table-pagination>
             </footer>
         </div>

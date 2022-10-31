@@ -5,11 +5,11 @@ customElements.define('round-button', class RoundButton extends HTMLElement {
         this._shadow.appendChild(RoundButtonTemplate.content.cloneNode(true));
     }
 
-    static get observedAttributes() { return ["app-icon", "disabled"]; }
+    static get observedAttributes() { return ["data-icon", "disabled"]; }
 
     attributeChangedCallback(name, oldValue, newValue) {
         const elm = this._shadow.querySelector("main");
-        if ("app-icon" === name) {
+        if ("data-icon" === name) {
             elm.innerText = newValue;
         } else if ("disabled" === name) {
             if (null === newValue) {

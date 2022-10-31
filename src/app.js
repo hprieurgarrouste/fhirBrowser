@@ -82,10 +82,10 @@ AppTemplate.innerHTML = `
     </style>
     <header>
         <app-bar id="header" caption="">
-            <round-button slot="left" id="navigation" title="Menu" app-icon="menu"></round-button>
+            <round-button slot="left" id="navigation" title="Menu" data-icon="menu"></round-button>
             <h3 slot="middle">FHIR Browser</h3>
-            <round-button slot="right" id="colorScheme" title="Theme" app-icon="brightness_auto"></round-button>
-            <round-button slot="right" id="serverSelectorToggle" title="Connections" app-icon="public"></round-button>
+            <round-button slot="right" id="colorScheme" title="Theme" data-icon="brightness_auto"></round-button>
+            <round-button slot="right" id="serverSelectorToggle" title="Connections" data-icon="public"></round-button>
         </app-bar>
     </header>
     <main>
@@ -194,7 +194,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                 break;
         }
         const themeButton = this._shadow.getElementById("colorScheme");
-        themeButton.setAttribute("app-icon", colorSchemeIcon);
+        themeButton.setAttribute("data-icon", colorSchemeIcon);
         themeButton.title = `Theme ${colorScheme}`;
         document.body.setAttribute("color-scheme", scheme);
     }

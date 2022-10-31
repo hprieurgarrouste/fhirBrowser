@@ -130,10 +130,10 @@ FhirSearchTemplate.innerHTML = `
     <div id="wrapper">
         <header>
             <app-bar id="header">
-                <round-button slot="left" id="back" title="back" app-icon="arrow_back"></round-button>
+                <round-button slot="left" id="back" title="back" data-icon="arrow_back"></round-button>
                 <h3 id="title" slot="middle">Search</h3>
-                <round-button id="clear" title="Clear" app-icon="clear_all" slot="right"></round-button>
-                <round-button id="help" title="Help" app-icon="help" slot="right"></round-button>
+                <round-button id="clear" title="Clear" data-icon="clear_all" slot="right"></round-button>
+                <round-button id="help" title="Help" data-icon="help" slot="right"></round-button>
             </app-bar>
         </header>
         <main></main>

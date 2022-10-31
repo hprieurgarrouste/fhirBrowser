@@ -207,7 +207,7 @@ FhirServerTemplate.innerHTML = `
         <div class="surface">
             <div class="overlay">
                 <app-bar id="header">
-                    <round-button id="close" title="Close" app-icon="close" slot="left"></round-button>
+                    <round-button id="close" title="Close" data-icon="close" slot="left"></round-button>
                     <h3 id="title" slot="middle">Connections</h3>
                 </app-bar>
                 <nav></nav>
