@@ -1,19 +1,19 @@
-customElements.define('app-linear-progress', class AppLinearProgress extends HTMLElement {
+customElements.define('linear-progress', class LinearProgress extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'closed' }).appendChild(AppLinearProgressTemplate.content.cloneNode(true));
+        this.attachShadow({ mode: 'closed' }).appendChild(LinearProgressTemplate.content.cloneNode(true));
     }
 });
 
-const AppLinearProgressTemplate = document.createElement('template');
-AppLinearProgressTemplate.innerHTML = `
+const LinearProgressTemplate = document.createElement('template');
+LinearProgressTemplate.innerHTML = `
     <style>
         main {
             background-color: var(--border-color);
             overflow: hidden;
         }
         .thumb {
-            height: 0.1em;
+            height: 0.2em;
             width: 50%;
             background-color: var(--primary-color);
             left: -50%;

@@ -1,4 +1,4 @@
-export class Preferences {
+export class PreferencesService {
     static {
         this.KEY = 'preferences';
     }

@@ -6,7 +6,7 @@ customElements.define('fhir-resource-html', class FhirResourceHtml extends HTMLE
     }
 
     set source(resource) {
-        let result = "<i>Work in progress</i>";
+        let result = "<i>Coming soon</i>";
         this._shadow.getElementById('content').innerHTML = result;
     }
 });
@@ -20,6 +20,7 @@ FhirResourceHtmlTemplate.innerHTML = `
             display:flex;
             flex-direction:column;
             height:100%;
+            border-top: 1px solid var(--border-color);
         }
         #content {
             padding: 1em;

@@ -1,4 +1,4 @@
-export class Fhir {
+export class FhirService {
     static {
         this._server = null;
     }

@@ -1,8 +1,8 @@
-customElements.define('app-tabs', class AppTabs extends HTMLElement {
+customElements.define('tab-bar', class TabBar extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.appendChild(AppTabsTemplate.content.cloneNode(true));
+        this._shadow.appendChild(TabBarTemplate.content.cloneNode(true));
     }
     connectedCallback() {
         this._shadow.querySelector("main").onclick = (event) => {
@@ -30,8 +30,8 @@ customElements.define('app-tabs', class AppTabs extends HTMLElement {
     }
 });
 
-const AppTabsTemplate = document.createElement('template');
-AppTabsTemplate.innerHTML = `
+const TabBarTemplate = document.createElement('template');
+TabBarTemplate.innerHTML = `
     <style>
         main {
             display:flex;

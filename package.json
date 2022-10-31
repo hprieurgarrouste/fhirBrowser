@@ -1,12 +1,12 @@
 {
   "name": "fhirbrowser",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "FHIR Browser",
   "main": "index.html",
   "scripts": {
-    "start": "webpack serve -open",
-    "build": "webpack",
-    "watch": "webpack --watch --mode=development"
+    "dev": "webpack serve -open",
+    "watch": "webpack --watch --mode=development",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",

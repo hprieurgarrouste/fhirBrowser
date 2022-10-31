@@ -63,6 +63,7 @@ FhirResourceJsonTemplate.innerHTML = `
             height:100%;
         }
         #content {
+            box-shadow: inset 0px 2px 4px 0px var(--border-color);
             color: var(--text-color-normal, black);
             flex: 1 1 auto;
             font-family: monospace;

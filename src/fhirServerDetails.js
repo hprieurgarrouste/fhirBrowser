@@ -1,4 +1,4 @@
-import "./appListItem.js"
+import "./components/ListItem.js"
 
 customElements.define('fhir-server-details', class FhirServerDetails extends HTMLElement {
     constructor() {
@@ -33,7 +33,7 @@ customElements.define('fhir-server-details', class FhirServerDetails extends HTM
         function make(name, value) {
             if (typeof value === "undefined") return;
 
-            const row = document.createElement('app-list-item');
+            const row = document.createElement('list-item');
             const title = document.createElement("span");
             title.appendChild(document.createTextNode(name));
             title.slot = "title";

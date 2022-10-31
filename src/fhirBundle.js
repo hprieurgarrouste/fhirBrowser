@@ -1,9 +1,10 @@
-import "./appBar.js";
-import "./appDataTable.js";
-import "./appDataTablePagination.js";
-import "./appLinearProgress.js";
-import { Fhir } from "./fhir.js";
+import "./components/AppBar.js";
+import "./components/DataTable.js";
+import "./components/DataTablePagination.js";
+import "./components/LinearProgress.js";
+import { FhirService } from "./services/Fhir.js";
 
+import "./fhirSearch.js";
 import "./fhirSearch.js";
 
 customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
@@ -24,8 +25,12 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._shadow.getElementById('help').addEventListener('click', () => {
             window.open(this._resourceType.profile, "FhirBrowserHelp");
         });
-        this._shadow.getElementById('pagination').addEventListener("pagination", ({ detail }) => {
-            this.loadPage(detail.button);
+        this._shadow.querySelector("data-table-pagination").addEventListener('click', (event) => {
+            const { target } = event;
+            if (!target.matches("round-button")) {
+                return;
+            }
+            this.loadPage(target.dataset.relation);
         });
         const dataTable = this._shadow.getElementById('table');
         dataTable.addEventListener('rowclick', ({ detail }) => {
@@ -38,15 +43,22 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
                 }
             }));
         });
+
+        const searchPanel = this._shadow.getElementById('search');
+
         this._shadow.getElementById('searchToggle').addEventListener('click', () => {
-            this._shadow.getElementById('search').hidden = false;
+            searchPanel.classList.toggle("hidden");
         });
-        this._shadow.getElementById('search').addEventListener('apply', ({ detail }) => {
+
+        searchPanel.addEventListener('apply', ({ detail }) => {
             this._filters = detail.parameters;
             this._link = {
-                "first": `${Fhir.server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
+                "first": `${FhirService.server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
             };
             this.loadPage();
+            if (window.matchMedia("(max-width: 480px)").matches) {
+                searchPanel.classList.add("hidden");
+            }
         });
     }
 
@@ -83,7 +95,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._shadow.getElementById('title').innerText = resourceType.type;
 
         this._link = {
-            "first": `${Fhir.server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
+            "first": `${FhirService.server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
         };
         this.loadPage();
     }
@@ -93,6 +105,8 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
             case 'first':
                 this._skip = 0;
                 break;
+            case 'prev':
+            //prev is specific to firely server
             case 'previous':
                 this._skip -= this._pageSize;
                 break;
@@ -106,15 +120,15 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
                 return;
         }
         this._shadow.getElementById('table').removeAll();
-        const loader = this._shadow.getElementById('loader');
+        const loader = this._shadow.querySelector('linear-progress');
         loader.style.visibility = "visible";
-        Fhir.searchByLink(this._link[page], this._filters).then(data => {
+        FhirService.searchByLink(this._link[page], this._filters).then(data => {
             if (data.total) {
                 this._count = data.total;
                 this.parsePage(data);
                 loader.style.visibility = "hidden";
             } else {
-                Fhir.searchCount(this._resourceType.type, this._filters).then(count => {
+                FhirService.searchCount(this._resourceType.type, this._filters).then(count => {
                     this._count = count.total;
                     this.parsePage(data);
                     loader.style.visibility = "hidden";
@@ -128,12 +142,12 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
             return
         }
         const dataTable = this._shadow.getElementById('table');
-        const pagination = this._shadow.getElementById('pagination');
+        const paginationRows = this._shadow.getElementById('paginationRows');
         let range = '0';
         if (this._count != 0) {
             range = `${this._skip + 1}-${Math.min(this._skip + this._pageSize, this._count)}`;
         }
-        pagination.text = `${range} of ${this._count}`;
+        paginationRows.innerText = `${range} of ${this._count}`;
         if (data.entry) {
             let value = "";
             data.entry.forEach(entry => {
@@ -159,24 +173,36 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
                 }
             });
             this._link = {};
-            pagination.first = false;
-            pagination.previous = false;
-            pagination.next = false;
-            pagination.last = false;
+
+            const paginationFirst = this._shadow.getElementById('paginationFirst');
+            paginationFirst.setAttribute("disabled", '');
+            const paginationPrevious = this._shadow.getElementById('paginationPrevious');
+            paginationPrevious.setAttribute("disabled", '');
+            const paginationNext = this._shadow.getElementById('paginationNext');
+            paginationNext.setAttribute("disabled", '');
+            const paginationLast = this._shadow.getElementById('paginationLast');
+            paginationLast.setAttribute("disabled", '');
+
             data.link.forEach(link => {
                 this._link[link.relation] = link.url;
                 switch (link.relation) {
                     case 'first':
-                        pagination.first = true;
+                        paginationFirst.removeAttribute("disabled");
+                        paginationFirst.setAttribute("data-relation", link.relation);
                         break;
+                    case 'prev':
+                    //prev is specific to firely server
                     case 'previous':
-                        pagination.previous = true;
+                        paginationPrevious.removeAttribute("disabled");
+                        paginationPrevious.setAttribute("data-relation", link.relation);
                         break;
                     case 'next':
-                        pagination.next = true;
+                        paginationNext.removeAttribute("disabled");
+                        paginationNext.setAttribute("data-relation", link.relation);
                         break;
                     case 'last':
-                        pagination.last = true;
+                        paginationLast.removeAttribute("disabled");
+                        paginationLast.setAttribute("data-relation", link.relation);
                         break;
                     default:
                         break;
@@ -193,38 +219,82 @@ FhirBundleTemplate.innerHTML = `
     <style>
         #wrapper {
             display:flex;
+            flex-direction:row;
+            height:100%;
+            overflow: hidden;
+        }
+        #bundleCnt {
+            display:flex;
             flex-direction:column;
             height:100%;
+            flex: auto;
+            width: 0;
         }
         main {
             flex:1 1 auto;
             height:0;
             border-top: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
+
+            display: flex;
+            flex-direction:row;
         }
         #title {
             margin:0;
+            overflow:hidden;
+            text-overflow:ellipsis;
         }
-        progress {
-            position: fixed;
-            top: 100px;
+        linear-progress {
+            position: relative;
+            top: 0;
+        }
+        #table {
+            flex: auto;
+        }
+        fhir-search {
+            border-left: 1px solid var(--border-color);
+            flex: none;
+            transition: all 0.3s;
+            width: 400px;
+        }
+        fhir-search.hidden {
+            transition: all 0.3s;
+            margin-right: -400px;
+        }
+        @media (max-width:480px){
+            fhir-search {
+                background-color: var(--background-color, rgb(255,255,255));
+                position: relative;
+                width:100%;
+            }
+            fhir-search.hidden {
+                margin-right: -100%;
+            }
         }
     </style>
     <div id="wrapper">
-        <header>
-            <app-bar>
-                <h3 slot="middle" id="title"></h3>
-                <app-round-button slot="right" id="searchToggle" title="Search" app-icon="filter_list"></app-round-button>
-                <app-round-button slot="right" id="help" title="Help" app-icon="help"></app-round-button>
-            </app-bar>
-            <app-linear-progress id="loader"></app-linear-progress>
-        </header>
-        <main>
-            <app-data-table id="table"></app-data-table>
-        </main>
-        <footer>
-            <app-data-table-pagination id="pagination"/>
-        </footer>
+        <div id="bundleCnt">
+            <header>
+                <app-bar>
+                    <h3 slot="middle" id="title"></h3>
+                    <round-button slot="right" id="searchToggle" title="Search" app-icon="filter_list"></round-button>
+                    <round-button slot="right" id="help" title="Help" app-icon="help"></round-button>
+                </app-bar>
+                <linear-progress></linear-progress>
+            </header>
+            <main>
+                <data-table id="table"></data-table>
+            </main>
+            <footer>
+                <data-table-pagination id="pagination">
+                    <span slot="rows" id="paginationRows"></span>
+                    <round-button slot="arrows" id="paginationFirst" title="first" app-icon="first_page" disabled></round-button>
+                    <round-button slot="arrows" id="paginationPrevious" title="previous" app-icon="chevron_left" disabled></round-button>
+                    <round-button slot="arrows" id="paginationNext" title="next" app-icon="chevron_right" disabled></round-button>
+                    <round-button slot="arrows" id="paginationLast" title="last" app-icon="last_page" disabled/>
+                </data-table-pagination>
+            </footer>
+        </div>
+        <fhir-search id="search" class="hidden"></fhir-search>
     </div>
-    <fhir-search id="search" hidden></fhir-seach>
 `;

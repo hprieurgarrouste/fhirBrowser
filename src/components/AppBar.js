@@ -20,7 +20,6 @@ AppBarTemplate.innerHTML = `
             margin:0;
             overflow: hidden;
             padding-left: 0.5em;
-            text-overflow: ellipsis;
         }
         #barRight {
             white-space: nowrap;

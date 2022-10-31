@@ -1,8 +1,8 @@
-customElements.define('app-round-button', class AppRoundButton extends HTMLElement {
+customElements.define('round-button', class RoundButton extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' })
-        this._shadow.appendChild(AppRoundButtonTemplate.content.cloneNode(true));
+        this._shadow.appendChild(RoundButtonTemplate.content.cloneNode(true));
     }
 
     static get observedAttributes() { return ["app-icon", "disabled"]; }
@@ -29,8 +29,8 @@ customElements.define('app-round-button', class AppRoundButton extends HTMLEleme
     }
 });
 
-const AppRoundButtonTemplate = document.createElement('template');
-AppRoundButtonTemplate.innerHTML = `
+const RoundButtonTemplate = document.createElement('template');
+RoundButtonTemplate.innerHTML = `
     <link href="./assets/material.css" rel="stylesheet"/>
     <style>
         main {

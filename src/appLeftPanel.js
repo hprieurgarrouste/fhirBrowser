@@ -1,6 +1,6 @@
-import "./appCircularProgress.js";
+import "./components/CircularProgress.js";
 import "./fhirMetadata.js";
-import { Fhir } from "./fhir.js";
+import { FhirService } from "./services/Fhir.js";
 
 customElements.define('app-left-panel', class AppLeftPanel extends HTMLElement {
     constructor() {
@@ -25,7 +25,7 @@ customElements.define('app-left-panel', class AppLeftPanel extends HTMLElement {
         const loader = this._shadow.getElementById("waiting");
         metadata.hidden = true;
         loader.hidden = false;
-        Fhir.capabilities().then(data => {
+        FhirService.capabilities().then(data => {
             metadata.metadata = data;
             loader.hidden = true;
             metadata.hidden = false;
@@ -46,14 +46,14 @@ AppLeftPanelTemplate.innerHTML = `
             flex: 1 1 auto;
             height: 0;
         }
-        app-circular-progress {
+        circular-progress {
             font-size: 2em;
             text-align: center;
             padding-top: 1em;
         }
     </style>
     <main>
-        <app-circular-progress id="waiting" hidden></app-circular-progress>
+        <circular-progress id="waiting" hidden></circular-progress>
         <fhir-metadata id="metadata"></fhir-metadata>
     </main>
 `;

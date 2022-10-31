@@ -1,4 +1,7 @@
-customElements.define('app-text', class AppText extends HTMLElement {
+/**
+ * work in progress
+ */
+customElements.define('text-field', class TextField extends HTMLElement {
     connectedCallback() {
         let shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = `

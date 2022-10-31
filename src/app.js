@@ -1,7 +1,7 @@
-import "./appBar.js";
+import "./components/AppBar.js";
 import "./appLeftPanel.js";
-import { Preferences } from "./appPreferences.js";
-import { Snackbars } from "./appSnackbars.js";
+import { PreferencesService } from "./services/Preferences.js";
+import { SnackbarsService } from "./services/Snackbars.js";
 import "./fhirBundle.js";
 import "./fhirResource.js";
 import "./fhirServer.js";
@@ -82,10 +82,10 @@ AppTemplate.innerHTML = `
     </style>
     <header>
         <app-bar id="header" caption="">
-            <app-round-button slot="left" id="navigation" title="Menu" app-icon="menu"></app-round-button>
+            <round-button slot="left" id="navigation" title="Menu" app-icon="menu"></round-button>
             <h3 slot="middle">FHIR Browser</h3>
-            <app-round-button slot="right" id="colorScheme" title="Theme" app-icon="brightness_auto"></app-round-button>
-            <app-round-button slot="right" id="serverSelectorToggle" title="Connections" app-icon="public"></app-round-button>
+            <round-button slot="right" id="colorScheme" title="Theme" app-icon="brightness_auto"></round-button>
+            <round-button slot="right" id="serverSelectorToggle" title="Connections" app-icon="public"></round-button>
         </app-bar>
     </header>
     <main>
@@ -108,7 +108,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
     }
 
     connectedCallback() {
-        Snackbars.container = this._shadow;
+        SnackbarsService.container = this._shadow;
         const leftPanel = this._shadow.getElementById("leftPanel");
         const bundle = this._shadow.getElementById("bundle");
         const resource = this._shadow.getElementById("resource");
@@ -128,7 +128,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
         });
 
         this._shadow.getElementById("serverSelector").addEventListener('serverchanged', ({ detail }) => {
-            Snackbars.show(`Connected to "${detail.serverCode}" server.`);
+            SnackbarsService.show(`Connected to "${detail.serverCode}" server.`);
             leftPanel.load();
             leftPanel.classList.remove("hidden");
             bdy.style.visibility = "hidden";
@@ -146,10 +146,10 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             bundle.classList.add("hidden");
         });
 
-        this.setColorScheme(Preferences.get("colorScheme", "auto"));
+        this.setColorScheme(PreferencesService.get("colorScheme", "auto"));
 
         this._shadow.getElementById("colorScheme").addEventListener('click', () => {
-            let colorScheme = Preferences.get("colorScheme", "auto");
+            let colorScheme = PreferencesService.get("colorScheme", "auto");
             switch (colorScheme) {
                 case "dark":
                     colorScheme = "auto";
@@ -162,7 +162,7 @@ customElements.define('fhir-browser', class App extends HTMLElement {
                     colorScheme = "light";
                     break;
             }
-            Preferences.set("colorScheme", colorScheme);
+            PreferencesService.set("colorScheme", colorScheme);
             this.setColorScheme(colorScheme);
         });
 

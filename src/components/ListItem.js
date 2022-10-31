@@ -1,13 +1,13 @@
-customElements.define('app-list-item', class AppListItem extends HTMLElement {
+customElements.define('list-item', class ListItem extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.appendChild(AppListItemTemplate.content.cloneNode(true));
+        this._shadow.appendChild(ListItemTemplate.content.cloneNode(true));
     }
 });
 
-const AppListItemTemplate = document.createElement('template');
-AppListItemTemplate.innerHTML = `
+const ListItemTemplate = document.createElement('template');
+ListItemTemplate.innerHTML = `
     <style>
         main {
             padding: 0.5em 1em;

@@ -1,12 +1,12 @@
-customElements.define('app-circular-progress', class AppCircularProgress extends HTMLElement {
+customElements.define('circular-progress', class CircularProgress extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'closed' }).appendChild(AppCircularProgressTemplate.content.cloneNode(true));
+        this.attachShadow({ mode: 'closed' }).appendChild(CircularProgressTemplate.content.cloneNode(true));
     }
 });
 
-const AppCircularProgressTemplate = document.createElement('template');
-AppCircularProgressTemplate.innerHTML = `
+const CircularProgressTemplate = document.createElement('template');
+CircularProgressTemplate.innerHTML = `
     <style>
         main {
             height: 0.70em;

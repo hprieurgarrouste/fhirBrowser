@@ -1,4 +1,4 @@
-customElements.define('app-data-table', class AppDataTable extends HTMLElement {
+customElements.define('data-table', class DataTable extends HTMLElement {
     constructor() {
         super();
         this.rowClickEvent = new CustomEvent("rowclick", {
@@ -6,7 +6,7 @@ customElements.define('app-data-table', class AppDataTable extends HTMLElement {
             cancelable: false,
         });
         const shadow = this.attachShadow({ mode: 'open' });
-        shadow.appendChild(AppDataTableTemplate.content.cloneNode(true));
+        shadow.appendChild(DataTableTemplate.content.cloneNode(true));
         this._header = shadow.getElementById("header");
         this._body = shadow.getElementById("body");
     }
@@ -53,8 +53,8 @@ customElements.define('app-data-table', class AppDataTable extends HTMLElement {
     }
 });
 
-const AppDataTableTemplate = document.createElement('template');
-AppDataTableTemplate.innerHTML = `
+const DataTableTemplate = document.createElement('template');
+DataTableTemplate.innerHTML = `
     <link href="./assets/material.css" rel="stylesheet"/>
     <style>
         div {

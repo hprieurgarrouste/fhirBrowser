@@ -68,6 +68,7 @@ FhirResourceTypesTemplate.innerHTML = `
             height:100%;
         }
         #list {
+            box-shadow: inset 0px 2px 4px 0px var(--border-color);
             flex:1 1 auto;
             height:0;
             overflow:auto;
@@ -84,9 +85,6 @@ FhirResourceTypesTemplate.innerHTML = `
         }
         li:hover, li.selected {
             background-color:var(--hover-color, lightgray);
-        }
-        fhir-resource-types-filter {
-            box-shadow: 0 2px 4px var(--border-color);
         }
     </style>
     <main>

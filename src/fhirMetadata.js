@@ -1,5 +1,5 @@
 import "./appTab.js";
-import "./appTabs.js";
+import "./components/TabBar.js";
 import "./fhirResourceTypes.js";
 import "./fhirServerDetails.js";
 
@@ -12,7 +12,7 @@ customElements.define('fhir-metadata', class FhirMetadata extends HTMLElement {
     }
 
     connectedCallback() {
-        this._shadow.getElementById("tabs").addEventListener('click', ({ detail }) => {
+        this._shadow.querySelector("tab-bar").addEventListener('click', ({ detail }) => {
             const tabId = detail.tabId;
             if (tabId === "tabResources") {
                 this._shadow.getElementById("resourceTypes").classList.remove("hidden");
@@ -49,7 +49,7 @@ FhirMetadataTemplate.innerHTML = `
             flex-direction: column;
             height : 100%;
         }
-        #tabs {
+        tab-bar {
             border-bottom:1px solid var(--border-color, gray);
         }
         #resourceTypes, #serverDetails {
@@ -72,10 +72,10 @@ FhirMetadataTemplate.innerHTML = `
         }
     </style>
     <main>
-        <app-tabs id="tabs">
+        <tab-bar>
             <app-tab id="tabResources" selected>Resource Types</app-tab>
             <app-tab id="tabDetails">Details</app-tab>
-        </app-tabs>
+        </tab-bar>
         <div id="tabsBody">
             <fhir-resource-types id="resourceTypes"></fhir-resource-types>
             <fhir-server-details id="serverDetails"></fhir-server-details>

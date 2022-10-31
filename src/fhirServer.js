@@ -1,7 +1,7 @@
-import "./appRoundButton.js"
-import "./appListItem.js"
-import { Preferences } from "./appPreferences.js";
-import { Fhir } from "./fhir.js";
+import "./components/RoundButton.js"
+import "./components/ListItem.js"
+import { PreferencesService } from "./services/Preferences.js";
+import { FhirService } from "./services/Fhir.js";
 
 customElements.define('fhir-server', class FhirServer extends HTMLElement {
     constructor() {
@@ -10,7 +10,7 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
         this._shadow.appendChild(FhirServerTemplate.content.cloneNode(true));
     }
     connectedCallback() {
-        const content = this._shadow.getElementById('content');
+        const nav = this._shadow.querySelector('nav');
         this._shadow.getElementById('close').addEventListener("click", () => {
             this.hidden = true;
         });
@@ -20,10 +20,10 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
         this._shadow.querySelector('.surface').addEventListener("click", (event) => {
             event.stopPropagation();
         });
-        content.addEventListener("click", ({ target }) => {
-            const row = target.closest("app-list-item");
+        nav.addEventListener("click", ({ target }) => {
+            const row = target.closest("list-item");
             if (row) {
-                const prev = content.querySelector(".selected");
+                const prev = nav.querySelector(".selected");
                 if (prev) prev.classList.remove('selected');
                 row.classList.add('selected');
                 this.serverChanged(row.dataset.id);
@@ -33,10 +33,10 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
 
         this.loadConf().then(conf => {
             this._conf = conf;
-            const preferedServer = Preferences.get("server");
-            const content = this._shadow.getElementById('content');
+            const preferedServer = PreferencesService.get("server");
+            const nav = this._shadow.querySelector('nav');
             for (const key of Object.keys(conf).sort()) {
-                const row = document.createElement('app-list-item');
+                const row = document.createElement('list-item');
                 row.setAttribute("data-id", key);
                 if (key === preferedServer) row.classList.add("selected");
                 const title = document.createElement("span");
@@ -47,7 +47,7 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
                 subTitle.appendChild(document.createTextNode(this._conf[key].url));
                 subTitle.slot = "subTitle";
                 row.appendChild(subTitle);
-                content.appendChild(row);
+                nav.appendChild(row);
             }
             if (preferedServer != null) {
                 this.serverChanged(preferedServer);
@@ -60,7 +60,7 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
     serverChanged(serverKey) {
         const server = this._conf[serverKey];
         this.connect(server);
-        Fhir.server = server;
+        FhirService.server = server;
         this.dispatchEvent(new CustomEvent("serverchanged", {
             bubbles: false,
             cancelable: false,
@@ -70,7 +70,7 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
             }
         }));
 
-        Preferences.set("server", serverKey);
+        PreferencesService.set("server", serverKey);
     }
 
     connect(server) {
@@ -159,15 +159,15 @@ FhirServerTemplate.innerHTML = `
         app-bar {
             border-bottom: 1px solid var(--border-color);
         }
-        #content {
+        nav {
             overflow:auto;
             flex: 1 1 auto;
             height: 0;
         }
-        app-list-item {
+        list-item {
             cursor: pointer;
         }
-        app-list-item.selected {
+        list-item.selected {
             background-color: var(--hover-color, rgba(0, 0, 0, 5%));
         }
         #actions {
@@ -207,10 +207,10 @@ FhirServerTemplate.innerHTML = `
         <div class="surface">
             <div class="overlay">
                 <app-bar id="header">
-                    <app-round-button id="close" title="Close" app-icon="close" slot="left"></app-round-button>
+                    <round-button id="close" title="Close" app-icon="close" slot="left"></round-button>
                     <h3 id="title" slot="middle">Connections</h3>
                 </app-bar>
-                <div id="content"></div>
+                <nav></nav>
                 <div id="actions">
                     <input type="button" value="New connection"></input>
                 <div>

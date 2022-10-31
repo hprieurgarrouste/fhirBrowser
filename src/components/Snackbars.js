@@ -1,43 +1,16 @@
-export class Snackbars {
-
-    // TODO : Add message queuing
-
-    static {
-        this._container = document.body;
-    }
-
-    static set container(cnt) {
-        this._container = cnt;
-    }
-
-    static show(message, action, delay = 4000) {
-        let bar = document.createElement("app-snackbars");
-        bar.appendChild(document.createTextNode(message));
-        if (action) {
-            action.setAttribute("slot", "right");
-            bar.appendChild(action);
-        }
-        this._container.appendChild(bar);
-        // TODO : disable timeout if action present
-        setTimeout(() => {
-            bar.remove();
-        }, delay);
-    }
-}
-
-customElements.define('app-snackbars', class AppSnackbars extends HTMLElement {
+customElements.define('snack-bars', class Snackbars extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.appendChild(AppSnackbarsTemplate.content.cloneNode(true));
+        this._shadow.appendChild(SnackbarsTemplate.content.cloneNode(true));
     }
 
     connectedCallback() {
     }
 });
 
-const AppSnackbarsTemplate = document.createElement('template');
-AppSnackbarsTemplate.innerHTML = `
+const SnackbarsTemplate = document.createElement('template');
+SnackbarsTemplate.innerHTML = `
     <style>
         main {
             background-color: white;
