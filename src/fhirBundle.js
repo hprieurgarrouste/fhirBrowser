@@ -235,9 +235,6 @@ FhirBundleTemplate.innerHTML = `
             height:0;
             border-top: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
-
-            display: flex;
-            flex-direction:row;
         }
         #title {
             margin:0;
