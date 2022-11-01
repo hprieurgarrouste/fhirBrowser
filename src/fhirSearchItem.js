@@ -73,10 +73,11 @@ customElements.define('fhir-search-item', class FhirSearchItem extends HTMLEleme
             case "markdown":
             case "id":
             case "reference":
-                field = document.createElement("fhir-search-modifier");
-                field.setAttribute("data-name", search.name);
-                content.appendChild(field);
-
+                if ("_filter" !== search.name) {
+                    field = document.createElement("fhir-search-modifier");
+                    field.setAttribute("data-name", search.name);
+                    content.appendChild(field);
+                }
                 field = document.createElement("fhir-search-text");
                 field.setAttribute("name", search.name);
                 content.appendChild(field);
