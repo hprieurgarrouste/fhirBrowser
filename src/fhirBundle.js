@@ -15,7 +15,6 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
         this._resourceType = null;
         this._skip = 0;
         this._pageSize = 20;
-        this._link = null;
         this._count = null;
         this._columns = null;
         this._filters = [];
@@ -30,7 +29,7 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
             if (!target.matches("round-button")) {
                 return;
             }
-            this.loadPage(target.dataset.relation);
+            this.loadPage(target.dataset);
         });
         const dataTable = this._shadow.getElementById('table');
         dataTable.addEventListener('rowclick', ({ detail }) => {
@@ -52,9 +51,6 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
 
         searchPanel.addEventListener('apply', ({ detail }) => {
             this._filters = detail.parameters;
-            this._link = {
-                "first": `${FhirService.server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
-            };
             this.loadPage();
             if (window.matchMedia("(max-width: 480px)").matches) {
                 searchPanel.classList.add("hidden");
@@ -94,19 +90,13 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
 
         this._shadow.getElementById('title').innerText = resourceType.type;
 
-        this._link = {
-            "first": `${FhirService.server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
-        };
         this.loadPage();
     }
 
-    loadPage(page = 'first') {
-        switch (page) {
-            case 'first':
-                this._skip = 0;
-                break;
-            case 'prev':
-            //prev is specific to firely server
+    loadPage(link = {
+        url: `${FhirService.server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
+    }) {
+        switch (link.relation) {
             case 'previous':
                 this._skip -= this._pageSize;
                 break;
@@ -116,96 +106,85 @@ customElements.define('fhir-bundle', class FhirBundle extends HTMLElement {
             case 'last':
                 this._skip = Math.floor(this._count / this._pageSize) * this._pageSize;
                 break;
+            case 'first':
             default:
-                return;
+                this._skip = 0;
+                break;
         }
         this._shadow.getElementById('table').removeAll();
         const loader = this._shadow.querySelector('linear-progress');
         loader.style.visibility = "visible";
-        FhirService.searchByLink(this._link[page], this._filters).then(data => {
-            if (data.total) {
-                this._count = data.total;
-                this.parsePage(data);
-                loader.style.visibility = "hidden";
+        FhirService.searchByLink(link.url, this._filters).then(data => {
+            this.parsePage(data);
+            loader.style.visibility = "hidden";
+            if (typeof link.relation === 'undefined') {
+                if (data.total) {
+                    this._count = data.total;
+                    this.fillPaginationRange();
+                    this._shadow.getElementById('paginationCount').innerHTML = this._count;
+                } else {
+                    this.getCount();
+                }
             } else {
-                FhirService.searchCount(this._resourceType.type, this._filters).then(count => {
-                    this._count = count.total;
-                    this.parsePage(data);
-                    loader.style.visibility = "hidden";
-                });
+                this.fillPaginationRange();
             }
         });
     }
 
-    parsePage(data) {
-        function evalColumn(resource, expression) {
-            return
-        }
-        const dataTable = this._shadow.getElementById('table');
-        const paginationRows = this._shadow.getElementById('paginationRows');
+    getCount() {
+        const paginationCount = this._shadow.getElementById('paginationCount');
+        paginationCount.innerHTML = "<circular-progress></circular-progress>";
+        FhirService.searchCount(this._resourceType.type, this._filters).then(({ total }) => {
+            this._count = total;
+            this.fillPaginationRange();
+            paginationCount.innerHTML = total;
+        });
+    }
+
+    fillPaginationRange() {
+        const paginationRange = this._shadow.getElementById('paginationRange');
         let range = '0';
         if (this._count != 0) {
             range = `${this._skip + 1}-${Math.min(this._skip + this._pageSize, this._count)}`;
         }
-        paginationRows.innerText = `${range} of ${this._count}`;
+        paginationRange.innerText = range;
+    }
+
+    parsePage(data) {
         if (data.entry) {
+            const dataTable = this._shadow.getElementById('table');
             let value = "";
             data.entry.forEach(entry => {
                 if (entry.resource && entry.resource.resourceType == this._resourceType.type) {
                     let row = {};
                     this._columns.forEach(column => {
                         value = eval("entry.resource." + column.expression);
-                        //if (column.type === "date") value = formatDate(value);
                         row[column.label] = value;
                     });
                     dataTable.addRow(entry.resource.id, row);
                 }
-                function formatDate(dte) {
-                    let date = new Date(dte);
-                    return date.toLocaleDateString(navigator.language, {
-                        year: 'numeric',
-                        month: 'numeric',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: 'numeric',
-                        second: 'numeric'
-                    });
-                }
             });
-            this._link = {};
 
-            const paginationFirst = this._shadow.getElementById('paginationFirst');
-            paginationFirst.setAttribute("disabled", '');
-            const paginationPrevious = this._shadow.getElementById('paginationPrevious');
-            paginationPrevious.setAttribute("disabled", '');
-            const paginationNext = this._shadow.getElementById('paginationNext');
-            paginationNext.setAttribute("disabled", '');
-            const paginationLast = this._shadow.getElementById('paginationLast');
-            paginationLast.setAttribute("disabled", '');
+            const buttons = {
+                "first": this._shadow.getElementById('paginationFirst'),
+                "previous": this._shadow.getElementById('paginationPrevious'),
+                "next": this._shadow.getElementById('paginationNext'),
+                "last": this._shadow.getElementById('paginationLast')
+            }
 
+            for (const [relation, button] of Object.entries(buttons)) {
+                button.setAttribute("disabled", '');
+                button.removeAttribute("data-relation");
+                button.removeAttribute("data-url");
+            }
+            let button = null;
             data.link.forEach(link => {
-                this._link[link.relation] = link.url;
-                switch (link.relation) {
-                    case 'first':
-                        paginationFirst.removeAttribute("disabled");
-                        paginationFirst.setAttribute("data-relation", link.relation);
-                        break;
-                    case 'prev':
-                    //prev is specific to firely server
-                    case 'previous':
-                        paginationPrevious.removeAttribute("disabled");
-                        paginationPrevious.setAttribute("data-relation", link.relation);
-                        break;
-                    case 'next':
-                        paginationNext.removeAttribute("disabled");
-                        paginationNext.setAttribute("data-relation", link.relation);
-                        break;
-                    case 'last':
-                        paginationLast.removeAttribute("disabled");
-                        paginationLast.setAttribute("data-relation", link.relation);
-                        break;
-                    default:
-                        break;
+                //prev is specific to firely server
+                const rel = ("prev" === link.relation) ? "previous" : link.relation;
+                if (button = buttons[rel]) {
+                    button.removeAttribute("disabled");
+                    button.setAttribute("data-relation", rel);
+                    button.setAttribute("data-url", link.url);
                 }
             });
         }
@@ -284,7 +263,7 @@ FhirBundleTemplate.innerHTML = `
             </main>
             <footer>
                 <data-table-pagination id="pagination">
-                    <span slot="rows" id="paginationRows"></span>
+                    <div slot="rows"><span id="paginationRange"></span> of <span id="paginationCount"></span></div>
                     <round-button slot="arrows" id="paginationFirst" title="first" data-icon="first_page" disabled></round-button>
                     <round-button slot="arrows" id="paginationPrevious" title="previous" data-icon="chevron_left" disabled></round-button>
                     <round-button slot="arrows" id="paginationNext" title="next" data-icon="chevron_right" disabled></round-button>
