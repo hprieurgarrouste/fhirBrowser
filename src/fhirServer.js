@@ -35,7 +35,7 @@ customElements.define('fhir-server', class FhirServer extends HTMLElement {
             this._conf = conf;
             const preferedServer = PreferencesService.get("server");
             const nav = this._shadow.querySelector('nav');
-            for (const key of Object.keys(conf).sort()) {
+            for (const key of Object.keys(conf).sort((k1, k2) => k1.localeCompare(k2))) {
                 const row = document.createElement('list-item');
                 row.setAttribute("data-id", key);
                 if (key === preferedServer) row.classList.add("selected");

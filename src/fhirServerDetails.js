@@ -52,6 +52,7 @@ const FhirServerDetailsTemplate = document.createElement('template');
 FhirServerDetailsTemplate.innerHTML = `
     <style>
         main {
+            height: 100%;
             overflow-y: auto;
         }
     </style>

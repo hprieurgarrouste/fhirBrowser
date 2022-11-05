@@ -25,6 +25,7 @@ customElements.define('data-table', class DataTable extends HTMLElement {
         row.addEventListener("click", onRowClick.bind(this));
         this._body.appendChild(row);
         function onRowClick(event) {
+            event.stopPropagation();
             let prev = this._body.querySelector(".selected");
             if (prev) {
                 prev.classList.remove('selected');
@@ -41,7 +42,6 @@ customElements.define('data-table', class DataTable extends HTMLElement {
                     }
                 }));
             }
-            event.stopPropagation();
         }
     }
     clear() {
