@@ -1,5 +1,6 @@
 import "./components/AppBar.js";
 import "./components/RoundButton.js";
+import "./appTab.js";
 import "./components/TabBar.js";
 import "./fhirResourceJson.js";
 import "./fhirResourceHtml.js";
@@ -61,9 +62,14 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
             });;
         });
 
+        this._shadow.querySelector("tab-bar").addEventListener('click', ({ detail }) => {
+            const tabId = detail.tabId;
+            this._shadow.getElementById("jsonView").hidden = (tabId !== 'tabJson');
+            this._shadow.getElementById("htmlView").hidden = (tabId !== 'tabHtml');
+        });
     }
 
-    async load({ resourceType, resourceId }) {
+    load({ resourceType, resourceId }) {
         this._resourceType = resourceType;
 
         const header = this._shadow.getElementById('header');
@@ -79,6 +85,7 @@ customElements.define('fhir-resource', class FhirResource extends HTMLElement {
             header.classList.remove('error');
             this._shadow.getElementById("error").hidden = true;
             tabBar.hidden = false;
+            tabBar.select('tabJson');
             this._resource = resource;
             jsonView.source = resource;
             htmlView.source = resource;
@@ -116,7 +123,11 @@ FhirResourceTemplate.innerHTML = `
             overflow:hidden;
             text-overflow:ellipsis;
         }
-        tab-bar {
+        #jsonView {
+            flex:1 1 auto;
+            height:0;
+        }
+        #htmlView {
             flex:1 1 auto;
             height:0;
         }
@@ -138,9 +149,11 @@ FhirResourceTemplate.innerHTML = `
             <round-button slot="right" id="help" title="Help" data-icon="help"></round-button>
         </app-bar>
         <tab-bar>
-            <fhir-resource-json data-tab="Json" id="jsonView"></fhir-resource-json>
-            <fhir-resource-html data-tab="Html" id="htmlView"></fhir-resource-html>
+            <app-tab id="tabJson" selected>Json</app-tab>
+            <app-tab id="tabHtml">Html</app-tab>
         </tab-bar>
+        <fhir-resource-json id="jsonView"></fhir-resource-json>
+        <fhir-resource-html id="htmlView" hidden></fhir-resource-html>
         <span id="error"></span>
     </div>
 `;

@@ -56,11 +56,18 @@ AppTemplate.innerHTML = `
         }
         #bdy {
             flex: 1 1 auto;
-            block-size: 100%;
-            display: grid;
-            grid-auto-flow: column;
-            grid-auto-columns: 100%;
             overflow: hidden;
+            width: 0;
+            display: flex;
+            flex-direction: row;
+        }
+        fhir-bundle, fhir-resource {
+            flex: auto;
+            min-width: 100%;
+            transition: all 0.2s ease-in-out;
+        }
+        fhir-bundle.hidden {
+            margin-left: -100%;
         }
         @media (max-width:480px){
             #leftPanel {
@@ -103,10 +110,9 @@ customElements.define('fhir-browser', class App extends HTMLElement {
     connectedCallback() {
         SnackbarsService.container = this._shadow;
         const leftPanel = this._shadow.getElementById("leftPanel");
-        const bdy = this._shadow.getElementById("bdy");
-        bdy.scrollTo(0, 0);
         const bundle = this._shadow.getElementById("bundle");
         const resource = this._shadow.getElementById("resource");
+        const bdy = this._shadow.getElementById("bdy");
 
         this._shadow.getElementById("navigation").addEventListener('click', () => {
             leftPanel.classList.toggle("hidden");
@@ -116,8 +122,8 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             if (window.matchMedia("(max-width: 480px)").matches) {
                 leftPanel.classList.add("hidden");
             }
+            bundle.classList.remove("hidden");
             bundle.load(detail.resourceType);
-            bdy.scrollTo({ top: 0, left: 0, behavior: "smooth" });
             bdy.style.visibility = "visible";
         });
 
@@ -125,18 +131,19 @@ customElements.define('fhir-browser', class App extends HTMLElement {
             SnackbarsService.show(`Connected to "${detail.serverCode}" server.`);
             leftPanel.load();
             leftPanel.classList.remove("hidden");
+            bdy.style.visibility = "hidden";
         });
 
         resource.addEventListener('back', () => {
-            bdy.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+            bundle.classList.remove("hidden");
         });
 
         bundle.addEventListener('resourceSelected', ({ detail }) => {
-            bdy.scrollTo({ top: 0, left: resource.offsetLeft, behavior: "smooth" });
             resource.load({
                 "resourceType": detail.resourceType,
                 "resourceId": detail.resourceId
             });
+            bundle.classList.add("hidden");
         });
 
         this.setColorScheme(PreferencesService.get("colorScheme", "auto"));

@@ -1,3 +1,4 @@
+import "./appTab.js";
 import "./components/TabBar.js";
 import "./fhirResourceTypes.js";
 import "./fhirServerDetails.js";
@@ -11,7 +12,15 @@ customElements.define('fhir-metadata', class FhirMetadata extends HTMLElement {
     }
 
     connectedCallback() {
-        this._shadow.querySelector("fhir-resource-types").addEventListener('resourceTypeSelected', ({ detail }) => {
+        this._shadow.querySelector("tab-bar").addEventListener('click', ({ detail }) => {
+            const tabId = detail.tabId;
+            if (tabId === "tabResources") {
+                this._shadow.getElementById("resourceTypes").classList.remove("hidden");
+            } else {
+                this._shadow.getElementById("resourceTypes").classList.add("hidden");
+            }
+        });
+        this._shadow.getElementById("resourceTypes").addEventListener('resourceTypeSelected', ({ detail }) => {
             this.dispatchEvent(new CustomEvent("resourceTypeSelected", {
                 bubbles: false,
                 cancelable: false,
@@ -26,8 +35,8 @@ customElements.define('fhir-metadata', class FhirMetadata extends HTMLElement {
     * @param {FhirMetadata} metadata
     */
     set metadata(metadata) {
-        this._shadow.querySelector("fhir-resource-types").metadata = metadata;
-        this._shadow.querySelector("fhir-server-details").metadata = metadata;
+        this._shadow.getElementById("resourceTypes").metadata = metadata;
+        this._shadow.getElementById("serverDetails").metadata = metadata;
     }
 
 });
@@ -41,14 +50,35 @@ FhirMetadataTemplate.innerHTML = `
             height : 100%;
         }
         tab-bar {
+            border-bottom:1px solid var(--border-color, gray);
+        }
+        #resourceTypes, #serverDetails {
+            flex: auto;
+            overflow: auto;
+            height: 100%;
+            min-width: 100%;
+            transition: all 0.3s;
+        }
+        #tabsBody {
+            display:flex;
+            flex-direction:row;
             flex: auto;
             height: 0;
+            overflow:hidden;
+        }
+        #resourceTypes.hidden {
+            margin-left: -100%;
+            transition: all 0.3s;
         }
     </style>
     <main>
         <tab-bar>
-            <fhir-resource-types data-tab="Resource Types"></fhir-resource-types>
-            <fhir-server-details data-tab="Details"></fhir-server-details>
+            <app-tab id="tabResources" selected>Resource Types</app-tab>
+            <app-tab id="tabDetails">Details</app-tab>
         </tab-bar>
+        <div id="tabsBody">
+            <fhir-resource-types id="resourceTypes"></fhir-resource-types>
+            <fhir-server-details id="serverDetails"></fhir-server-details>
+        </div>
     </main>
 `;
