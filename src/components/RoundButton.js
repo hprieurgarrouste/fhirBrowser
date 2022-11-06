@@ -41,6 +41,7 @@ RoundButtonTemplate.innerHTML = `
             color: inherit;
             background-color:transparent;
             border-radius: 50%;
+            user-select: none;
         }
         main:not([disabled]):hover {
             background-color:var(--hover-color, rgb(0 0 0 /5%));
