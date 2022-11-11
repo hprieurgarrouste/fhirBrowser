@@ -34,6 +34,9 @@ if ('serviceWorker' in navigator) {
                 }
                 const bdy = this._shadow.getElementById("bdy");
                 bdy.style.visibility = "visible";
+                if (window.matchMedia("(max-width: 480px)").matches) {
+                    this._shadow.getElementById("leftPanel").classList.add("hidden");
+                }
                 const bundle = this._shadow.getElementById("bundle");
                 if (path.length > 0 && path[1]) {
                     bundle.hidden = true;
@@ -67,7 +70,7 @@ if ('serviceWorker' in navigator) {
                     this._metadata = metadata;
                     metadataElm.metadata = metadata;
                     metadataElm.hidden = false;
-                    this.locationHandler();
+                    location.hash = "";
                 });
             });
 
