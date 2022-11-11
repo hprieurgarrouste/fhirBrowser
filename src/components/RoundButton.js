@@ -1,55 +1,64 @@
-customElements.define('round-button', class RoundButton extends HTMLElement {
-    constructor() {
-        super();
-        this._shadow = this.attachShadow({ mode: 'closed' })
-        this._shadow.appendChild(RoundButtonTemplate.content.cloneNode(true));
-    }
+(function () {
 
-    static get observedAttributes() { return ["data-icon", "disabled"]; }
+    class RoundButton extends HTMLElement {
+        constructor() {
+            super();
+            this._shadow = this.attachShadow({ mode: 'closed' })
+            this._shadow.appendChild(template.content.cloneNode(true));
+        }
 
-    attributeChangedCallback(name, oldValue, newValue) {
-        const elm = this._shadow.querySelector("main");
-        if ("data-icon" === name) {
-            elm.innerText = newValue;
-        } else if ("disabled" === name) {
-            if (null === newValue) {
-                elm.removeAttribute("disabled");
-            } else {
-                elm.setAttribute("disabled", "");
+        static get observedAttributes() { return ["data-icon", "disabled"]; }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+            const elm = this._shadow.querySelector("main");
+            if ("data-icon" === name) {
+                elm.innerText = newValue;
+            } else if ("disabled" === name) {
+                if (null === newValue) {
+                    elm.removeAttribute("disabled");
+                } else {
+                    elm.setAttribute("disabled", "");
+                }
             }
         }
-    }
 
-    connectedCallback() {
-        this._shadow.querySelector('main').addEventListener('click', (event) => {
+        connectedCallback() {
+            this._shadow.addEventListener('click', this._onClick);
+        }
+        disconnectedCallback() {
+            this._shadow.removeEventListener('click', this._onClick);
+        }
+
+        _onClick(event) {
             if (event.target.hasAttribute("disabled")) {
                 event.stopPropagation();
             }
-        });
+        }
     }
-});
 
-const RoundButtonTemplate = document.createElement('template');
-RoundButtonTemplate.innerHTML = `
-    <link href="./assets/material.css" rel="stylesheet"/>
-    <style>
-        main {
-            padding:8px;
-            cursor:pointer;
-            text-align:center;
-            border:0 none;
-            color: inherit;
-            background-color:transparent;
-            border-radius: 50%;
-            user-select: none;
-        }
-        main:not([disabled]):hover {
-            background-color:var(--hover-color, rgb(0 0 0 /5%));
-        }
-        main[disabled] {
-            color:var(--text-color-disabled);
-            cursor: default;
-        }
-    </style>
-    <main class="material-icons"/>
-`;
+    const template = document.createElement('template');
+    template.innerHTML = `
+        <link href="./assets/material.css" rel="stylesheet"/>
+        <style>
+            main {
+                padding:8px;
+                text-align:center;
+                border:0 none;
+                color: inherit;
+                background-color:transparent;
+                border-radius: 50%;
+                user-select: none;
+            }
+            main:not([disabled]):hover {
+                background-color:var(--hover-color, rgb(0 0 0 /5%));
+                cursor:pointer;
+            }
+            main[disabled] {
+                color:var(--text-color-disabled);
+            }
+        </style>
+        <main class="material-icons"/>
+    `;
+
+    window.customElements.define('round-button', RoundButton);
+})();
