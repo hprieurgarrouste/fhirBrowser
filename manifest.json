@@ -3,14 +3,25 @@
   "short_name": "FHIR Browser",
   "icons": [
     {
-      "src": "assets/favicon.png",
+      "src": "assets/icon_x512.png",
       "type": "image/png",
       "sizes": "512x512"
     },
     {
-      "src": "assets/maskable_icon.png",
+      "src": "assets/icon_x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "assets/maskable_icon_x512.png",
       "type": "image/png",
       "sizes": "512x512",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/maskable_icon_x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
       "purpose": "maskable"
     }
   ],
