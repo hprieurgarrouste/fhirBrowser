@@ -35,7 +35,9 @@
 
                     const valueElm = document.createElement('span');
                     valueElm.classList.add("value");
-                    if ("string" === typeof (value)) {
+                    if (value === null) {
+                        valueElm.innerText = "null";
+                    } else if ("string" === typeof (value)) {
                         valueElm.classList.add("string");
                         if (key === "reference") {
                             const a = document.createElement('a');
