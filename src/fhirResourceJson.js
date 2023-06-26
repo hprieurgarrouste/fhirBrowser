@@ -1,3 +1,5 @@
+import { FhirService } from "./services/Fhir.js";
+
 (function () {
     class FhirResourceJson extends HTMLElement {
         constructor() {
@@ -41,7 +43,11 @@
                         valueElm.classList.add("string");
                         if (key === "reference") {
                             const a = document.createElement('a');
-                            a.setAttribute("href", `#${value}`);
+                            let url = value;
+                            if (url.startsWith(FhirService.server.url)) {
+                                url = url.slice(FhirService.server.url.length + 1);
+                            }
+                            a.setAttribute("href", `#${url}`);
                             a.appendChild(document.createTextNode(value));
                             valueElm.appendChild(a);
                         } else {
@@ -175,4 +181,3 @@
 
     window.customElements.define('fhir-resource-json', FhirResourceJson);
 })();
-
