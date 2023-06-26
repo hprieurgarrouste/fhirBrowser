@@ -3,7 +3,7 @@ import "./components/RoundButton.js";
 import "./appTab.js";
 import "./components/TabBar.js";
 import "./fhirResourceJson.js";
-import "./fhirResourceHtml.js";
+import "./fhirResourceXml.js";
 
 import { FhirService } from "./services/Fhir.js";
 import { SnackbarsService } from "./services/Snackbars.js";
@@ -64,7 +64,7 @@ import { SnackbarsService } from "./services/Snackbars.js";
             this._shadow.querySelector("tab-bar").addEventListener('click', ({ detail }) => {
                 const tabId = detail.tab.id;
                 this._shadow.getElementById("jsonView").hidden = (tabId !== 'tabJson');
-                this._shadow.getElementById("htmlView").hidden = (tabId !== 'tabHtml');
+                this._shadow.getElementById("xmlView").hidden = (tabId !== 'tabXml');
             });
         }
 
@@ -73,23 +73,30 @@ import { SnackbarsService } from "./services/Snackbars.js";
             const header = this._shadow.getElementById('header');
             const tabBar = this._shadow.querySelector('tab-bar');
             const jsonView = this._shadow.getElementById('jsonView');
-            const htmlView = this._shadow.getElementById('htmlView');
+            const xmlView = this._shadow.getElementById('xmlView');
             const shareBtn = this._shadow.getElementById("share");
             const copyBtn = this._shadow.getElementById("copy");
             const downloadBtn = this._shadow.getElementById("download");
 
             this._shadow.getElementById('title').innerText = resourceType.type;
+            header.classList.remove('error');
+            this._shadow.getElementById("error").hidden = true;
+            tabBar.hidden = false;
+            tabBar.select('tabJson');
+
+            FhirService.readXml(resourceType.type, resourceId).then(
+                resource => {
+                    const parser = new DOMParser();
+                    const xml = parser.parseFromString(resource, "application/xml");
+                    xmlView.source = xml;
+                }
+            )
             FhirService.read(resourceType.type, resourceId).then(resource => {
                 this._resourceType = resourceType;
                 this._resourceId = resourceId;
 
-                header.classList.remove('error');
-                this._shadow.getElementById("error").hidden = true;
-                tabBar.hidden = false;
-                tabBar.select('tabJson');
                 this._resource = resource;
                 jsonView.source = resource;
-                htmlView.source = resource;
                 shareBtn.hidden = false;
                 copyBtn.hidden = false;
                 downloadBtn.hidden = false;
@@ -100,7 +107,7 @@ import { SnackbarsService } from "./services/Snackbars.js";
                 error.innerText = e;
                 tabBar.hidden = true;
                 jsonView.hidden = true;
-                htmlView.hidden = true;
+                xmlView.hidden = true;
                 this._resource = null;
                 shareBtn.hidden = true;
                 copyBtn.hidden = true;
@@ -124,11 +131,7 @@ import { SnackbarsService } from "./services/Snackbars.js";
                 overflow:hidden;
                 text-overflow:ellipsis;
             }
-            #jsonView {
-                flex:1 1 auto;
-                height:0;
-            }
-            #htmlView {
+            #jsonView, #xmlView {
                 flex:1 1 auto;
                 height:0;
             }
@@ -151,10 +154,10 @@ import { SnackbarsService } from "./services/Snackbars.js";
             </app-bar>
             <tab-bar>
                 <app-tab id="tabJson" selected>Json</app-tab>
-                <app-tab id="tabHtml">Html</app-tab>
+                <app-tab id="tabXml">Xml</app-tab>
             </tab-bar>
             <fhir-resource-json id="jsonView"></fhir-resource-json>
-            <fhir-resource-html id="htmlView" hidden></fhir-resource-html>
+            <fhir-resource-xml id="xmlView"></fhir-resource-xml>
             <span id="error"></span>
         </div>
     `;
