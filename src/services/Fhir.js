@@ -30,6 +30,15 @@ export class FhirService {
         return response.json();
     }
 
+    static async readXml(type, id) {
+        const url = new URL(`${this._server.url}/${type}/${id}`);
+        url.searchParams.set("_format", "xml");
+        const response = await fetch(url, {
+            "headers": this._server.headers
+        });
+        return response.text();
+    }
+
     static async searchByLink(linkUrl, parameters = []) {
         const url = new URL(linkUrl);
         url.searchParams.set("_summary", "true");
