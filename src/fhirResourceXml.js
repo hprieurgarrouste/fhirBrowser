@@ -13,6 +13,7 @@
             const content = this._shadow.getElementById("content");
             content.scrollTo(0, 0);
             content.innerHTML = "Loading...";
+            content.style.cursor = "wait";
         }
 
         /**
@@ -23,6 +24,7 @@
             const serializer = new XMLSerializer();
             content.scrollTo(0, 0);
             content.innerText = serializer.serializeToString(resource);
+            content.style.cursor = "default";
         }
     };
 

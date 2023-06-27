@@ -19,6 +19,7 @@ import { FhirService } from "./services/Fhir.js";
             const content = this._shadow.getElementById("content");
             content.scrollTo(0, 0);
             content.innerHTML = "Loading...";
+            content.style.cursor = "wait";
         }
 
         /**
@@ -31,6 +32,7 @@ import { FhirService } from "./services/Fhir.js";
             content.appendChild(document.createTextNode("{"));
             content.appendChild(parse(resource));
             content.appendChild(document.createTextNode("}"));
+            content.style.cursor = "default";
 
             function parse(obj) {
                 let dl = document.createElement('dl');
