@@ -46,7 +46,7 @@ import "./fhirResourceTypesFilter.js";
             if (resourceType != this._resourceType) {
                 const ul = this._shadow.getElementById('list').firstElementChild;
                 const li = Array.from(ul.childNodes).filter(li => li.dataset.type === resourceType);
-                if (li && li.length) {
+                if (li?.length) {
                     this._resourceType = resourceType;
                     let prev = this._shadow.querySelector(".selected");
                     if (prev) prev.classList.remove('selected');
