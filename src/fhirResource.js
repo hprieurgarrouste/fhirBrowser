@@ -78,12 +78,13 @@ import { SnackbarsService } from "./services/Snackbars.js";
             const copyBtn = this._shadow.getElementById("copy");
             const downloadBtn = this._shadow.getElementById("download");
 
-            this._shadow.getElementById('title').innerText = resourceType.type;
+            this._shadow.getElementById('title').innerText = `${resourceType.type} : ${resourceId}`;
             header.classList.remove('error');
             this._shadow.getElementById("error").hidden = true;
             tabBar.hidden = false;
             tabBar.select('tabJson');
 
+            xmlView.clear();
             FhirService.readXml(resourceType.type, resourceId).then(
                 resource => {
                     const parser = new DOMParser();
@@ -91,6 +92,8 @@ import { SnackbarsService } from "./services/Snackbars.js";
                     xmlView.source = xml;
                 }
             )
+
+            jsonView.clear();
             FhirService.read(resourceType.type, resourceId).then(resource => {
                 this._resourceType = resourceType;
                 this._resourceId = resourceId;
