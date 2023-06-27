@@ -8,6 +8,13 @@
         connectedCallback() {
             // todo
         }
+
+        clear() {
+            const content = this._shadow.getElementById("content");
+            content.scrollTo(0, 0);
+            content.innerHTML = "Loading...";
+        }
+
         /**
          * @param {object} resource
          */
