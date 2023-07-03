@@ -16,6 +16,7 @@ import { SnackbarsService } from "./services/Snackbars.js";
             this._shadow.appendChild(template.content.cloneNode(true));
             this._resourceType = null;
             this._resourceId = null;
+            this._xmlLoaded = false;
         }
         connectedCallback() {
             this._shadow.getElementById("back").addEventListener('click', () => {
@@ -63,8 +64,19 @@ import { SnackbarsService } from "./services/Snackbars.js";
 
             this._shadow.querySelector("tab-bar").addEventListener('click', ({ detail }) => {
                 const tabId = detail.tab.id;
+                const xmlView = this._shadow.getElementById('xmlView');
                 this._shadow.getElementById("jsonView").hidden = (tabId !== 'tabJson');
                 this._shadow.getElementById("xmlView").hidden = (tabId !== 'tabXml');
+                if (tabId == 'tabXml' && !this._xmlLoaded) {
+                    FhirService.readXml(this._resourceType.type, this._resourceId).then(resource => {
+                        const parser = new DOMParser();
+                        const xml = parser.parseFromString(resource, "application/xml");
+                        xmlView.source = xml;
+                        this._xmlLoaded = true;
+                    }).catch((e) => {
+                        //todo
+                    });
+                }
             });
         }
 
@@ -85,14 +97,6 @@ import { SnackbarsService } from "./services/Snackbars.js";
             tabBar.select('tabJson');
 
             xmlView.clear();
-            FhirService.readXml(resourceType.type, resourceId).then(
-                resource => {
-                    const parser = new DOMParser();
-                    const xml = parser.parseFromString(resource, "application/xml");
-                    xmlView.source = xml;
-                }
-            )
-
             jsonView.clear();
             FhirService.read(resourceType.type, resourceId).then(resource => {
                 this._resourceType = resourceType;
