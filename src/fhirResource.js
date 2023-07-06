@@ -97,6 +97,8 @@ import { SnackbarsService } from "./services/Snackbars.js";
             tabBar.select('tabJson');
 
             xmlView.clear();
+            this._xmlLoaded = false;
+
             jsonView.clear();
             FhirService.read(resourceType.type, resourceId).then(resource => {
                 this._resourceType = resourceType;
