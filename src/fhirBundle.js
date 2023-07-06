@@ -2,10 +2,10 @@ import "./components/AppBar.js";
 import "./components/DataTable.js";
 import "./components/DataTablePagination.js";
 import "./components/LinearProgress.js";
-import { FhirService } from "./services/Fhir.js";
+import "./fhirSearch.js";
 
-import "./fhirSearch.js";
-import "./fhirSearch.js";
+import { FhirService } from "./services/Fhir.js";
+import { SnackbarsService } from "./services/Snackbars.js";
 
 (function () {
     class FhirBundle extends HTMLElement {
@@ -19,6 +19,7 @@ import "./fhirSearch.js";
             this._count = null;
             this._columns = null;
             this._filters = [];
+            this._page = null;
         }
 
         connectedCallback() {
@@ -50,6 +51,30 @@ import "./fhirSearch.js";
                     searchPanel.classList.add("hidden");
                 }
             });
+
+            this._shadow.getElementById('copy').addEventListener("click", () => {
+                navigator.clipboard.writeText(JSON.stringify(this._page)).then(function () {
+                    SnackbarsService.show("Copying to clipboard was successful");
+                }, function (err) {
+                    console.error('Async: Could not copy text: ', err);
+                });
+            });
+
+            this._shadow.getElementById('download').addEventListener("click", () => {
+                const fileName = `${this._resourceType.type}-${this._skip}`;
+                const file = new File([JSON.stringify(this._page)], fileName, {
+                    type: 'data:text/json;charset=utf-8',
+                });
+                const url = URL.createObjectURL(file);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${fileName}.json`;
+                this._shadow.appendChild(link);
+                link.click();
+                this._shadow.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            });
+
         }
 
         load(resourceType) {
@@ -110,6 +135,7 @@ import "./fhirSearch.js";
             const loader = this._shadow.querySelector('linear-progress');
             loader.style.visibility = "visible";
             FhirService.searchByLink(link.url, this._filters).then(data => {
+                this._page = data;
                 this.parsePage(data);
                 loader.style.visibility = "hidden";
                 if (typeof link.relation === 'undefined') {
@@ -248,6 +274,8 @@ import "./fhirSearch.js";
                 <header>
                     <app-bar>
                         <h3 slot="middle" id="title"></h3>
+                        <round-button slot="right" id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
+                        <round-button slot="right" id="download" title="Download" data-icon="download"></round-button>
                         <round-button slot="right" id="searchToggle" title="Search" data-icon="search"></round-button>
                         <round-button slot="right" id="help" title="Help" data-icon="help"></round-button>
                     </app-bar>
