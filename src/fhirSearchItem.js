@@ -23,16 +23,24 @@ customElements.define('fhir-search-item', class FhirSearchItem extends HTMLEleme
     get value() {
         let field;
         switch (this._search.type) {
+            case "token":
+                let value = '';
+                const system = this._shadow.querySelector('fhir-search-text[data-type="system"]');
+                if (system?.value) value = `${system.value}|`;
+                field = this._shadow.querySelector('fhir-search-text:not([data-type])');
+                if (field?.value) value += field.value;
+                if (!value) return null;
+                return {
+                    "name": this._search.name,
+                    "value": value
+                };
             case "string":
-            case "code":
-            case "markdown":
-            case "id":
             case "reference":
                 field = this._shadow.querySelector('fhir-search-text');
-                if (field && field.value) {
+                if (field?.value) {
                     let name = this._search.name;
                     const modifier = this._shadow.querySelector('fhir-search-modifier');
-                    if (modifier && modifier.value) name += `:${modifier.value}`;
+                    if (modifier?.value) name += `:${modifier.value}`;
                     return {
                         "name": name,
                         "value": field.value
@@ -40,11 +48,12 @@ customElements.define('fhir-search-item', class FhirSearchItem extends HTMLEleme
                 }
                 break;
             case "date":
+            case "datetime":
                 field = this._shadow.querySelector('fhir-search-date');
-                if (field && field.value) {
+                if (field?.value) {
                     let value = field.value;
                     const prefix = this._shadow.querySelector('fhir-search-prefix');
-                    if (prefix && prefix.value) value = prefix.value + value;
+                    if (prefix?.value) value = prefix.value + value;
                     return {
                         "name": this._search.name,
                         "value": value
@@ -58,6 +67,24 @@ customElements.define('fhir-search-item', class FhirSearchItem extends HTMLEleme
     }
 
     init(search) {
+        function addModifier(search) {
+            let field = document.createElement("fhir-search-modifier");
+            field.setAttribute("data-name", search.name);
+            content.appendChild(field);
+        }
+        function addSystem(search) {
+            let field = document.createElement("fhir-search-text");
+            field.setAttribute("placeholder", 'System');
+            field.setAttribute("data-type", 'system');
+            field.setAttribute("name", search.name);
+            content.appendChild(field);
+        }
+        function addText(search, placeholder) {
+            let field = document.createElement("fhir-search-text");
+            field.setAttribute("name", search.name);
+            if (placeholder) field.setAttribute("placeholder", placeholder);
+            content.appendChild(field);
+        }
         //remove format selector, only json supported
         if ("_format" === search.name) return false;
 
@@ -66,33 +93,37 @@ customElements.define('fhir-search-item', class FhirSearchItem extends HTMLEleme
         this._shadow.querySelector("span").innerText = search.documentation || '';
         const content = this._shadow.querySelector("fieldset");
 
+        console.log(`${this._search.name}:${this._search.type}`);
+
         let field;
-        switch (search.type) {
-            case "string":
-            case "code":
-            case "markdown":
-            case "id":
-            case "reference":
-                if ("_filter" !== search.name) {
-                    field = document.createElement("fhir-search-modifier");
+        if ('_id' == search.name) {
+            addText(search);
+        } else if ('_filter' == search.name) {
+            addText(search);
+        } else {
+            switch (search.type) {
+                case "token":
+                    addSystem(search);
+                    addText(search, 'code');
+                    break;
+                case "string":
+                case "reference":
+                    addModifier(search);
+                    addText(search);
+                    break;
+                case "date":
+                case "datetime":
+                    field = document.createElement("fhir-search-prefix");
                     field.setAttribute("data-name", search.name);
                     content.appendChild(field);
-                }
-                field = document.createElement("fhir-search-text");
-                field.setAttribute("name", search.name);
-                content.appendChild(field);
-                break;
-            case "date":
-                field = document.createElement("fhir-search-prefix");
-                field.setAttribute("data-name", search.name);
-                content.appendChild(field);
 
-                field = document.createElement("fhir-search-date");
-                field.setAttribute("name", search.name);
-                content.appendChild(field);
-                break;
-            default:
-                return false;
+                    field = document.createElement("fhir-search-date");
+                    field.setAttribute("name", search.name);
+                    content.appendChild(field);
+                    break;
+                default:
+                    return false;
+            }
         }
         return true;
     }
