@@ -6,7 +6,10 @@ customElements.define('fhir-search-text', class FhirSearchText extends HTMLEleme
     }
 
     connectedCallback() {
-
+        let placeholder = this.getAttribute("placeholder");
+        if (placeholder) {
+            this._shadow.querySelector("input").setAttribute("placeholder", placeholder);
+        }
     }
 
     get value() {
