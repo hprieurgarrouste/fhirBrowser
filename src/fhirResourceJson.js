@@ -34,6 +34,15 @@ import { FhirService } from "./services/Fhir.js";
             content.appendChild(document.createTextNode("}"));
             content.style.cursor = "default";
 
+            function isUrl(value) {
+                let url;
+                try {
+                    url = new URL(value);
+                } catch (_) {
+                    return false;
+                }
+                return url.protocol === "http:" || url.protocol === "https:";
+            }
             function parse(obj) {
                 let dl = document.createElement('dl');
                 for (const [key, value] of Object.entries(obj)) {
@@ -51,12 +60,18 @@ import { FhirService } from "./services/Fhir.js";
                     } else if ("string" === typeof (value)) {
                         valueElm.classList.add("string");
                         if (key === "reference") {
-                            const a = document.createElement('a');
                             let url = value;
                             if (url.startsWith(FhirService.server.url)) {
                                 url = url.slice(FhirService.server.url.length + 1);
                             }
+                            let a = document.createElement('a');
                             a.setAttribute("href", `#${url}`);
+                            a.appendChild(document.createTextNode(value));
+                            valueElm.appendChild(a);
+                        } else if (isUrl(value)) {
+                            let a = document.createElement('a');
+                            a.setAttribute("href", value);
+                            a.setAttribute("target", "_blank");
                             a.appendChild(document.createTextNode(value));
                             valueElm.appendChild(a);
                         } else {
