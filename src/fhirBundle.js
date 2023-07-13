@@ -180,7 +180,7 @@ import { SnackbarsService } from "./services/Snackbars.js";
                         let row = {};
                         this._columns.forEach(column => {
                             value = eval("entry.resource." + column.expression);
-                            row[column.label] = value;
+                            row[column.label] = typeof value !== "undefined" ? value : "";
                         });
                         dataTable.addRow(entry.resource.id, row);
                     }
