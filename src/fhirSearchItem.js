@@ -93,8 +93,6 @@ customElements.define('fhir-search-item', class FhirSearchItem extends HTMLEleme
         this._shadow.querySelector("span").innerText = search.documentation || '';
         const content = this._shadow.querySelector("fieldset");
 
-        console.log(`${this._search.name}:${this._search.type}`);
-
         let field;
         if ('_id' == search.name) {
             addText(search);
