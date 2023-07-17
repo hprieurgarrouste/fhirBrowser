@@ -64,6 +64,7 @@ if ('serviceWorker' in navigator) {
             this._shadow.getElementById("serverSelector").addEventListener('serverchanged', ({ detail }) => {
                 SnackbarsService.show(`Connected to "${detail.serverCode}" server.`);
                 this._shadow.getElementById("bdy").style.visibility = "hidden";
+                this._shadow.getElementById("serverCode").innerText = ` : ${detail.serverCode}`;
                 const metadataElm = this._shadow.getElementById("metadata");
                 metadataElm.clear();
                 FhirService.capabilities().then(metadata => {
@@ -99,6 +100,9 @@ if ('serviceWorker' in navigator) {
             header {
                 background-color: var(--primary-color, #000);
                 color:#FFF;
+            }
+            #serverCode {
+                text-transform: capitalize;
             }
             h3 {
                 margin:0;
@@ -152,7 +156,8 @@ if ('serviceWorker' in navigator) {
         <header>
             <app-bar id="header" caption="">
                 <round-button slot="left" id="navigation" title="Menu" data-icon="menu"></round-button>
-                <h3 slot="middle">FHIR Browser</h3>
+                <span id="appTitle" slot="middle">FHIR Browser</span>
+                <span id="serverCode" slot="middle"></span>
                 <color-scheme slot="right"></color-scheme>
                 <round-button slot="right" id="serverSelectorToggle" title="Connections" data-icon="public"></round-button>
             </app-bar>

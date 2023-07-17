@@ -21,6 +21,8 @@
                 margin:0;
                 overflow: hidden;
                 padding-left: 0.5em;
+                font-size:1.17em;
+                font-weight: bold;
             }
             #barRight {
                 white-space: nowrap;
