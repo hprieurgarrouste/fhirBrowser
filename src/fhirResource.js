@@ -24,7 +24,7 @@ import { SnackbarsService } from "./services/Snackbars.js";
             });
 
             this._shadow.getElementById("help").addEventListener('click', () => {
-                window.open(`${this._resourceType.profile}#resource`, "FhirBrowserHelp");
+                window.open(`${FhirService.helpUrl(this._resourceType.type)}#resource`, "FhirBrowserHelp");
             });
 
             this._shadow.getElementById('download').addEventListener("click", () => {

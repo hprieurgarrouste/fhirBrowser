@@ -6,10 +6,9 @@ export class FhirService {
     /**
          * Returns Fhir release from server fhirVersion
          * http://hl7.org/fhir/directory.html
-         * @param {*} serverVersion
          * @returns release or null
          */
-    static release(serverVersion) {
+    static get release() {
         const release = {
             "5.0.0": "R5",
             "4.6.0": "R5",
@@ -24,7 +23,7 @@ export class FhirService {
             "3.2.0": "R4",
             "3.0.2": "R3"
         }
-        return release[serverVersion] || null;
+        return release[this._server.version] || null;
     }
 
     static set server(srv) {
@@ -32,6 +31,10 @@ export class FhirService {
     }
     static get server() {
         return this._server;
+    }
+
+    static helpUrl(resourceType) {
+        return `https://hl7.org/fhir/${this.release}/${resourceType.toLowerCase()}.html`;
     }
 
     static async capabilities(mode = "full") {

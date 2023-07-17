@@ -1,6 +1,8 @@
 import "./components/RoundButton.js"
 import "./fhirSearchItem.js"
 
+import { FhirService } from "./services/Fhir.js";
+
 customElements.define('fhir-search', class FhirSearch extends HTMLElement {
     constructor() {
         super();
@@ -21,7 +23,7 @@ customElements.define('fhir-search', class FhirSearch extends HTMLElement {
         });
 
         this._shadow.getElementById('help').addEventListener('click', () => {
-            window.open("https://hl7.org/fhir/search.html", "FhirBrowserHelp");
+            window.open(FhirService.helpUrl("search"), "FhirBrowserHelp");
         });
 
         this._shadow.getElementById("apply").addEventListener("click", () => {

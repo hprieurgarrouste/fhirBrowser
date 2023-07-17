@@ -24,7 +24,7 @@ import { SnackbarsService } from "./services/Snackbars.js";
 
         connectedCallback() {
             this._shadow.getElementById('help').addEventListener('click', () => {
-                window.open(this._resourceType.profile, "FhirBrowserHelp");
+                window.open(FhirService.helpUrl(this._resourceType.type), "FhirBrowserHelp");
             });
             this._shadow.querySelector("data-table-pagination").addEventListener('click', (event) => {
                 const { target } = event;

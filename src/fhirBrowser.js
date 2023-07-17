@@ -72,6 +72,7 @@ if ('serviceWorker' in navigator) {
                     metadataElm.metadata = metadata;
                     metadataElm.hidden = false;
                     location.hash = "";
+                    FhirService.server.version = metadata.fhirVersion;
                 });
             });
 
