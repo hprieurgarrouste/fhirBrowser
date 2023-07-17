@@ -158,14 +158,16 @@ import { SnackbarsService } from "./services/Snackbars.js";
             FhirService.searchCount(this._resourceType.type, this._filters).then(({ total }) => {
                 this._count = total;
                 this.fillPaginationRange();
-                paginationCount.innerHTML = total;
+                paginationCount.innerHTML = total || "Unkown";
             });
         }
 
         fillPaginationRange() {
             const paginationRange = this._shadow.getElementById('paginationRange');
             let range = '0';
-            if (this._count != 0) {
+            if (typeof this._count == 'undefined') {
+                range = `${this._skip + 1}-${this._skip + this._pageSize}`;
+            } else if (this._count != 0) {
                 range = `${this._skip + 1}-${Math.min(this._skip + this._pageSize, this._count)}`;
             }
             paginationRange.innerText = range;
