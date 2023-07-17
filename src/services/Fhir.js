@@ -3,6 +3,30 @@ export class FhirService {
         this._server = null;
     }
 
+    /**
+         * Returns Fhir release from server fhirVersion
+         * http://hl7.org/fhir/directory.html
+         * @param {*} serverVersion
+         * @returns release or null
+         */
+    static release(serverVersion) {
+        const release = {
+            "5.0.0": "R5",
+            "4.6.0": "R5",
+            "4.5.0": "R5",
+            "4.4.0": "R5",
+            "4.3.0": "R4B",
+            "4.2.0": "R5",
+            "4.1.0": "R4B",
+            "4.0.1": "R4",
+            "3.5.0": "R4",
+            "3.3.0": "R4",
+            "3.2.0": "R4",
+            "3.0.2": "R3"
+        }
+        return release[serverVersion] || null;
+    }
+
     static set server(srv) {
         this._server = srv;
     }
@@ -18,6 +42,18 @@ export class FhirService {
             "cache": "reload",
             "headers": this._server.headers
         });
+        return response.json();
+    }
+
+    /**
+     * get structureDefinition from hl7 server
+     * @param {*} release
+     * @param {*} resourceType
+     * @returns
+     */
+    static async structureDefinition(release, resourceType) {
+        const url = new URL(`https://hl7.org/fhir/${release}/${resourceType.toLowerCase()}.profile.json`);
+        const response = await fetch(url, {});
         return response.json();
     }
 
