@@ -27,6 +27,16 @@ customElements.define('fhir-search', class FhirSearch extends HTMLElement {
         });
 
         this._shadow.getElementById("apply").addEventListener("click", () => {
+            applyClick.call(this);
+        });
+
+        this._shadow.getElementById("wrapper").addEventListener("keydown", (e) => {
+            if ('Enter' == e.code) {
+                applyClick.call(this);
+            }
+        });
+
+        function applyClick() {
             const parameters = [];
             const fields = content.querySelectorAll("fhir-search-item");
             fields.forEach(field => {
@@ -42,7 +52,7 @@ customElements.define('fhir-search', class FhirSearch extends HTMLElement {
                     "parameters": parameters
                 }
             }));
-        });
+        }
     }
 
     /**
