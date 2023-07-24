@@ -1,6 +1,6 @@
 import "./components/RoundButton.js"
 import "./components/ListItem.js"
-import "./components/ListRow.js"
+import "./components/ListRowCheck.js"
 import { FhirService } from "./services/Fhir.js";
 
 (function () {
@@ -23,18 +23,19 @@ import { FhirService } from "./services/Fhir.js";
             this.clear();
             FhirService.structureDefinition(resourceType).then(structureDefinition => {
                 const nav = this._shadow.getElementById('content');
-                structureDefinition.snapshot.element.forEach(element => {
-                    if (element.isSummary) {
+                structureDefinition.snapshot.element
+                    .filter(e => e.isSummary)
+                    .sort((e1, e2) => e1.path.localeCompare(e2.path))
+                    .forEach(element => {
                         const path = element.path;
                         const item = document.createElement('list-item');
                         item.setAttribute("data-primary", path.substr(path.indexOf(".") + 1));
                         item.setAttribute("data-secondary", element.short);
-                        const row = document.createElement('list-row');
+                        const row = document.createElement('list-row-check');
                         row.setAttribute("data-id", element.id);
                         row.appendChild(item);
                         nav.appendChild(row);
-                    }
-                });
+                    });
             }).catch((e) => {
                 //todo
             });
