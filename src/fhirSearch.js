@@ -13,26 +13,36 @@ customElements.define('fhir-search', class FhirSearch extends HTMLElement {
     connectedCallback() {
         const content = this._shadow.querySelector("main");
 
-        this._shadow.getElementById("back").addEventListener('click', () => {
+        this._shadow.getElementById("back").addEventListener('click', (event) => {
             this.classList.add("hidden");
+            event.preventDefault();
+            event.stopPropagation();
         });
 
-        this._shadow.getElementById("clear").addEventListener("click", () => {
+        this._shadow.getElementById("clear").addEventListener("click", (event) => {
             const fields = content.querySelectorAll("fhir-search-item");
             fields.forEach(field => field.clear());
+            event.preventDefault();
+            event.stopPropagation();
         });
 
-        this._shadow.getElementById('help').addEventListener('click', () => {
+        this._shadow.getElementById('help').addEventListener('click', (event) => {
             window.open(FhirService.helpUrl("search"), "FhirBrowserHelp");
+            event.preventDefault();
+            event.stopPropagation();
         });
 
-        this._shadow.getElementById("apply").addEventListener("click", () => {
+        this._shadow.getElementById("apply").addEventListener("click", (event) => {
             applyClick.call(this);
+            event.preventDefault();
+            event.stopPropagation();
         });
 
-        this._shadow.getElementById("wrapper").addEventListener("keydown", (e) => {
-            if ('Enter' == e.code) {
+        content.addEventListener("keydown", (event) => {
+            if ('Enter' === event.code) {
                 applyClick.call(this);
+                event.preventDefault();
+                event.stopPropagation();
             }
         });
 
