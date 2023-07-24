@@ -1,8 +1,10 @@
 import "./components/AppBar.js";
+import "./components/AppDialog.js";
 import "./components/DataTable.js";
 import "./components/DataTablePagination.js";
 import "./components/LinearProgress.js";
 import "./fhirSearch.js";
+//import "./fhirBundleColumns.js";
 
 import { FhirService } from "./services/Fhir.js";
 import { SnackbarsService } from "./services/Snackbars.js";
@@ -75,9 +77,16 @@ import { SnackbarsService } from "./services/Snackbars.js";
                 window.URL.revokeObjectURL(url);
             });
 
+            /*this._shadow.getElementById('settingsDialogToggle').addEventListener("click", () => {
+                const columnsSelector = this._shadow.getElementById('columnsSelector');
+                columnsSelector.load(this._resourceType.type);
+                this._shadow.getElementById('settingsDialog').hidden = false;
+            });*/
+
         }
 
         load(resourceType) {
+            //this._shadow.getElementById("settingsDialog").hidden = true;
             if (resourceType === this._resourceType) return;
             this._resourceType = resourceType;
             this._filters = [];
@@ -276,6 +285,7 @@ import { SnackbarsService } from "./services/Snackbars.js";
                 <header>
                     <app-bar>
                         <h3 slot="middle" id="title"></h3>
+                        <!--<round-button slot="right" id="settingsDialogToggle" title="Settings" data-icon="view_column"></round-button>-->
                         <round-button slot="right" id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
                         <round-button slot="right" id="download" title="Download" data-icon="download"></round-button>
                         <round-button slot="right" id="searchToggle" title="Search" data-icon="search"></round-button>
@@ -298,6 +308,9 @@ import { SnackbarsService } from "./services/Snackbars.js";
             </div>
             <fhir-search id="search" class="hidden"></fhir-search>
         </div>
+        <!--<app-dialog id="settingsDialog" data-title="Settings" hidden>
+            <fhir-bundle-columns id="columnsSelector"></fhir-bundle-columns>
+        </app-dialog>-->
     `;
 
     window.customElements.define('fhir-bundle', FhirBundle);
