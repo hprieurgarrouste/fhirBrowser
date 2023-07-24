@@ -60,6 +60,9 @@ import "./RoundButton.js"
             #header {
                 border-bottom: 1px solid var(--border-color);
             }
+            #title {
+                margin: 0.5em 0;
+            }
             #content {
                 overflow:auto;
                 flex: 1 1 auto;
