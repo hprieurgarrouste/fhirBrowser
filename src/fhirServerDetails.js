@@ -54,6 +54,9 @@ import "./components/ListItem.js"
                 height: 100%;
                 overflow-y: auto;
             }
+            main > * {
+                cursor: default;
+            }
         </style>
         <main/>
     `;

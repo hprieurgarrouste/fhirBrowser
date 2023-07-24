@@ -27,7 +27,6 @@
             main {
                 padding: 0.5em 1em;
                 background-color: inherit;
-                cursor: pointer;
             }
             main[selected], main:hover {
                 background-color: var(--hover-color, rgba(0, 0, 0, 5%));

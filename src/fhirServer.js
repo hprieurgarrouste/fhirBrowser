@@ -128,6 +128,9 @@ import { FhirService } from "./services/Fhir.js";
                 flex: 1 1 auto;
                 height: 0;
             }
+            #content > * {
+                cursor: pointer;
+            }
             #actions {
                 border-top: 1px solid var(--border-color);
                 padding: 0.5em 1em;
