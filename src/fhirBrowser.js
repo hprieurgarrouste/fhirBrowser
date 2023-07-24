@@ -1,6 +1,6 @@
 import "./components/AppBar.js";
+import "./components/AppDialog.js";
 import "./appLeftPanel.js";
-import { PreferencesService } from "./services/Preferences.js";
 import { SnackbarsService } from "./services/Snackbars.js";
 import "./fhirBundle.js";
 import "./fhirResource.js";
@@ -62,6 +62,7 @@ if ('serviceWorker' in navigator) {
             });
 
             this._shadow.getElementById("serverSelector").addEventListener('serverchanged', ({ detail }) => {
+                this._shadow.getElementById("serverDialog").hidden = true;
                 SnackbarsService.show(`Connected to "${detail.serverCode}" server.`);
                 this._shadow.getElementById("bdy").style.visibility = "hidden";
                 this._shadow.getElementById("serverCode").innerText = ` : ${detail.serverCode}`;
@@ -76,8 +77,8 @@ if ('serviceWorker' in navigator) {
                 });
             });
 
-            this._shadow.getElementById('serverSelectorToggle').addEventListener("click", () => {
-                this._shadow.getElementById('serverSelector').hidden = false;
+            this._shadow.getElementById('serverDialogToggle').addEventListener("click", () => {
+                this._shadow.getElementById('serverDialog').hidden = false;
             });
         }
 
@@ -160,7 +161,7 @@ if ('serviceWorker' in navigator) {
                 <span id="appTitle" slot="middle">FHIR Browser</span>
                 <span id="serverCode" slot="middle"></span>
                 <color-scheme slot="right"></color-scheme>
-                <round-button slot="right" id="serverSelectorToggle" title="Connections" data-icon="public"></round-button>
+                <round-button slot="right" id="serverDialogToggle" title="Connections" data-icon="public"></round-button>
             </app-bar>
         </header>
         <main>
@@ -174,7 +175,9 @@ if ('serviceWorker' in navigator) {
                 </div>
             </div>
         </main>
-        <fhir-server id="serverSelector" hidden></fhir-server>
+        <app-dialog id="serverDialog" data-title="Connections" hidden>
+            <fhir-server id="serverSelector"></fhir-server>
+        </app-dialog>
     `;
 
     window.customElements.define('fhir-browser', FhirBrowser);
