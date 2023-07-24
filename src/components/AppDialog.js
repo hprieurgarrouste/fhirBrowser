@@ -44,6 +44,7 @@ import "./RoundButton.js"
                 border-radius: 4px;
                 height: 50%;
                 min-width: 20%;
+                max-width: 50%;
                 position: absolute;
                 top: 60px;
                 right: 1em;
