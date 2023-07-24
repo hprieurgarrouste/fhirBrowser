@@ -50,12 +50,11 @@ export class FhirService {
 
     /**
      * get structureDefinition from hl7 server
-     * @param {*} release
      * @param {*} resourceType
      * @returns
      */
-    static async structureDefinition(release, resourceType) {
-        const url = new URL(`https://hl7.org/fhir/${release}/${resourceType.toLowerCase()}.profile.json`);
+    static async structureDefinition(resourceType) {
+        const url = new URL(`https://hl7.org/fhir/${this.release}/${resourceType.toLowerCase()}.profile.json`);
         const response = await fetch(url, {});
         return response.json();
     }
