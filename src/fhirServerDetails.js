@@ -36,15 +36,11 @@ import "./components/ListItem.js"
             function make(name, value) {
                 if (typeof value === "undefined") return;
 
-                const row = document.createElement('list-item');
-                const title = document.createElement("span");
-                title.appendChild(document.createTextNode(name));
-                title.slot = "title";
-                row.appendChild(title);
-                const subTitle = document.createElement("span");
-                subTitle.appendChild(document.createTextNode(value));
-                subTitle.slot = "subTitle";
-                row.appendChild(subTitle);
+                const row = document.createElement('list-row');
+                const item = document.createElement('list-item');
+                item.setAttribute("data-primary", name);
+                item.setAttribute("data-secondary", value);
+                row.appendChild(item);
                 wrapper.appendChild(row);
             }
         }
