@@ -6,19 +6,30 @@
             this._shadow = this.attachShadow({ mode: 'closed' });
             this._shadow.appendChild(template.content.cloneNode(true));
         }
+
+        static get observedAttributes() { return ["data-primary", "data-secondary"]; }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+            switch (name) {
+                case "data-primary":
+                    this._shadow.getElementById("primary").innerText = newValue;
+                    break;
+                case "data-secondary":
+                    this._shadow.getElementById("secondary").innerText = newValue;
+                    break;
+                default:
+                    break;
+            }
+        }
     };
 
     const template = document.createElement('template');
     template.innerHTML = `
         <style>
             main {
-                padding: 0.5em 1em;
                 background-color: inherit;
             }
-            main:hover {
-                background-color: var(--hover-color, rgba(0, 0, 0, 5%));
-            }
-            slot[name="title"] {
+            #primary {
                 display:block;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -26,15 +37,15 @@
                 text-transform: capitalize;
                 color: var(--text-color-normal, black);
             }
-            slot[name="subTitle"] {
+            #secondary {
                 font-size: smaller;
                 color: var(--text-color-disabled);
                 overflow-wrap: break-word;
             }
         </style>
         <main>
-            <slot name="title"></slot>
-            <slot name="subTitle"></slot>
+            <span id="primary"></span>
+            <span id="secondary"></span>
         </main>
     `;
 
