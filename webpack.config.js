@@ -9,5 +9,12 @@ module.exports = {
     path: path.resolve(__dirname, '.'),
     filename: 'fhirBrowser.js',
     clean: false
+  },
+  devServer: {
+    static: {
+      directory: __dirname
+    },
+    compress: true,
+    port: 3000
   }
 };
