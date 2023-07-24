@@ -17,7 +17,7 @@ import "./fhirResourceTypesFilter.js";
                 const filter = detail.text.toLowerCase();
                 const list = this._shadow.getElementById('list');
                 list.childNodes.forEach(row => {
-                    row.hidden = !row.innerText.toLowerCase().startsWith(filter);
+                    row.hidden = !row.dataset.type.toLowerCase().startsWith(filter);
                 });
             });
 
