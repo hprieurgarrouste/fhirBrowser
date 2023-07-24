@@ -1,3 +1,5 @@
+import "./components/ListRow.js"
+import "./components/ListItem.js"
 import "./fhirResourceTypesFilter.js";
 
 (function () {
@@ -12,30 +14,30 @@ import "./fhirResourceTypesFilter.js";
 
         connectedCallback() {
             this._shadow.getElementById('filter').addEventListener("filterChanged", ({ detail }) => {
-                const ul = this._shadow.getElementById('list').firstElementChild;
                 const filter = detail.text.toLowerCase();
-                ul.childNodes.forEach(li => {
-                    li.hidden = !li.innerText.toLowerCase().startsWith(filter);
+                const list = this._shadow.getElementById('list');
+                list.childNodes.forEach(row => {
+                    row.hidden = !row.innerText.toLowerCase().startsWith(filter);
                 });
             });
 
-            this._shadow.getElementById('list').onclick = ({ target }) => {
-                if (target.nodeName === 'LI') {
-                    let prev = this._shadow.querySelector(".selected");
-                    if (prev) prev.classList.remove('selected');
-                    target.classList.add('selected');
-                    this._resourceType = target.dataset.type;
-                    location.hash = `#${target.dataset.type}`;
+            const list = this._shadow.getElementById('list');
+            list.addEventListener("click", ({ target }) => {
+                const row = target.closest("list-row");
+                if (row) {
+                    list.querySelector("[selected]")?.removeAttribute("selected");
+                    row.setAttribute("selected", "");
+                    this._resourceType = row.dataset.type;
+                    location.hash = `#${row.dataset.type}`;
                 }
-            };
+            });
         }
 
         clear() {
             this._shadow.getElementById('filter').clear();
             const list = this._shadow.getElementById('list');
             list.scrollTop = 0;
-            const ul = list.firstElementChild;
-            while (ul.firstChild) ul.removeChild(ul.lastChild);
+            while (list.firstChild) list.removeChild(list.lastChild);
         }
 
         get value() {
@@ -44,14 +46,13 @@ import "./fhirResourceTypesFilter.js";
 
         set value(resourceType) {
             if (resourceType != this._resourceType) {
-                const ul = this._shadow.getElementById('list').firstElementChild;
-                const li = Array.from(ul.childNodes).filter(li => li.dataset.type === resourceType);
-                if (li?.length) {
+                const list = this._shadow.getElementById('list');
+                const rows = Array.from(list.childNodes).filter(r => r.dataset.type === resourceType);
+                if (rows?.length) {
                     this._resourceType = resourceType;
-                    let prev = this._shadow.querySelector(".selected");
-                    if (prev) prev.classList.remove('selected');
-                    li[0].classList.add('selected');
-                    li[0].scrollIntoView();
+                    this._shadow.querySelector("[selected]")?.removeAttribute("selected");
+                    rows[0].setAttribute("selected", "");
+                    rows[0].scrollIntoView();
                 }
             }
         }
@@ -59,12 +60,14 @@ import "./fhirResourceTypesFilter.js";
         set metadata(metadata) {
             this._metadata = metadata;
             this.clear();
-            const ul = this._shadow.getElementById('list').firstElementChild;
+            const list = this._shadow.getElementById('list');
             metadata.rest[0].resource.forEach(resource => {
-                const li = document.createElement('li');
-                li.setAttribute("data-type", resource.type);
-                li.innerHTML = resource.type;
-                ul.appendChild(li);
+                const row = document.createElement('list-row');
+                row.setAttribute("data-type", resource.type);
+                const item = document.createElement('list-item');
+                item.setAttribute("data-primary", resource.type);
+                row.appendChild(item);
+                list.appendChild(row);
             })
         }
 
@@ -85,23 +88,13 @@ import "./fhirResourceTypesFilter.js";
                 height:0;
                 overflow:auto;
             }
-            ul {
-                list-style: none;
-                padding: 0;
-                margin: 0;
-            }
-            li {
+            #list > * {
                 cursor: pointer;
-                padding: 0.3em 1em;
-                line-height: 2em;
-            }
-            li:hover, li.selected {
-                background-color:var(--hover-color, lightgray);
             }
         </style>
         <main>
             <fhir-resource-types-filter id="filter"></fhir-resource-types-filter>
-            <div id="list"><ul></ul></div>
+            <div id="list"></div>
         </main>
     `;
 
