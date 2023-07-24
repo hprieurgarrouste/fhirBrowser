@@ -1,4 +1,5 @@
 import "./components/RoundButton.js"
+import "./components/ListRow.js"
 import "./components/ListItem.js"
 import { PreferencesService } from "./services/Preferences.js";
 import { FhirService } from "./services/Fhir.js";
@@ -11,43 +12,28 @@ import { FhirService } from "./services/Fhir.js";
             this._shadow.appendChild(template.content.cloneNode(true));
         }
         connectedCallback() {
-            const nav = this._shadow.querySelector('nav');
-            this._shadow.getElementById('close').addEventListener("click", () => {
-                this.hidden = true;
-            });
-            this._shadow.querySelector("main").addEventListener("click", () => {
-                this.hidden = true;
-            });
-            this._shadow.querySelector('.surface').addEventListener("click", (event) => {
-                event.stopPropagation();
-            });
+            const nav = this._shadow.getElementById('content');
             nav.addEventListener("click", ({ target }) => {
-                const row = target.closest("list-item");
+                const row = target.closest("list-row");
                 if (row) {
-                    const prev = nav.querySelector(".selected");
-                    if (prev) prev.classList.remove('selected');
-                    row.classList.add('selected');
+                    nav.querySelector("[selected]")?.removeAttribute("selected");
+                    row.setAttribute("selected", "true");
                     this.serverChanged(row.dataset.id);
-                    this.hidden = true;
                 }
             });
 
             this.loadConf().then(conf => {
                 this._conf = conf;
                 const preferedServer = PreferencesService.get("server");
-                const nav = this._shadow.querySelector('nav');
+                const nav = this._shadow.getElementById('content');
                 for (const key of Object.keys(conf).sort((k1, k2) => k1.localeCompare(k2))) {
-                    const row = document.createElement('list-item');
+                    const row = document.createElement('list-row');
                     row.setAttribute("data-id", key);
-                    if (key === preferedServer) row.classList.add("selected");
-                    const title = document.createElement("span");
-                    title.appendChild(document.createTextNode(key));
-                    title.slot = "title";
-                    row.appendChild(title);
-                    const subTitle = document.createElement("span");
-                    subTitle.appendChild(document.createTextNode(this._conf[key].url));
-                    subTitle.slot = "subTitle";
-                    row.appendChild(subTitle);
+                    if (key === preferedServer) row.setAttribute("selected", "true");
+                    const item = document.createElement('list-item');
+                    item.setAttribute("data-primary", key);
+                    item.setAttribute("data-secondary", this._conf[key].url);
+                    row.appendChild(item);
                     nav.appendChild(row);
                 }
                 if (preferedServer != null) {
@@ -133,43 +119,14 @@ import { FhirService } from "./services/Fhir.js";
         <link rel="stylesheet" href="./assets/material.css">
         <style>
             main {
-                position: absolute;
-                top: 0;
-                left:0;
-                background-color: rgba(0,0,0,32%);
-                min-height: 100%;
-                min-width: 100%;
-            }
-            .surface {
-                background-color: var(--background-color, white);
-                border-radius: 4px;
-                height: 50%;
-                min-width: 20%;
-                position: absolute;
-                top: 60px;
-                right: 1em;
-            }
-            .overlay {
-                background-color: rgba(255,255,255,4%);
-                color:var(--text-color-normal, white);
                 display:flex;
                 flex-direction: column;
-                font-family: Roboto, Arial, monospace;
                 height: 100%;
             }
-            app-bar {
-                border-bottom: 1px solid var(--border-color);
-            }
-            nav {
-                overflow:auto;
+            #content {
+                overflow: auto;
                 flex: 1 1 auto;
                 height: 0;
-            }
-            list-item {
-                cursor: pointer;
-            }
-            list-item.selected {
-                background-color: var(--hover-color, rgba(0, 0, 0, 5%));
             }
             #actions {
                 border-top: 1px solid var(--border-color);
@@ -190,33 +147,12 @@ import { FhirService } from "./services/Fhir.js";
             #actions input[type=button]:hover {
                 background-color: var(--hover-color);
             }
-            @media (max-width:480px){
-                .surface {
-                    top:0;
-                    left:0;
-                    height: 100%;
-                    width:100%;
-                    max-width: unset;
-                    max-height: unset;
-                }
-                .overlay {
-                    background-color: transparent;
-                }
-            }
         </style>
         <main>
-            <div class="surface">
-                <div class="overlay">
-                    <app-bar id="header">
-                        <round-button id="close" title="Close" data-icon="close" slot="left"></round-button>
-                        <h3 id="title" slot="middle">Connections</h3>
-                    </app-bar>
-                    <nav></nav>
-                    <div id="actions">
-                        <input type="button" value="New connection"></input>
-                    <div>
-                </div>
-            </div>
+            <section id="content"></section>
+            <section id="actions">
+                <input type="button" value="New connection"></input>
+            <section>
         </main>
     `;
 
