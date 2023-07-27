@@ -38,8 +38,6 @@ import { FhirService } from "./services/Fhir.js";
                 }
                 if (preferedServer != null) {
                     this.serverChanged(preferedServer);
-                } else {
-                    this.hidden = false;
                 }
             });
         }

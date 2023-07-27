@@ -7,6 +7,7 @@ import "./fhirResource.js";
 import "./fhirServer.js";
 import { FhirService } from "./services/Fhir.js";
 import "./components/ColorScheme.js";
+import { PreferencesService } from "./services/Preferences.js";
 
 /* Only register a service worker if it's supported */
 if ('serviceWorker' in navigator) {
@@ -80,6 +81,10 @@ if ('serviceWorker' in navigator) {
             this._shadow.getElementById('serverDialogToggle').addEventListener("click", () => {
                 this._shadow.getElementById('serverDialog').hidden = false;
             });
+
+            if (!PreferencesService.get("server")) {
+                this._shadow.getElementById('serverDialog').hidden = false;
+            }
         }
 
     };
