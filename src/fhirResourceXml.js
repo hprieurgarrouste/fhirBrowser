@@ -45,7 +45,7 @@
                 height:0;
                 overflow: auto;
                 padding: 1em;
-                white-space: pre-wrap;
+                white-space: pre;
                 margin:0;
             }
             @media (max-width:480px){
