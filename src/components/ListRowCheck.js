@@ -11,12 +11,7 @@
 
         attributeChangedCallback(name, oldValue, newValue) {
             if ("selected" === name) {
-                const elm = this._shadow.querySelector("main");
-                if (null === newValue) {
-                    elm.removeAttribute("selected");
-                } else {
-                    elm.setAttribute("selected", "");
-                }
+                this._shadow.querySelector("input[type=checkbox]").checked = (newValue !== null);
             }
         }
     };

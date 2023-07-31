@@ -78,6 +78,9 @@
                 padding: 1px 16px;
                 text-align: left;
             }
+            th {
+                text-transform: capitalize;
+            }
             tbody tr {
                 border-bottom: 1px solid var(--border-color, gray);
                 cursor:pointer;

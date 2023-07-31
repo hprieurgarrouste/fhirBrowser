@@ -4,10 +4,11 @@ import "./components/DataTable.js";
 import "./components/DataTablePagination.js";
 import "./components/LinearProgress.js";
 import "./fhirSearch.js";
-//import "./fhirBundleColumns.js";
+import "./fhirBundleColumns.js";
 
 import { FhirService } from "./services/Fhir.js";
 import { SnackbarsService } from "./services/Snackbars.js";
+import { PreferencesService } from "./services/Preferences.js";
 
 (function () {
     class FhirBundle extends HTMLElement {
@@ -77,47 +78,51 @@ import { SnackbarsService } from "./services/Snackbars.js";
                 window.URL.revokeObjectURL(url);
             });
 
-            /*this._shadow.getElementById('settingsDialogToggle').addEventListener("click", () => {
+            this._shadow.getElementById('settingsDialogToggle').addEventListener("click", () => {
                 const columnsSelector = this._shadow.getElementById('columnsSelector');
                 columnsSelector.load(this._resourceType.type);
                 this._shadow.getElementById('settingsDialog').hidden = false;
-            });*/
+            });
+
+            this._shadow.getElementById("settingsDialog").addEventListener('settingschanged', ({ detail }) => {
+                this._shadow.getElementById("settingsDialog").hidden = true;
+
+                this._columns = [];
+                detail.columns.forEach(column => {
+                    this._columns.push(column);
+                });
+                const dataTable = this._shadow.getElementById('table');
+                dataTable.clear();
+                this._columns.forEach(column => dataTable.addColumn(column));
+                this.loadPage();
+
+                const pref = PreferencesService.get("columns", {});
+                pref[this._resourceType.type] = this._columns;
+                PreferencesService.set("columns", pref);
+            });
+
 
         }
 
         load(resourceType) {
-            //this._shadow.getElementById("settingsDialog").hidden = true;
+            this._shadow.getElementById("settingsDialog").hidden = true;
             if (resourceType === this._resourceType) return;
             this._resourceType = resourceType;
             this._filters = [];
 
             this._shadow.getElementById("search").metadata = resourceType;
 
-            this._columns = [];
-            if ("Binary" === resourceType.type) {
-                this._columns.push({
-                    "label": "Content type",
-                    "expression": "contentType",
-                    "type": "string"
-                })
-            }
-            this._columns.push({
-                "label": "Id",
-                "expression": "id",
-                "type": "string"
-            }, {
-                "label": "Last updated",
-                "expression": "meta.lastUpdated",
-                "type": "date"
-            });
+            const pref = PreferencesService.get("columns", {});
+            this._columns = pref[resourceType.type] || ["id", "meta.lastUpdated"];
+
+            this._shadow.getElementById('title').innerText = resourceType.type;
 
             const dataTable = this._shadow.getElementById('table');
             dataTable.clear();
             this._columns.forEach(column => {
-                dataTable.addColumn(column.label);
+                dataTable.addColumn(column);
             });
 
-            this._shadow.getElementById('title').innerText = resourceType.type;
 
             this.loadPage();
         }
@@ -185,17 +190,22 @@ import { SnackbarsService } from "./services/Snackbars.js";
         parsePage(data) {
             if (data.entry) {
                 const dataTable = this._shadow.getElementById('table');
-                let value = "";
-                data.entry.forEach(entry => {
-                    if (entry.resource && entry.resource.resourceType == this._resourceType.type) {
+                data.entry
+                    .filter(entry => this._resourceType.type === entry?.resource?.resourceType)
+                    .forEach(entry => {
                         let row = {};
                         this._columns.forEach(column => {
-                            value = eval("entry.resource." + column.expression);
-                            row[column.label] = typeof value !== "undefined" ? value : "";
+                            let value = entry.resource;
+                            column.split('.').every(expr => {
+                                value = eval("value[expr]");
+                                if (value === null || typeof value === "undefined") return false;
+                                if (Array.isArray(value)) value = value[0];
+                                return true;
+                            })
+                            row[column] = value || '';
                         });
                         dataTable.addRow(entry.resource.id, row);
-                    }
-                });
+                    });
 
                 const buttons = {
                     "first": this._shadow.getElementById('paginationFirst'),
@@ -285,10 +295,10 @@ import { SnackbarsService } from "./services/Snackbars.js";
                 <header>
                     <app-bar>
                         <h3 slot="middle" id="title"></h3>
-                        <!--<round-button slot="right" id="settingsDialogToggle" title="Settings" data-icon="view_column"></round-button>-->
                         <round-button slot="right" id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
                         <round-button slot="right" id="download" title="Download" data-icon="download"></round-button>
                         <round-button slot="right" id="searchToggle" title="Search" data-icon="search"></round-button>
+                        <round-button slot="right" id="settingsDialogToggle" title="Settings" data-icon="view_column"></round-button>
                         <round-button slot="right" id="help" title="Help" data-icon="help"></round-button>
                     </app-bar>
                     <linear-progress></linear-progress>
@@ -308,9 +318,9 @@ import { SnackbarsService } from "./services/Snackbars.js";
             </div>
             <fhir-search id="search" class="hidden"></fhir-search>
         </div>
-        <!--<app-dialog id="settingsDialog" data-title="Settings" hidden>
+        <app-dialog id="settingsDialog" data-title="Settings" hidden>
             <fhir-bundle-columns id="columnsSelector"></fhir-bundle-columns>
-        </app-dialog>-->
+        </app-dialog>
     `;
 
     window.customElements.define('fhir-bundle', FhirBundle);

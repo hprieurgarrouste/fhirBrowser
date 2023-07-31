@@ -55,7 +55,9 @@ export class FhirService {
      */
     static async structureDefinition(resourceType) {
         const url = new URL(`https://hl7.org/fhir/${this.release}/${resourceType.toLowerCase()}.profile.json`);
-        const response = await fetch(url, {});
+        const response = await fetch(url, {
+            "cache": "force-cache"
+        });
         return response.json();
     }
 
