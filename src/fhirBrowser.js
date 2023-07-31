@@ -64,17 +64,23 @@ if ('serviceWorker' in navigator) {
 
             this._shadow.getElementById("serverSelector").addEventListener('serverchanged', ({ detail }) => {
                 this._shadow.getElementById("serverDialog").hidden = true;
-                SnackbarsService.show(`Connected to "${detail.serverCode}" server.`);
                 this._shadow.getElementById("bdy").style.visibility = "hidden";
                 this._shadow.getElementById("serverCode").innerText = ` : ${detail.serverCode}`;
                 const metadataElm = this._shadow.getElementById("metadata");
                 metadataElm.clear();
                 FhirService.capabilities().then(metadata => {
+                    SnackbarsService.show(`Connected to "${detail.serverCode}" server.`);
                     this._metadata = metadata;
                     metadataElm.metadata = metadata;
                     metadataElm.hidden = false;
                     location.hash = "";
                     FhirService.server.version = metadata.fhirVersion;
+                }).catch(error => {
+                    SnackbarsService.show(`An error occurred while connecting to the server "${detail.serverCode}"`,
+                        undefined,
+                        undefined,
+                        'error'
+                    );
                 });
             });
 

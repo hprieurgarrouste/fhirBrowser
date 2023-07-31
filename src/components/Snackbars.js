@@ -6,7 +6,8 @@
             this._shadow.appendChild(template.content.cloneNode(true));
         }
 
-        connectedCallback() {
+        set type(type = 'info') {
+            this._shadow.querySelector('main').classList.add(type);
         }
     };
 
@@ -31,6 +32,9 @@
                 font-family: Roboto, Arial, monospace;
                 min-height: 48px;
                 padding: 0 1em;
+            }
+            main.error .overlay {
+                background-color: var(--background-error);
             }
             #message {
                 flex-grow: 1;

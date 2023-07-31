@@ -41,11 +41,19 @@ export class FhirService {
         const url = new URL(`${this._server.url}/metadata`);
         url.searchParams.set("mode", mode);
         url.searchParams.set("_format", "json");
-        const response = await fetch(url, {
-            "cache": "reload",
-            "headers": this._server.headers
-        });
-        return response.json();
+        try {
+            const response = await fetch(url, {
+                "cache": "reload",
+                "headers": this._server.headers
+            });
+            if (response.ok) {
+                return response.json();
+            } else {
+                return Promise.reject(response);
+            }
+        } catch (error) {
+            return Promise.reject(error);
+        }
     }
 
     /**

@@ -12,8 +12,9 @@ export class SnackbarsService {
         this._container = cnt;
     }
 
-    static show(message, action, delay = 4000) {
+    static show(message, action, delay = 4000, type = 'info') {
         let bar = document.createElement("snack-bars");
+        bar.type = type;
         bar.appendChild(document.createTextNode(message));
         if (action) {
             action.setAttribute("slot", "right");
