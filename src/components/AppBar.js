@@ -15,6 +15,8 @@
                 display: flex;
                 flex-direction: row;
                 padding: 0.5em;
+                flex-wrap: wrap;
+                justify-content: flex-end;
             }
             #barMiddle {
                 flex-grow: 1;

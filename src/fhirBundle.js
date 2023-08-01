@@ -295,11 +295,13 @@ import { PreferencesService } from "./services/Preferences.js";
                 <header>
                     <app-bar>
                         <h3 slot="middle" id="title"></h3>
-                        <round-button slot="right" id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
-                        <round-button slot="right" id="download" title="Download" data-icon="download"></round-button>
-                        <round-button slot="right" id="searchToggle" title="Search" data-icon="search"></round-button>
-                        <round-button slot="right" id="settingsDialogToggle" title="Settings" data-icon="view_column"></round-button>
-                        <round-button slot="right" id="help" title="Help" data-icon="help"></round-button>
+                        <div class="toolbar" slot="right">
+                            <round-button id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
+                            <round-button id="download" title="Download" data-icon="download"></round-button>
+                            <round-button id="searchToggle" title="Search" data-icon="search"></round-button>
+                            <round-button id="settingsDialogToggle" title="Settings" data-icon="view_column"></round-button>
+                            <round-button id="help" title="Help" data-icon="help"></round-button>
+                        </div>
                     </app-bar>
                     <linear-progress></linear-progress>
                 </header>
