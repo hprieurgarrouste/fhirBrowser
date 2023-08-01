@@ -66,10 +66,14 @@ if ('serviceWorker' in navigator) {
                 this._shadow.getElementById("serverDialog").hidden = true;
                 this._shadow.getElementById("bdy").style.visibility = "hidden";
                 this._shadow.getElementById("serverCode").innerText = ` : ${detail.serverCode}`;
+                this._shadow.getElementById("leftPanel").classList.add("hidden");
+                this._shadow.getElementById("navigation").hidden = true;
                 const metadataElm = this._shadow.getElementById("metadata");
                 metadataElm.clear();
                 FhirService.capabilities().then(metadata => {
                     SnackbarsService.show(`Connected to "${detail.serverCode}" server.`);
+                    this._shadow.getElementById("leftPanel").classList.remove("hidden");
+                    this._shadow.getElementById("navigation").hidden = false;
                     this._metadata = metadata;
                     metadataElm.metadata = metadata;
                     metadataElm.hidden = false;
@@ -168,7 +172,7 @@ if ('serviceWorker' in navigator) {
         </style>
         <header>
             <app-bar id="header" caption="">
-                <round-button slot="left" id="navigation" title="Menu" data-icon="menu"></round-button>
+                <round-button slot="left" id="navigation" title="Menu" data-icon="menu" hidden></round-button>
                 <span id="appTitle" slot="middle">FHIR Browser</span>
                 <span id="serverCode" slot="middle"></span>
                 <color-scheme slot="right"></color-scheme>
@@ -177,7 +181,7 @@ if ('serviceWorker' in navigator) {
         </header>
         <main>
             <div>
-                <app-left-panel id="leftPanel">
+                <app-left-panel id="leftPanel" class="hidden">
                     <fhir-metadata id="metadata" hidden></fhir-metadata>
                 </app-left-panel>
                 <div id="bdy" style="visibility:hidden;">
