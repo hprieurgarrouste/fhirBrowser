@@ -1,0 +1,2 @@
+FHIR Browser is a utility developed by and intended for fhir developers and all IT professionals who work with a FHIR server.
+Its purpose is to help users analyze FHIR servers and learn about their content.
