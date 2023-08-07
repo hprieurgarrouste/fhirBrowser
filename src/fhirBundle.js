@@ -104,11 +104,11 @@ import { PreferencesService } from "./services/Preferences.js";
 
         }
 
-        load(resourceType) {
+        load(resourceType, filters = []) {
             this._shadow.getElementById("settingsDialog").hidden = true;
             if (resourceType === this._resourceType) return;
             this._resourceType = resourceType;
-            this._filters = [];
+            this._filters = filters;
 
             this._shadow.getElementById("search").metadata = resourceType;
 
