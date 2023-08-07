@@ -37,6 +37,14 @@ export class FhirService {
         return `https://hl7.org/fhir/${this.release}/${resourceType.toLowerCase()}.html`;
     }
 
+    static references(resourceType) {
+        const ref = [];
+        this._server.capabilities.rest[0].resource
+            .filter(resource => resource?.searchParam?.find((searchParam) => searchParam.type === 'reference' && searchParam.name === resourceType.type.toLowerCase()))
+            .forEach(resource => ref.push(resource.type));
+        return ref;
+    }
+
     static async capabilities(mode = "full") {
         const url = new URL(`${this._server.url}/metadata`);
         url.searchParams.set("mode", mode);
