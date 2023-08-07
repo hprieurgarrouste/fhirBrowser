@@ -45,9 +45,8 @@ export class FhirService {
         return ref;
     }
 
-    static async capabilities(mode = "full") {
+    static async capabilities() {
         const url = new URL(`${this._server.url}/metadata`);
-        url.searchParams.set("mode", mode);
         url.searchParams.set("_format", "json");
         try {
             const response = await fetch(url, {
