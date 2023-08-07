@@ -39,7 +39,7 @@ customElements.define('fhir-search', class FhirSearch extends HTMLElement {
         });
 
         content.addEventListener("keydown", (event) => {
-            if ('Enter' === event.code) {
+            if ('Enter' === event.code || 'NumpadEnter' === event.code) {
                 applyClick.call(this);
                 event.preventDefault();
                 event.stopPropagation();
