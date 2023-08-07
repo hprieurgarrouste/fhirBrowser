@@ -4,6 +4,8 @@ import "./appTab.js";
 import "./components/TabBar.js";
 import "./fhirResourceJson.js";
 import "./fhirResourceXml.js";
+import "./components/Chips.js";
+import "./fhirReferences.js";
 
 import { FhirService } from "./services/Fhir.js";
 import { SnackbarsService } from "./services/Snackbars.js";
@@ -78,10 +80,22 @@ import { SnackbarsService } from "./services/Snackbars.js";
                     });
                 }
             });
+
+            this._shadow.querySelector('fhir-references').addEventListener('referenceClick', ({ detail }) => {
+                location.hash = `#${detail.resourceType}?${this._resourceType.type.toLowerCase()}=${this._resourceId}`;
+            });
         }
 
         load({ resourceType, resourceId }) {
-            if (resourceType === this._resourceType && resourceId === this.resourceId) return;
+            const references = FhirService.references(resourceType);
+            const refPanel = this._shadow.getElementById('refPanel');
+            if (references.length) {
+                this._shadow.querySelector('fhir-references').load(references);
+                refPanel.style.display = 'flex';
+            } else {
+                refPanel.style.display = 'none';
+            }
+            if (resourceType === this._resourceType && resourceId === this._resourceId) return;
             const header = this._shadow.getElementById('header');
             const tabBar = this._shadow.querySelector('tab-bar');
             const jsonView = this._shadow.getElementById('jsonView');
@@ -151,6 +165,13 @@ import { SnackbarsService } from "./services/Snackbars.js";
             #error {
                 padding: 1em;
             }
+            #refPanel {
+                align-items: center;
+                display: flex;
+                flex-direction: row;
+                padding: 0.5em;
+                border-top: 1px solid var(--border-color, gray);
+            }
         </style>
         <div id="wrapper">
             <app-bar id="header">
@@ -168,6 +189,9 @@ import { SnackbarsService } from "./services/Snackbars.js";
             <fhir-resource-json id="jsonView"></fhir-resource-json>
             <fhir-resource-xml id="xmlView"></fhir-resource-xml>
             <span id="error"></span>
+            <div id="refPanel">
+                <fhir-references></fhir-references>
+            </div>
         </div>
     `;
 
