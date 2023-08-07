@@ -106,7 +106,7 @@ import { PreferencesService } from "./services/Preferences.js";
 
         load(resourceType, filters = []) {
             this._shadow.getElementById("settingsDialog").hidden = true;
-            if (resourceType === this._resourceType) return;
+            if (resourceType === this._resourceType && JSON.stringify(this._filters) === JSON.stringify(filters)) return;
             this._resourceType = resourceType;
             this._filters = filters;
 
@@ -163,6 +163,12 @@ import { PreferencesService } from "./services/Preferences.js";
                 } else {
                     this.fillPaginationRange();
                 }
+            }).catch(error => {
+                SnackbarsService.show(`An error occurred while searching`,
+                    undefined,
+                    undefined,
+                    'error'
+                );
             });
         }
 
