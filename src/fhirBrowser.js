@@ -24,34 +24,58 @@ if ('serviceWorker' in navigator) {
             this._metadata = null;
         }
 
+        showResource(resourceType, id) {
+            const bundle = this._shadow.getElementById("bundle");
+            bundle.hidden = true;
+            const resource = this._shadow.getElementById("resource");
+            resource.load({
+                "resourceType": resourceType,
+                "resourceId": id
+            });
+        }
+        showBundle(resourceType, search) {
+            const bdy = this._shadow.getElementById("bdy");
+            bdy.style.visibility = "visible";
+            if (window.matchMedia("(max-width: 480px)").matches) {
+                this._shadow.getElementById("leftPanel").classList.add("hidden");
+            }
+            const bundle = this._shadow.getElementById("bundle");
+            bundle.hidden = false;
+            const metadata = this._shadow.getElementById("metadata");
+            metadata.select(resourceType.type);
+            bundle.load(resourceType, search);
+        }
+
         locationHandler = async () => {
             let hash = window.location.hash.replace('#', '').trim();
             if (hash.length) {
-                let path = hash.split("/");
-                const resourceType = this._metadata.rest[0].resource.filter(res => res.type === path[0])[0];
+                let id = '';
+                let resourceName = '';
+                let queryParams = [];
+                if (hash.indexOf('?') > 0) {
+                    resourceName = hash.split('?')[0];
+                    queryParams = hash.slice(hash.indexOf(`?`) + 1).split(`&`).map(p => {
+                        const [key, val] = p.split(`=`)
+                        return {
+                            name: key,
+                            value: decodeURIComponent(val)
+                        }
+                    });
+                } else {
+                    const hashparts = hash.split("/");
+                    resourceName = hashparts[0];
+                    id = hashparts[1] || '';
+                }
+                const resourceType = this._metadata.rest[0].resource.filter(res => res.type === resourceName)[0];
                 if (!resourceType) {
                     SnackbarsService.show(`Resource "${resourceType}" not found!`);
                     return;
                 }
-                const bdy = this._shadow.getElementById("bdy");
-                bdy.style.visibility = "visible";
-                if (window.matchMedia("(max-width: 480px)").matches) {
-                    this._shadow.getElementById("leftPanel").classList.add("hidden");
+                if (id) {
+                    this.showResource(resourceType, id);
+                } else {
+                    this.showBundle(resourceType, queryParams);
                 }
-                const bundle = this._shadow.getElementById("bundle");
-                if (path.length > 0 && path[1]) {
-                    bundle.hidden = true;
-                    const resource = this._shadow.getElementById("resource");
-                    resource.load({
-                        "resourceType": resourceType,
-                        "resourceId": path[1]
-                    });
-                    return;
-                }
-                bundle.hidden = false;
-                const metadata = this._shadow.getElementById("metadata");
-                metadata.select(resourceType.type);
-                bundle.load(resourceType);
             }
         }
 
@@ -78,7 +102,7 @@ if ('serviceWorker' in navigator) {
                     metadataElm.metadata = metadata;
                     metadataElm.hidden = false;
                     location.hash = "";
-                    FhirService.server.version = metadata.fhirVersion;
+                    FhirService.server.capabilities = metadata;
                 }).catch(error => {
                     SnackbarsService.show(`An error occurred while connecting to the server "${detail.serverCode}"`,
                         undefined,

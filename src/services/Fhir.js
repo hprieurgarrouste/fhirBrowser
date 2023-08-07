@@ -23,7 +23,7 @@ export class FhirService {
             "3.2.0": "R4",
             "3.0.2": "R3"
         }
-        return release[this._server.version] || null;
+        return release[this._server.capabilities.fhirVersion] || null;
     }
 
     static set server(srv) {
