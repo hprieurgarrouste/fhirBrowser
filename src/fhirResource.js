@@ -166,10 +166,6 @@ import { SnackbarsService } from "./services/Snackbars.js";
                 padding: 1em;
             }
             #refPanel {
-                align-items: center;
-                display: flex;
-                flex-direction: row;
-                padding: 0.5em;
                 border-top: 1px solid var(--border-color, gray);
             }
         </style>

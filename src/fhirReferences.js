@@ -52,6 +52,9 @@ import "./components/Chips.js"
                 flex-direction: row;
                 gap: 0.5em;
                 flex-wrap: wrap;
+                max-height: 3.5em;
+                overflow-y: auto;
+                padding: 0.5em;
             }
             main > * {
                 cursor: pointer;
