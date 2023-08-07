@@ -128,7 +128,7 @@ import { PreferencesService } from "./services/Preferences.js";
         }
 
         loadPage(link = {
-            url: `${FhirService.server.url}/${this._resourceType.type}?_count=${this._pageSize}&_summary=true`
+            url: `${FhirService.server.url}/${this._resourceType.type}?_count=${this._pageSize}`
         }) {
             switch (link.relation) {
                 case 'previous':
