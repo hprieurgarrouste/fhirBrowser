@@ -2,6 +2,7 @@ import "./components/AppBar.js";
 import "./components/AppDialog.js";
 import "./appLeftPanel.js";
 import { SnackbarsService } from "./services/Snackbars.js";
+import "./fhirBrowserAbout.js";
 import "./fhirBundle.js";
 import "./fhirResource.js";
 import "./fhirServer.js";
@@ -112,6 +113,10 @@ if ('serviceWorker' in navigator) {
                 });
             });
 
+            this._shadow.getElementById('aboutDialogToggle').addEventListener("click", () => {
+                this._shadow.getElementById('aboutDialog').hidden = false;
+            });
+
             this._shadow.getElementById('serverDialogToggle').addEventListener("click", () => {
                 this._shadow.getElementById('serverDialog').hidden = false;
             });
@@ -201,6 +206,7 @@ if ('serviceWorker' in navigator) {
                 <span id="serverCode" slot="middle"></span>
                 <color-scheme slot="right"></color-scheme>
                 <round-button slot="right" id="serverDialogToggle" title="Connections" data-icon="public"></round-button>
+                <round-button slot="right" id="aboutDialogToggle" title="About" data-icon="help"></round-button>
             </app-bar>
         </header>
         <main>
@@ -216,6 +222,9 @@ if ('serviceWorker' in navigator) {
         </main>
         <app-dialog id="serverDialog" data-title="Connections" hidden>
             <fhir-server id="serverSelector"></fhir-server>
+        </app-dialog>
+        <app-dialog id="aboutDialog" data-title="About FHIR Browser" hidden>
+            <fhir-browser-about></fhir-browser-about>
         </app-dialog>
     `;
 
