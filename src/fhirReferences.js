@@ -1,4 +1,5 @@
 import "./components/Chips.js"
+import { FhirService } from "./services/Fhir.js";
 
 (function () {
     class FhirReferences extends HTMLElement {
@@ -30,14 +31,43 @@ import "./components/Chips.js"
             while (main.firstChild) main.removeChild(main.lastChild);
         }
 
-        load(references) {
+        load(references, resourceType, resourceId) {
             this.clear();
+
             const main = this._shadow.querySelector('main')
+            main.appendChild(document.createElement("populated-refs"));
+            main.appendChild(document.createElement("empty-refs"));
+            const populatedRefs = this._shadow.querySelector('populated-refs')
+            const emptyRefs = this._shadow.querySelector('empty-refs')
+
             references.forEach(ref => {
-                let chip = document.createElement("app-chips");
-                chip.setAttribute("data-resource", ref);
-                chip.appendChild(document.createTextNode(ref));
-                main.appendChild(chip);
+
+                FhirService.searchCount(ref,[{"name":resourceType.type.toLowerCase(), "value":resourceId}]).then(({ total }) => {
+                    this._count = total;
+                    const chipCount = this._shadow.getElementById(ref).querySelector('chip-count');
+                    chipCount.innerText = total;
+                    if (total=="0") {
+                        chipCount.parentElement.setAttribute("class", "disabled");
+                    } else {
+                        populatedRefs.appendChild(this._shadow.getElementById(ref))
+                    }
+                });
+
+                let chipRef = document.createElement("app-chips");
+                let chipCount = document.createElement("chip-count");
+                let chipLabel = document.createElement("chip-label");
+
+                chipRef.setAttribute("data-resource", ref);
+                chipRef.setAttribute("id", ref);
+                chipLabel.innerText=ref;
+                chipCount.appendChild(document.createTextNode("⏳"));
+
+                chipRef.appendChild(chipCount);
+                chipRef.appendChild(chipLabel);
+
+                emptyRefs.appendChild(chipRef);
+
+
             });
         }
 
@@ -47,7 +77,7 @@ import "./components/Chips.js"
     template.innerHTML = `
         <link href="./assets/material.css" rel="stylesheet"/>
         <style>
-            main {
+            main,container {
                 display: flex;
                 flex-direction: row;
                 gap: 0.5em;
@@ -55,12 +85,33 @@ import "./components/Chips.js"
                 max-height: 5em;
                 overflow-y: auto;
                 padding: 0.5em;
+                align-items: center;
             }
+            container {
+                padding: 0 0.5em;
+            }
+
             main > * {
                 cursor: pointer;
+                display: flex;
+                gap: inherit;
             }
+            app-chips > * {
+                margin: 0.2em;
+            }
+            .disabled {
+                opacity: 0.5;
+            }
+
         </style>
+
+        <container>
+        <span class="material-icons">link</span>
+        <span>References:</span>
         <main></main>
+        </container>
+
+
     `;
 
     window.customElements.define('fhir-references', FhirReferences);

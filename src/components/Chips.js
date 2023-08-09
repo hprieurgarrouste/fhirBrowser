@@ -13,7 +13,7 @@
         <link href="./assets/material.css" rel="stylesheet"/>
         <style>
             main {
-                padding: 0 0.5em;
+                padding: 0.5em;
                 border-radius: 1em;
                 white-space: nowrap;
                 border: 1px solid var(--border-color);
