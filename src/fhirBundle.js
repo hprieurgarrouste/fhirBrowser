@@ -178,7 +178,7 @@ import { PreferencesService } from "./services/Preferences.js";
             FhirService.searchCount(this._resourceType.type, this._filters).then(({ total }) => {
                 this._count = total;
                 this.fillPaginationRange();
-                paginationCount.innerHTML = total || "Unkown";
+                paginationCount.innerHTML = total?.toLocaleString() || "Unkown";
             });
         }
 

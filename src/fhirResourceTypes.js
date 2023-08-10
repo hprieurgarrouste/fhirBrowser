@@ -1,6 +1,8 @@
 import "./components/ListRow.js"
 import "./components/ListItem.js"
 import "./fhirResourceTypesFilter.js";
+import { FhirService } from "./services/Fhir.js";
+import { AsyncService } from "./services/Async.js";
 
 (function () {
     class FhirResourceTypes extends HTMLElement {
@@ -61,14 +63,34 @@ import "./fhirResourceTypesFilter.js";
             this._metadata = metadata;
             this.clear();
             const list = this._shadow.getElementById('list');
+            const countList = [];
             metadata.rest[0].resource.forEach(resource => {
                 const row = document.createElement('list-row');
                 row.setAttribute("data-type", resource.type);
                 const item = document.createElement('list-item');
                 item.setAttribute("data-primary", resource.type);
+                const badge = item._shadow.querySelector('badge');
+                const icon = document.createElement('icon')
+                icon.setAttribute('class', 'material-symbols');
+                icon.innerText = FhirService.fhirIconSet[resource.type.toLowerCase()]?FhirService.fhirIconSet[resource.type.toLowerCase()]:'';
+                countList.push({'resource': resource.type, 'element': badge});
                 row.appendChild(item);
                 list.appendChild(row);
+                const row_item = item._shadow.querySelector('span');
+                row_item.appendChild(icon);
             })
+
+            const myPromise = args =>
+                AsyncService.sleep(1000).then(() => {
+                    FhirService.searchCount(args.resource).then(({total}) => {
+                        args.element.innerText = (total==undefined)?'':total.toLocaleString();
+                    }).catch(response=>{
+                        args.element.innerText = 'report ';
+                        args.element.setAttribute('class', 'error material-symbols')
+                        args.element.setAttribute('title', "HTTP Error: " + response.status + " " + response.statusText)
+                    });
+                })
+            AsyncService.forEachSeries(countList, myPromise)
         }
 
     };
