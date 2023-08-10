@@ -1,4 +1,5 @@
 import "./components/Chips.js"
+import "./components/Badge.js"
 import { FhirService } from "./services/Fhir.js";
 import { AsyncService } from "./services/Async.js";
 
@@ -43,14 +44,14 @@ import { AsyncService } from "./services/Async.js";
             references.forEach(ref => {
                 let chipRef = document.createElement("app-chips");
                 let chipIcon = document.createElement("chip-icon");
-                let chipCount = document.createElement("badge");
+                let chipCount = document.createElement("app-badge");
                 let chipLabel = document.createElement("chip-label");
                 chipRef.setAttribute("data-resource", ref);
                 chipRef.setAttribute("id", ref);
                 chipIcon.setAttribute("class", 'material-symbols');
                 chipIcon.innerText = FhirService.fhirIconSet[ref.toLowerCase()]?FhirService.fhirIconSet[ref.toLowerCase()]:'';
                 chipLabel.innerText=ref;
-                chipCount.innerHTML = "<circular-progress></circular-progress>"
+                chipCount.spinner();
                 chipRef.appendChild(chipIcon);
                 chipRef.appendChild(chipLabel);
                 chipRef.appendChild(chipCount);
@@ -76,7 +77,7 @@ import { AsyncService } from "./services/Async.js";
                         populatedRefs.appendChild(this._shadow.getElementById(args.ref))
                         this._count = "🥶"
                     }).finally( () => {
-                        args.element.innerText = this._count;
+                        args.element.set(this._count);
                     });
                 })
             AsyncService.forEachSeries(countList, myPromise)

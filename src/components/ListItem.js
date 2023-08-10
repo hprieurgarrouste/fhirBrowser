@@ -51,22 +51,15 @@
                 display: flex;
                 order: -1;
             }
-            badge {
-                line-height:1.9em;
+            app-badge {
+                display: flex;
                 margin-left: auto;
                 order: 2;
-                border-radius: 1em;
-                background-color: var(--primary-color);
-                color: rgb(255, 255, 255);
-                padding: 0 0.5em;
-                font-size: 0.8em;
             }
-            badge.error {
-                background-color: var(--background-error);
-            }
+
         </style>
         <main>
-            <span id="primary"><badge></badge></span>
+            <span id="primary"></span>
             <span id="secondary"></span>
         </main>
     `;

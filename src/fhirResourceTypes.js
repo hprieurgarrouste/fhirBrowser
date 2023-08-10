@@ -1,5 +1,6 @@
 import "./components/ListRow.js"
 import "./components/ListItem.js"
+import "./components/Badge.js"
 import "./fhirResourceTypesFilter.js";
 import { FhirService } from "./services/Fhir.js";
 import { AsyncService } from "./services/Async.js";
@@ -69,7 +70,9 @@ import { AsyncService } from "./services/Async.js";
                 row.setAttribute("data-type", resource.type);
                 const item = document.createElement('list-item');
                 item.setAttribute("data-primary", resource.type);
-                const badge = item._shadow.querySelector('badge');
+                const badge = document.createElement('app-badge');
+                item._shadow.querySelector('span').appendChild(badge);
+
                 const icon = document.createElement('icon')
                 icon.setAttribute('class', 'material-symbols');
                 icon.innerText = FhirService.fhirIconSet[resource.type.toLowerCase()]?FhirService.fhirIconSet[resource.type.toLowerCase()]:'';
@@ -83,10 +86,10 @@ import { AsyncService } from "./services/Async.js";
             const myPromise = args =>
                 AsyncService.sleep(1000).then(() => {
                     FhirService.searchCount(args.resource).then(({total}) => {
-                        args.element.innerText = (total==undefined)?'':total.toLocaleString();
+                        args.element.set((total==undefined)?'':total.toLocaleString());
                     }).catch(response=>{
-                        args.element.innerText = 'report ';
-                        args.element.setAttribute('class', 'error material-symbols')
+                        args.element.error('report ');
+
                         args.element.setAttribute('title', "HTTP Error: " + response.status + " " + response.statusText)
                     });
                 })
