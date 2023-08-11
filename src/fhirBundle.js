@@ -23,6 +23,17 @@ import { PreferencesService } from "./services/Preferences.js";
             this._columns = null;
             this._filters = [];
             this._page = null;
+            this._dateOptions = {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit"
+            };
+            this._timeOptions = {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                timeZoneName: "short"
+            }
         }
 
         connectedCallback() {
@@ -193,6 +204,15 @@ import { PreferencesService } from "./services/Preferences.js";
             paginationRange.innerText = range;
         }
 
+        beautifyDate(stringdate) {
+            const date = new Date(stringdate);
+            try {
+                return date.toLocaleString(undefined, this._dateOptions) + "<br><small>" + date.toLocaleString(undefined, this._timeOptions) + "</small>";
+            } catch (e) {
+                return stringdate;
+            }
+        }
+
         parsePage(data) {
             if (data.entry) {
                 const dataTable = this._shadow.getElementById('table');
@@ -208,6 +228,7 @@ import { PreferencesService } from "./services/Preferences.js";
                                 if (Array.isArray(value)) value = value[0];
                                 return true;
                             })
+                            if (column === "meta.lastUpdated") value = this.beautifyDate(value);
                             row[column] = value || '';
                         });
                         dataTable.addRow(entry.resource.id, row);
