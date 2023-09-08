@@ -61,7 +61,7 @@ import "./fhirResourceTypesFilter.js";
             this._metadata = metadata;
             this.clear();
             const list = this._shadow.getElementById('list');
-            metadata.rest[0].resource.forEach(resource => {
+            metadata.rest[0].resource.filter(res => res.interaction.map(interaction => interaction.code).includes('search-type')).forEach(resource => {
                 const row = document.createElement('list-row');
                 row.setAttribute("data-type", resource.type);
                 const item = document.createElement('list-item');
