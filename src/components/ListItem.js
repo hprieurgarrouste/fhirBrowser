@@ -12,7 +12,9 @@
         attributeChangedCallback(name, oldValue, newValue) {
             switch (name) {
                 case "data-primary":
-                    this._shadow.getElementById("primary").innerText = newValue;
+                    const label = document.createElement('span');
+                    label.innerText = newValue;
+                    this._shadow.getElementById("primary").appendChild(label);
                     break;
                 case "data-secondary":
                     this._shadow.getElementById("secondary").innerText = newValue;
@@ -25,12 +27,15 @@
 
     const template = document.createElement('template');
     template.innerHTML = `
+        <link href="./assets/material.css" rel="stylesheet"/>
         <style>
             main {
                 background-color: inherit;
             }
             #primary {
-                display:block;
+                display: flex;
+                align-items: center;
+                gap: 0.2em;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 overflow: hidden;
@@ -42,6 +47,16 @@
                 color: var(--text-color-disabled);
                 overflow-wrap: break-word;
             }
+            icon {
+                display: flex;
+                order: -1;
+            }
+            app-badge {
+                display: flex;
+                margin-left: auto;
+                order: 2;
+            }
+
         </style>
         <main>
             <span id="primary"></span>

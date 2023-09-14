@@ -1,5 +1,7 @@
 import "./components/Chips.js"
+import "./components/Badge.js"
 import { FhirService } from "./services/Fhir.js";
+import { AsyncService } from "./services/Async.js";
 
 (function () {
     class FhirReferences extends HTMLElement {
@@ -33,42 +35,52 @@ import { FhirService } from "./services/Fhir.js";
 
         load(references, resourceType, resourceId) {
             this.clear();
-
             const main = this._shadow.querySelector('main')
             main.appendChild(document.createElement("populated-refs"));
             main.appendChild(document.createElement("empty-refs"));
             const populatedRefs = this._shadow.querySelector('populated-refs')
             const emptyRefs = this._shadow.querySelector('empty-refs')
-
+            const countList = []
             references.forEach(ref => {
-
-                FhirService.searchCount(ref,[{"name":resourceType.type.toLowerCase(), "value":resourceId}]).then(({ total }) => {
-                    this._count = total;
-                    const chipCount = this._shadow.getElementById(ref).querySelector('chip-count');
-                    chipCount.innerText = total;
-                    if (total=="0") {
-                        chipCount.parentElement.setAttribute("class", "disabled");
-                    } else {
-                        populatedRefs.appendChild(this._shadow.getElementById(ref))
-                    }
-                });
-
                 let chipRef = document.createElement("app-chips");
-                let chipCount = document.createElement("chip-count");
+                let chipIcon = document.createElement("chip-icon");
+                let chipCount = document.createElement("app-badge");
                 let chipLabel = document.createElement("chip-label");
-
                 chipRef.setAttribute("data-resource", ref);
                 chipRef.setAttribute("id", ref);
+                chipIcon.setAttribute("class", 'material-symbols');
+                chipIcon.innerText = FhirService.fhirIconSet[ref.toLowerCase()]?FhirService.fhirIconSet[ref.toLowerCase()]:'';
                 chipLabel.innerText=ref;
-                chipCount.appendChild(document.createTextNode("⏳"));
-
-                chipRef.appendChild(chipCount);
+                chipCount.spinner();
+                chipRef.appendChild(chipIcon);
                 chipRef.appendChild(chipLabel);
-
+                chipRef.appendChild(chipCount);
                 emptyRefs.appendChild(chipRef);
-
-
+                countList.push({
+                    'ref':ref,
+                    'resourceType': resourceType.type,
+                    'resourceId': resourceId,
+                    'element': chipCount
+                })
             });
+
+            const myPromise = args =>
+                AsyncService.sleep(1000).then(() => {
+                    FhirService.searchCount(args.ref,[{"name":args.resourceType.toLowerCase(), "value":resourceId}]).then(({ total }) => {
+                        this._count = (total == undefined) ? "?" : total.toLocaleString();
+                        if (this._count=="0") {
+                            args.element.parentElement.setAttribute("class", "disabled");
+                        } else {
+                            populatedRefs.appendChild(this._shadow.getElementById(args.ref))
+                        }
+                    }).catch((e) => {
+                        populatedRefs.appendChild(this._shadow.getElementById(args.ref))
+                        this._count = "🥶"
+                    }).finally( () => {
+                        args.element.set(this._count);
+                    });
+                })
+            AsyncService.forEachSeries(countList, myPromise)
         }
 
     };
@@ -81,8 +93,7 @@ import { FhirService } from "./services/Fhir.js";
                 display: flex;
                 flex-direction: row;
                 gap: 0.5em;
-                flex-wrap: wrap;
-                max-height: 5em;
+                #max-height: 5em;
                 overflow-y: auto;
                 padding: 0.5em;
                 align-items: center;
@@ -94,13 +105,26 @@ import { FhirService } from "./services/Fhir.js";
             main > * {
                 cursor: pointer;
                 display: flex;
+                flex-wrap: wrap;
                 gap: inherit;
             }
-            app-chips > * {
-                margin: 0.2em;
-            }
+
             .disabled {
                 opacity: 0.5;
+            }
+
+            badge {
+                display: flex;
+                margin-left: auto;
+                order: 2;
+                border-radius: 1em;
+                background-color: var(--primary-color);
+                color: rgb(255, 255, 255);
+                padding: 0 0.5em;
+                font-size: 0.8em;
+            }
+            badge.error {
+                background-color: var(--background-error);
             }
 
         </style>

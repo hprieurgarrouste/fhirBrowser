@@ -2,9 +2,15 @@
     class CircularProgress extends HTMLElement {
         constructor() {
             super();
-            this.attachShadow({ mode: 'closed' }).appendChild(template.content.cloneNode(true));
+            this._shadow = this.attachShadow({ mode: 'closed' })
+            this._shadow.appendChild(template.content.cloneNode(true));
         }
-    };
+
+        setColor(color) {
+            const main = this._shadow.querySelector('main')
+            main.setAttribute('style', 'color:' + color +';')
+        }
+    }
 
     const template = document.createElement('template');
     template.innerHTML = `
