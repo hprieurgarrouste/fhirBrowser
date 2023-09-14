@@ -13,7 +13,10 @@
         <link href="./assets/material.css" rel="stylesheet"/>
         <style>
             main {
-                padding: 0.5em;
+                display: flex;
+                align-items: center;
+                gap: 0.2em;
+                padding: 0.2em 0.5em;
                 border-radius: 1em;
                 white-space: nowrap;
                 border: 1px solid var(--border-color);
@@ -21,7 +24,6 @@
                 cursor: pointer;
                 text-decoration: none;
                 text-align: center;
-                font-size: smaller;
             }
             main:hover {
                 background-color: var(--hover-color);

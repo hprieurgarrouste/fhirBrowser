@@ -28,6 +28,8 @@ const PRECACHE_URLS = [
   "./assets/maskable_icon_x192.png",
   "./assets/maskable_icon_x512.png",
   "./assets/MaterialIcons.woff2",
+  "./assets/material-symbols-outlined.woff2",
+  "./assets/material-symbols-sharp.woff2",
   "./assets/Roboto-Regular.ttf",
 ];
 
