@@ -29,6 +29,7 @@ if ('serviceWorker' in navigator) {
             const bundle = this._shadow.getElementById("bundle");
             bundle.hidden = true;
             const resource = this._shadow.getElementById("resource");
+            resource.hidden = false;
             resource.load({
                 "resourceType": resourceType,
                 "resourceId": id
@@ -47,7 +48,7 @@ if ('serviceWorker' in navigator) {
             bundle.load(resourceType, search);
         }
 
-        locationHandler = async () => {
+        locationHandler = async ({oldURL}) => {
             let hash = window.location.hash.replace('#', '').trim();
             if (hash.length) {
                 let id = '';
@@ -75,7 +76,14 @@ if ('serviceWorker' in navigator) {
                 if (id) {
                     this.showResource(resourceType, id);
                 } else {
-                    this.showBundle(resourceType, queryParams);
+                    if (oldURL.includes(resourceType.type)) {
+                        const bundle = this._shadow.getElementById("bundle");
+                        bundle.hidden = false;
+                        const resource = this._shadow.getElementById("resource");
+                        resource.hidden = true
+                    } else {
+                        this.showBundle(resourceType, queryParams);
+                    }
                 }
             }
         }
