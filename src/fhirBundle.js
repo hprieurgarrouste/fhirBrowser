@@ -167,7 +167,7 @@ import { PreferencesService } from "./services/Preferences.js";
                     if (data.total) {
                         this._count = data.total;
                         this.fillPaginationRange();
-                        this._shadow.getElementById('paginationCount').innerHTML = this._count;
+                        this._shadow.getElementById('paginationCount').innerHTML = this._count.toLocaleString();
                     } else {
                         this.getCount();
                     }

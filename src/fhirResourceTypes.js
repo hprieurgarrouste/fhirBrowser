@@ -86,7 +86,7 @@ import { AsyncService } from "./services/Async.js";
             const myPromise = args =>
                 AsyncService.sleep(1000).then(() => {
                     FhirService.searchCount(args.resource).then(({total}) => {
-                        args.element.set((total==undefined)?'':total.toLocaleString());
+                        args.element.set((total==undefined)?'':total);
                     }).catch(response=>{
                         args.element.error('report ');
 

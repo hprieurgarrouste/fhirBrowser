@@ -67,7 +67,7 @@ import { AsyncService } from "./services/Async.js";
             const myPromise = args =>
                 AsyncService.sleep(1000).then(() => {
                     FhirService.searchCount(args.ref,[{"name":args.resourceType.toLowerCase(), "value":resourceId}]).then(({ total }) => {
-                        this._count = (total == undefined) ? "?" : total.toLocaleString();
+                        this._count = (total == undefined) ? "?" : total;
                         if (this._count=="0") {
                             args.element.parentElement.setAttribute("class", "disabled");
                         } else {

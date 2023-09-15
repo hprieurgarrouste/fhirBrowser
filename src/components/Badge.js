@@ -17,7 +17,16 @@ import "./CircularProgress.js";
         }
 
         set(value) {
-            this._main.innerHTML = value;
+            this._main.innerHTML = this.beautifyNumber(value);
+        }
+
+        beautifyNumber(number) {
+            if (isNaN(parseFloat(number))) return number
+            const nbDigit = number.toString().length;
+            const unit = {0: "", 3:" k", 6:" M", 9:" G", 12:" B"};
+            const maxOrder = Math.max(...Object.keys(unit).map(parseFloat))
+            const order = Math.min(3*Math.floor((nbDigit-1)/3),maxOrder)
+            return (number/10**(order)).toFixed((nbDigit%3==1 && nbDigit > 1 && nbDigit<= maxOrder+1)?1:0) + unit[order]
         }
 
         error(value) {
