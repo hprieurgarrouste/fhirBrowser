@@ -1,6 +1,3 @@
 /schema
 conf.js
-_fhirBrowser.js
-fhirBrowser.js
-index.html
-src/services/Snackbars.js
+conf.js

@@ -47,7 +47,6 @@ import { AsyncService } from "./services/Async.js";
             return this._resourceType;
         }
 
-
         set value(resourceType) {
             if (resourceType != this._resourceType) {
                 const list = this._shadow.getElementById('list');
@@ -87,7 +86,7 @@ import { AsyncService } from "./services/Async.js";
             const myPromise = args =>
                 AsyncService.sleep(1000).then(() => {
                     FhirService.searchCount(args.resource).then(({total}) => {
-                        args.element.set((total==undefined)?'':total);
+                        args.element.set((total==undefined)?'':total.toLocaleString());
                     }).catch(response=>{
                         args.element.error('report ');
 

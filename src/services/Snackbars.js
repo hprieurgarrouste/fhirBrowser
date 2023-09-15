@@ -1,3 +1,5 @@
+import { Snackbars } from "../components/Snackbars.js";
+
 export class SnackbarsService {
 
     // TODO : Add message queuing
