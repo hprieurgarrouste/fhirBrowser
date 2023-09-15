@@ -11,7 +11,6 @@ import { PreferencesService } from "./services/Preferences.js";
             this._shadow = this.attachShadow({ mode: 'closed' });
             this._shadow.appendChild(template.content.cloneNode(true));
             this._resourceType = null;
-            this._columns = [];
         }
 
         clear() {
@@ -26,33 +25,21 @@ import { PreferencesService } from "./services/Preferences.js";
                 const row = target.closest("list-row-check");
                 if (row?.getAttribute("selected") !== null) {
                     row.removeAttribute("selected");
-                    this._columns.splice(target.dataset.order, 1);
                 } else {
                     row.setAttribute("selected", "");
-                    this._columns.push(target.dataset.id);
-                    target.dataset.order = this._columns.indexOf(target.dataset.id);
                 }
             });
 
-
-            nav.addEventListener('orderChanged', ({detail}) => {
-                const r2 = this._shadow.querySelectorAll('list-row-check[data-order="'+detail.newValue+'"]')
-                const r1 = this._shadow.querySelectorAll('list-row-check[data-id="'+detail.what+'"]')
-                r2?.forEach(r => {
-                    r.setAttribute('data-order', detail.oldValue)
-                    r1[0].setAttribute('data-order', detail.newValue)
-                });
-                [this._columns[r1[0].dataset.order], this._columns[r2[0].dataset.order]] = [this._columns[r2[0].dataset.order], this._columns[r1[0].dataset.order]]
-            });
-
             this._shadow.getElementById("apply").addEventListener("click", (event) => {
+                const columns = [];
+                this._shadow.querySelectorAll('list-row-check[selected]')?.forEach(r => columns.push(r.dataset.id));
                 event.preventDefault();
                 event.stopPropagation();
                 this.dispatchEvent(new CustomEvent("settingschanged", {
                     bubbles: true,
                     cancelable: false,
                     "detail": {
-                        "columns": this._columns
+                        "columns": columns
                     }
                 }));
             });
@@ -64,7 +51,6 @@ import { PreferencesService } from "./services/Preferences.js";
 
             const pref = PreferencesService.get("columns", {});
             const selected = pref[resourceType] || ["id", "meta.lastUpdated"];
-            this._columns = selected;
             this.clear();
             const elements = [];
             const types = {};
@@ -121,8 +107,6 @@ import { PreferencesService } from "./services/Preferences.js";
                     row.setAttribute("data-id", element.id);
                     if (selected.includes(element.id))
                         row.setAttribute("selected", "");
-                        const order = (selected.indexOf(element.id)>=0)?selected.indexOf(element.id):undefined;
-                        if (order>=0) {row.setAttribute("data-order", order);}
                     row.appendChild(item);
                     nav.appendChild(row);
                 });
