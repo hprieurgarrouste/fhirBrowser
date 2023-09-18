@@ -68,7 +68,7 @@ import { AsyncService } from "./services/Async.js";
                 row.setAttribute("data-type", resource.type);
                 const item = document.createElement('list-item');
                 item.setAttribute("data-primary", resource.type);
-                item.setAttribute("data-icon", FhirService.fhirIconSet[resource.type.toLowerCase()] || '');
+                item.setAttribute("data-icon", FhirService.ResourceIcon(resource.type));
                 row.appendChild(item);
                 list.appendChild(row);
             });

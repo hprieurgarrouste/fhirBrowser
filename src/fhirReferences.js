@@ -37,7 +37,7 @@ import { AsyncService } from "./services/Async.js";
             const main = this._shadow.querySelector('main');
             references.forEach(ref => {
                 let chip = document.createElement("app-chips");
-                chip.setAttribute("data-icon", FhirService.fhirIconSet[ref.toLowerCase()] || '');
+                chip.setAttribute("data-icon", FhirService.ResourceIcon(ref));
                 chip.setAttribute("data-text", ref);
                 chip.setAttribute("data-resource", ref);
                 main.appendChild(chip);
@@ -54,9 +54,10 @@ import { AsyncService } from "./services/Async.js";
                 display: flex;
                 flex-direction: row;
                 gap: 0.5em;
-                #max-height: 5em;
+                max-height: 8em;
                 overflow-y: auto;
                 padding: 0.5em;
+                flex-wrap: wrap;
             }
 
             main > * {
