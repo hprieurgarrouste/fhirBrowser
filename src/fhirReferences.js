@@ -28,19 +28,19 @@ import { AsyncService } from "./services/Async.js";
         }
 
         clear() {
-            const main = this._shadow.querySelector('main');
-            while (main.firstChild) main.removeChild(main.lastChild);
+            const list = this._shadow.getElementById('list');
+            while (list.firstChild) list.removeChild(list.lastChild);
         }
 
         load(references, resourceType, resourceId) {
             this.clear();
-            const main = this._shadow.querySelector('main');
+            const list = this._shadow.getElementById('list');
             references.forEach(ref => {
                 let chip = document.createElement("app-chips");
                 chip.setAttribute("data-icon", FhirService.ResourceIcon(ref));
                 chip.setAttribute("data-text", ref);
                 chip.setAttribute("data-resource", ref);
-                main.appendChild(chip);
+                list.appendChild(chip);
             });
         }
 
@@ -52,24 +52,29 @@ import { AsyncService } from "./services/Async.js";
         <style>
             main {
                 display: flex;
+                flex-direction: column;
+                gap: 0.5em;
+                padding: 0.5em;
+            }
+            #list {
+                display: flex;
                 flex-direction: row;
+                flex-wrap: wrap;
                 gap: 0.5em;
                 max-height: 8em;
                 overflow-y: auto;
-                padding: 0.5em;
-                flex-wrap: wrap;
             }
-
-            main > * {
+            #list > * {
                 cursor: pointer;
             }
-
-            .disabled {
-                opacity: 0.5;
+            #title {
+                font-weight: bold;
             }
         </style>
-
-        <main></main>
+        <main>
+            <section id="title">References</section>
+            <section id="list"></section>
+        </main>
     `;
 
     window.customElements.define('fhir-references', FhirReferences);
