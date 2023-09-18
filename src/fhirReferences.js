@@ -1,5 +1,4 @@
 import "./components/Chips.js"
-import "./components/Badge.js"
 import { FhirService } from "./services/Fhir.js";
 import { AsyncService } from "./services/Async.js";
 
