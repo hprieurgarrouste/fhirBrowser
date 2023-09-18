@@ -34,6 +34,7 @@
                 background-color: inherit;
                 display: flex;
                 align-items: center;
+                gap: 0.5em;
             }
             #primary {
                 display: block;
@@ -50,8 +51,6 @@
                 overflow-wrap: break-word;
             }
             #icon {
-                align-self: center;
-                margin-right: 0.5em;
             }
         </style>
         <main>
