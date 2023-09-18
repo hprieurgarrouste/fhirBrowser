@@ -7,14 +7,15 @@
             this._shadow.appendChild(template.content.cloneNode(true));
         }
 
-        static get observedAttributes() { return ["data-primary", "data-secondary"]; }
+        static get observedAttributes() { return ["data-primary", "data-secondary", "data-icon"]; }
 
         attributeChangedCallback(name, oldValue, newValue) {
             switch (name) {
+                case "data-icon":
+                    this._shadow.getElementById("icon").innerText = newValue;
+                    break;
                 case "data-primary":
-                    const label = document.createElement('span');
-                    label.innerText = newValue;
-                    this._shadow.getElementById("primary").appendChild(label);
+                    this._shadow.getElementById("primary").innerText = newValue;
                     break;
                 case "data-secondary":
                     this._shadow.getElementById("secondary").innerText = newValue;
@@ -31,11 +32,11 @@
         <style>
             main {
                 background-color: inherit;
-            }
-            #primary {
                 display: flex;
                 align-items: center;
-                gap: 0.2em;
+            }
+            #primary {
+                display: block;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 overflow: hidden;
@@ -43,24 +44,22 @@
                 color: var(--text-color-normal, black);
             }
             #secondary {
+                display: block;
                 font-size: smaller;
                 color: var(--text-color-disabled);
                 overflow-wrap: break-word;
             }
-            icon {
-                display: flex;
-                order: -1;
+            #icon {
+                align-self: center;
+                margin-right: 0.5em;
             }
-            app-badge {
-                display: flex;
-                margin-left: auto;
-                order: 2;
-            }
-
         </style>
         <main>
-            <span id="primary"></span>
-            <span id="secondary"></span>
+            <span id="icon" class="material-symbols"></span>
+            <span class="text">
+                <span id="primary"></span>
+                <span id="secondary"></span>
+            </span>
         </main>
     `;
 

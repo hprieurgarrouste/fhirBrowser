@@ -20,7 +20,7 @@
     template.innerHTML = `
         <style>
             main {
-                padding: 0.5em 1em;
+                padding: 0.5em 1em 0.5em 0;
                 background-color: inherit;
                 display: flex;
                 flex-direction: row;
