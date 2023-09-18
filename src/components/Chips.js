@@ -6,7 +6,23 @@
             this._shadow = this.attachShadow({ mode: 'closed' })
             this._shadow.appendChild(template.content.cloneNode(true));
         }
+
+        static get observedAttributes() { return ["data-text", "data-icon"]; }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+            switch (name) {
+                case "data-icon":
+                    this._shadow.getElementById("icon").innerText = newValue;
+                    break;
+                case "data-text":
+                    this._shadow.getElementById("text").innerText = newValue;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
+
 
     const template = document.createElement('template');
     template.innerHTML = `
@@ -15,7 +31,7 @@
             main {
                 display: flex;
                 align-items: center;
-                gap: 0.2em;
+                gap: 0.5em;
                 padding: 0.2em 0.5em;
                 border-radius: 1em;
                 white-space: nowrap;
@@ -29,7 +45,10 @@
                 background-color: var(--hover-color);
             }
         </style>
-        <main><slot/></main>
+        <main>
+            <span id="icon" class="material-symbols"></span>
+            <span id="text"></span>
+        </main>
     `;
 
     window.customElements.define('app-chips', Chips);
