@@ -90,7 +90,7 @@ import { SnackbarsService } from "./services/Snackbars.js";
             const references = FhirService.references(resourceType);
             const refPanel = this._shadow.getElementById('refPanel');
             if (references.length) {
-                this._shadow.querySelector('fhir-references').load(references, resourceType, resourceId);
+                this._shadow.querySelector('fhir-references').load(references);
                 refPanel.style.display = 'flex';
             } else {
                 refPanel.style.display = 'none';
