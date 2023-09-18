@@ -169,7 +169,7 @@ import { FhirService } from "./services/Fhir.js";
             dt.array::before,
             dt.object::before {
                 content: 'expand_less ';
-                font-family: 'Material Icons';
+                font-family: 'Material Symbols Sharp';
                 font-weight: bold;
                 line-height: inherit;
                 vertical-align: middle;

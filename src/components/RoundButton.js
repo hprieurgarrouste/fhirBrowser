@@ -57,7 +57,7 @@
                 color:var(--text-color-disabled);
             }
         </style>
-        <main class="material-icons"/>
+        <main class="material-symbols"/>
     `;
 
     window.customElements.define('round-button', RoundButton);

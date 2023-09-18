@@ -65,7 +65,7 @@
         </style>
         <main>
             <input id="text" type="text" placeholder="Type to filter"/>
-            <i id="clear" class="material-icons" title="clear">close</i>
+            <i id="clear" class="material-symbols" title="clear">close</i>
         </main>
     `;
 

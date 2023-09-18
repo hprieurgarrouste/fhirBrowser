@@ -9,40 +9,7 @@
     src: local("Roboto"), local("Roboto-Regular"), url(./Roboto-Regular.ttf) format("truetype")
 }
 
-/* Material Icons
-   https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round|Material+Icons+Two+Tone|Material+Icons+Sharp */
-
-@font-face {
-    font-family: 'Material Icons';
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url(./MaterialIcons.woff2) format('woff2');
-}
-
-.material-icons {
-    font-family: 'Material Icons', sans-serif;
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    -webkit-font-feature-settings: 'liga';
-    -webkit-font-smoothing: antialiased;
-}
-
-@font-face {
-    font-family: "Material Symbols Outlined";
-    font-style: normal;
-    font-weight: 100 700;
-    font-display: block;
-    src: url("./material-symbols-outlined.woff2") format("woff2");
-}
+/* Material Symbols */
 
 @font-face {
     font-family: "Material Symbols Sharp";
@@ -53,7 +20,7 @@
 }
 
 .material-symbols {
-    font-family: "Material Symbols Sharp";
+    font-family: 'Material Symbols Sharp', sans-serif;
     font-weight: normal;
     font-style: normal;
     font-size: 24px;
