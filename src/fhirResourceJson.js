@@ -8,11 +8,13 @@ import { FhirService } from "./services/Fhir.js";
             this._shadow.appendChild(template.content.cloneNode(true));
         }
         connectedCallback() {
-            this._shadow.getElementById("content").addEventListener('click', (event) => {
-                if (event.offsetX > 32) return;
-                const dt = event.target.closest('dt');
-                if (dt && (dt.classList.contains("array") || dt.classList.contains("object")))
-                    dt.classList.toggle("collapsed");
+            this._shadow.getElementById("content").addEventListener('click', ({ target, offsetX, offsetY }) => {
+                if (target.classList.contains("array") || target.classList.contains("object")) {
+                    const key = target.childNodes[0];
+                    if (key && offsetX < key.offsetLeft && offsetY < key.offsetHeight) {
+                        target.classList.toggle("collapsed");
+                    }
+                }
             });
         }
 
@@ -164,11 +166,11 @@ import { FhirService } from "./services/Fhir.js";
             }
             dt.array,
             dt.object {
-                cursor: pointer;
                 padding-left: 0;
             }
             dt.array::before,
             dt.object::before {
+                cursor: pointer;
                 content: 'expand_less ';
                 font-family: 'Material Symbols Sharp';
                 font-weight: bold;
