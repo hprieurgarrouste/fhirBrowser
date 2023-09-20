@@ -8,8 +8,9 @@ import { FhirService } from "./services/Fhir.js";
             this._shadow.appendChild(template.content.cloneNode(true));
         }
         connectedCallback() {
-            this._shadow.getElementById("content").addEventListener('click', ({ target }) => {
-                const dt = target.closest('dt');
+            this._shadow.getElementById("content").addEventListener('click', (event) => {
+                if (event.offsetX > 32) return;
+                const dt = event.target.closest('dt');
                 if (dt && (dt.classList.contains("array") || dt.classList.contains("object")))
                     dt.classList.toggle("collapsed");
             });
@@ -97,7 +98,7 @@ import { FhirService } from "./services/Fhir.js";
         <link rel="stylesheet" href="./assets/material.css">
         <style>
             main {
-                --indent: 1.3em;
+                --indent: 32px;
                 display:flex;
                 flex-direction:column;
                 height:100%;
