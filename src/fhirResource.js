@@ -1,3 +1,5 @@
+import template from "./templates/fhirResource.html";
+
 import "./components/AppBar.js";
 import "./components/RoundButton.js";
 import "./appTab.js";
@@ -15,7 +17,7 @@ import { SnackbarsService } from "./services/Snackbars.js";
         constructor() {
             super();
             this._shadow = this.attachShadow({ mode: 'closed' });
-            this._shadow.appendChild(template.content.cloneNode(true));
+            this._shadow.innerHTML = template;
             this._resourceType = null;
             this._resourceId = null;
             this._xmlLoaded = false;
@@ -140,56 +142,5 @@ import { SnackbarsService } from "./services/Snackbars.js";
 
     };
 
-    const template = document.createElement('template');
-    template.innerHTML = `
-        <link rel="stylesheet" href="./assets/material.css">
-        <style>
-            #wrapper {
-                display:flex;
-                flex-direction: column;
-                height : 100%;
-            }
-            #title {
-                margin:0;
-                overflow:hidden;
-                text-overflow:ellipsis;
-            }
-            #jsonView, #xmlView {
-                flex:1 1 auto;
-                height:0;
-            }
-            #header.error {
-                background-color: var(--background-error, transparent);
-                color: white;
-            }
-            #error {
-                padding: 1em;
-            }
-            #refPanel {
-                border-top: 1px solid var(--border-color, gray);
-            }
-        </style>
-        <div id="wrapper">
-            <app-bar id="header">
-                <round-button slot="left" id="back" title="back" data-icon="arrow_back"></round-button>
-                <h3 slot="middle" id="title"></h3>
-                <round-button slot="right" id="share" title="Share" data-icon="share"></round-button>
-                <round-button slot="right" id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
-                <round-button slot="right" id="download" title="Download" data-icon="download"></round-button>
-                <round-button slot="right" id="help" title="Help" data-icon="help"></round-button>
-            </app-bar>
-            <tab-bar>
-                <app-tab id="tabJson" selected>Json</app-tab>
-                <app-tab id="tabXml">Xml</app-tab>
-            </tab-bar>
-            <fhir-resource-json id="jsonView"></fhir-resource-json>
-            <fhir-resource-xml id="xmlView"></fhir-resource-xml>
-            <span id="error"></span>
-            <div id="refPanel">
-                <fhir-references></fhir-references>
-            </div>
-        </div>
-    `;
-
-    window.customElements.define('fhir-resource', FhirResource);
+    customElements.define('fhir-resource', FhirResource)
 })();

@@ -1,0 +1,35 @@
+<style>
+    main {
+        background-color: var(--hover-color);
+        border-bottom: 1px solid gray;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    main:focus-within,
+    main:focus-within input {
+        border-color: var(--primary-color);
+    }
+
+    input {
+        background: none;
+        border: 0 none;
+        border-bottom: 1px solid transparent;
+        color: var(--text-color-normal);
+        flex: auto;
+        font: inherit;
+        padding: 4px 5px;
+
+        max-width: 120px;
+        min-width: 100px;
+    }
+
+    input:focus {
+        outline: none;
+    }
+</style>
+<main>
+    <input type="date"></input>
+    <input type="time"></input>
+</main>

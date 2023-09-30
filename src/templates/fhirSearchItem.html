@@ -1,0 +1,41 @@
+<style>
+    main {
+        margin-bottom: 1em;
+    }
+
+    fieldset {
+        display: flex;
+        flex-direction: row;
+        border: none;
+        padding: 0;
+        gap: 1em;
+    }
+
+    fieldset:focus-within legend {
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+
+    fhir-search-text,
+    fhir-search-date {
+        flex: auto;
+    }
+
+    span {
+        color: var(--text-color-disabled);
+        font-size: small;
+        display: -webkit-box;
+        text-overflow: ellipsis;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        padding-top: 2px;
+    }
+</style>
+<main>
+    <fieldset>
+        <legend inert></legend>
+        <slot></slot>
+    </fieldset>
+    <span inert></span>
+</main>

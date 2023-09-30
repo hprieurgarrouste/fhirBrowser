@@ -45,13 +45,13 @@ export class FhirService {
         return ref;
     }
 
-    static async capabilities() {
-        const url = new URL(`${this._server.url}/metadata`);
+    static async capabilities(server) {
+        const url = new URL(`${server.url}/metadata`);
         url.searchParams.set("_format", "json");
         try {
             const response = await fetch(url, {
                 "cache": "reload",
-                "headers": this._server.headers
+                "headers": server.headers
             });
             if (response.ok) {
                 return response.json();
@@ -131,6 +131,55 @@ export class FhirService {
         }
         return response.json();
     }
+
+    static async connect(code, server) {
+        if (server.auth) {
+            switch (server.auth.method) {
+                case "oauth2":
+                    this.oauth2_getToken(server.auth.setup).then(response => {
+                        if (!server.headers) server.headers = {};
+                        server.headers.Authorization = `${response.token_type} ${response.access_token}`;
+                    });
+                    break;
+                case "basic":
+                    let auth = btoa(`${server.auth.setup.username}:${server.auth.setup.password}`);
+                    if (!server.headers) server.headers = {};
+                    server.headers.Authorization = `Basic ${auth}`;
+                    break;
+                case "apikey":
+                    if (!server.headers) server.headers = {};
+                    server.headers[server.auth.setup.key] = server.auth.setup.value;
+                    break;
+                default:
+                    break;
+            }
+        }
+        await FhirService.capabilities(server).then(metadata => {
+            server.serverCode = code;
+            server.capabilities = metadata;
+            FhirService.server = server;
+        });
+    }
+
+    static async oauth2_getToken(setup) {
+        let urlParams = {
+            "client_id": setup.client_id,
+            "client_secret": setup.client_secret,
+            "grant_type": setup.grant_type,
+            "username": setup.username,
+            "password": setup.password
+        }
+        let result = new URLSearchParams(urlParams);
+        const response = await fetch(setup.access_token_url, {
+            "headers": {
+                "Content-type": "application/x-www-form-urlencoded"
+            },
+            "method": "POST",
+            "body": result.toString()
+        });
+        return response.json();
+    }
+
 
     static ResourceIcon(resource) {
         const fhirIconSet = {

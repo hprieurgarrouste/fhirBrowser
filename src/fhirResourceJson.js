@@ -1,3 +1,5 @@
+import template from "./templates/fhirResourceJson.html";
+
 import { FhirService } from "./services/Fhir.js";
 
 (function () {
@@ -5,7 +7,7 @@ import { FhirService } from "./services/Fhir.js";
         constructor() {
             super();
             this._shadow = this.attachShadow({ mode: 'closed' });
-            this._shadow.appendChild(template.content.cloneNode(true));
+            this._shadow.innerHTML = template;
         }
         connectedCallback() {
             this._shadow.getElementById("content").addEventListener('click', ({ target, offsetX, offsetY }) => {
@@ -94,117 +96,5 @@ import { FhirService } from "./services/Fhir.js";
             }
         }
     };
-
-    const template = document.createElement('template');
-    template.innerHTML = `
-        <link rel="stylesheet" href="./assets/material.css">
-        <style>
-            main {
-                --indent: 32px;
-                display:flex;
-                flex-direction:column;
-                height:100%;
-            }
-            #content {
-                box-shadow: inset 0px 2px 4px 0px var(--border-color);
-                color: var(--text-color-normal, black);
-                flex: 1 1 auto;
-                font-family: monospace;
-                height:0;
-                overflow: auto;
-                padding: 1em;
-                white-space: nowrap;
-            }
-            dl {
-                margin: 0;
-                padding-left: var(--indent);
-            }
-            dt {
-                list-style-type: none;
-            }
-            span {
-                color: var(--json-viewer-values-color, black);
-                cursor: inherit;
-            }
-            span.key {
-                color: var(--json-viewer-properties-color, black);
-            }
-            span.key::before {
-                content: '"';
-            }
-            span.key::after {
-                content: '": ';
-            }
-            dt.array > span.value > dl > dt > span.key::before {
-                content: '';
-            }
-            dt.array > span.value > dl > dt > span.key::after {
-                content: ': ';
-            }
-            span.value.string::before {
-                content: '"';
-            }
-            span.value.string::after {
-                content: '"';
-            }
-            dt.array > span.value::before {
-                content: '[';
-            }
-            dt.array > span.value::after {
-                content: ']';
-            }
-            dt.object > span.value::before {
-                content: '{';
-            }
-            dt.object > span.value::after {
-                content: '}';
-            }
-            dt,
-            dt.array > span.value::after,
-            dt.object > span.value::after {
-                padding-left: var(--indent);
-            }
-            dt.array,
-            dt.object {
-                padding-left: 0;
-            }
-            dt.array::before,
-            dt.object::before {
-                cursor: pointer;
-                content: 'expand_less ';
-                font-family: 'Material Symbols Sharp';
-                font-weight: bold;
-                line-height: inherit;
-                vertical-align: middle;
-                color: var(--text-color-disabled, black);
-            }
-            dt:not(:last-child)::after {
-                content: ",";
-            }
-            dt.collapsed::before {
-                content: 'expand_more ';
-            }
-            dt.collapsed > span dl {
-                display: none;
-            }
-            dt.array.collapsed span.value::after {
-                content: '...]';
-                padding-left: 0;
-            }
-            dt.object.collapsed span.value::after {
-                content: '...}';
-                padding-left: 0;
-            }
-            @media (max-width:480px){
-                #content {
-                    line-height: 2em;
-                }
-            }
-        </style>
-        <main>
-            <div id="content"></div>
-        </main>
-    `;
-
-    window.customElements.define('fhir-resource-json', FhirResourceJson);
+    customElements.define('fhir-resource-json', FhirResourceJson);
 })();

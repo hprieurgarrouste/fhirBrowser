@@ -16,5 +16,18 @@ module.exports = {
     },
     compress: true,
     port: 3000
+  },
+  module: {
+    rules: [
+      {
+        test: /\.html$/i,
+        use: {
+          loader: 'html-loader',
+          options: {
+            minimize: true
+          }
+        }
+      }
+    ]
   }
 };

@@ -1,0 +1,35 @@
+<style>
+    main {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+
+    tab-bar {
+        border-bottom: 1px solid var(--border-color, gray);
+    }
+
+    #tabsBody {
+        flex: auto;
+        height: 0;
+        overflow: hidden;
+        position: relative;
+        block-size: 100%;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 100%;
+        grid-auto-rows: 100%;
+    }
+</style>
+<main>
+    <tab-bar>
+        <app-tab id="tabResources" data-target="resourceTypes" selected>Resource Types</app-tab>
+        <app-tab id="tabDetails" data-target="capability">Details</app-tab>
+    </tab-bar>
+    <div id="tabsBody">
+        <fhir-resource-types id="resourceTypes"></fhir-resource-types>
+        <fhir-capability id="capability"></fhir-capability>
+    </div>
+</main>

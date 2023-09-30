@@ -1,9 +1,10 @@
+import template from "./templates/TabBar.html";
 (function () {
     class TabBar extends HTMLElement {
         constructor() {
             super();
             this._shadow = this.attachShadow({ mode: 'closed' });
-            this._shadow.appendChild(template.content.cloneNode(true));
+            this._shadow.innerHTML = template;
         }
         connectedCallback() {
             this._shadow.querySelector("main").onclick = (event) => {
@@ -30,31 +31,5 @@
             }
         }
     };
-
-    const template = document.createElement('template');
-    template.innerHTML = `
-        <style>
-            main {
-                display:flex;
-                flex-direction:row;
-                flex-wrap: nowrap;
-            }
-            ::slotted(app-tab) {
-                flex-grow:1;
-                border-bottom: 2px solid transparent;
-                font-size: smaller;
-            }
-            ::slotted(app-tab:hover) {
-                background-color:var(--hover-color, rgba(0, 0, 0, 5%));
-            }
-            ::slotted(app-tab[selected]) {
-                border-bottom-color: var(--primary-color, #000);
-                font-weight: bold;
-                color: var(--primary-color, #000);
-            }
-        </style>
-        <main><slot></slot></main>
-    `;
-
-    window.customElements.define('tab-bar', TabBar);
+    customElements.define('tab-bar', TabBar);
 })();

@@ -1,0 +1,52 @@
+<link rel="stylesheet" href="/assets/material.css">
+<style>
+    #wrapper {
+        display: flex;
+        flex-direction: column;
+        font-family: Roboto, Arial, monospace;
+        height: 100%;
+    }
+
+    main {
+        overflow: auto;
+        padding: 1em;
+        flex: 1 1 auto;
+        height: 0;
+    }
+
+    footer {
+        padding: 9px 16px;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    footer input[type=button] {
+        background: none;
+        border: 1px solid var(--primary-color);
+        border-radius: 4px;
+        color: var(--primary-color);
+        cursor: pointer;
+        font: inherit;
+        padding: 5px 16px;
+        text-transform: uppercase;
+    }
+
+    footer input[type=button]:hover {
+        background-color: var(--hover-color);
+    }
+</style>
+<div id="wrapper">
+    <main>
+        <text-field placeholder="Code"></text-field>
+        <text-field placeholder="Url"></text-field>
+        <server-auth id="authMethod" placeholder="Authorization" value="No Auth"></datalist>
+        </server-auth>
+        <text-field id="apiKey" placeholder="Key" hidden></text-field>
+        <text-field id="apiValue" placeholder="Value" hidden></text-field>
+        <text-field id="basicUsername" placeholder="Username" hidden></text-field>
+        <text-field id="basicPassword" placeholder="Password" hidden></text-field>
+    </main>
+    <footer>
+        <input type="button" id="apply" value="Apply"></input>
+    </footer>
+</div>

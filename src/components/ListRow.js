@@ -1,10 +1,11 @@
-(function () {
+import template from "./templates/ListRow.html";
 
+(function () {
     class ListRow extends HTMLElement {
         constructor() {
             super();
             this._shadow = this.attachShadow({ mode: 'closed' });
-            this._shadow.appendChild(template.content.cloneNode(true));
+            this._shadow.innerHTML = template;
         }
 
         static get observedAttributes() { return ["selected"]; }
@@ -20,22 +21,5 @@
             }
         }
     };
-
-    const template = document.createElement('template');
-    template.innerHTML = `
-        <style>
-            main {
-                padding: 0.5em 1em;
-                background-color: inherit;
-            }
-            main[selected], main:hover {
-                background-color: var(--hover-color, rgba(0, 0, 0, 5%));
-            }
-        </style>
-        <main>
-            <slot></slot>
-        </main>
-    `;
-
-    window.customElements.define('list-row', ListRow);
+    customElements.define('list-row', ListRow);
 })();

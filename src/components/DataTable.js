@@ -1,3 +1,5 @@
+import template from "./templates/DataTable.html";
+
 (function () {
     class DataTable extends HTMLElement {
         constructor() {
@@ -7,7 +9,7 @@
                 cancelable: false,
             });
             const shadow = this.attachShadow({ mode: 'open' });
-            shadow.appendChild(template.content.cloneNode(true));
+            shadow.innerHTML = template;
             this._header = shadow.getElementById("header");
             this._body = shadow.getElementById("body");
         }
@@ -53,52 +55,5 @@
             while (this._body.firstChild) this._body.removeChild(this._body.lastChild);
         }
     };
-
-    const template = document.createElement('template');
-    template.innerHTML = `
-        <link href="./assets/material.css" rel="stylesheet"/>
-        <style>
-            div {
-                height:100%;
-                overflow:auto;
-            }
-            table {
-                border-collapse: collapse;
-                min-width: 100%;
-                white-space: nowrap;
-            }
-            thead {
-                background-color: var(--background-color);
-                box-shadow: 0 2px 4px var(--border-color);
-                position: sticky;
-                top: 0;
-            }
-            th, td {
-                height: 56px;
-                padding: 1px 16px;
-                text-align: left;
-            }
-            th {
-                text-transform: capitalize;
-            }
-            tbody tr {
-                border-bottom: 1px solid var(--border-color, gray);
-                cursor:pointer;
-            }
-            tbody tr:hover, tbody tr.selected {
-                background-color: var(--hover-color, rgb(0 0 0 / 4%));
-            }
-        </style>
-        <div>
-            <table>
-                <thead>
-                    <tr id="header"></tr>
-                </thead>
-                <tbody id="body"></tbody>
-            </table>
-        </div>
-    `;
-
-
-    window.customElements.define('data-table', DataTable);
+    customElements.define('data-table', DataTable)
 })();

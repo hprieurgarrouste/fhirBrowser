@@ -1,10 +1,12 @@
+import template from "./templates/ListItem.html";
+
 (function () {
 
     class ListItem extends HTMLElement {
         constructor() {
             super();
             this._shadow = this.attachShadow({ mode: 'closed' });
-            this._shadow.appendChild(template.content.cloneNode(true));
+            this._shadow.innerHTML = template;
         }
 
         static get observedAttributes() { return ["data-primary", "data-secondary", "data-icon"]; }
@@ -26,41 +28,5 @@
         }
     };
 
-    const template = document.createElement('template');
-    template.innerHTML = `
-        <link href="./assets/material.css" rel="stylesheet"/>
-        <style>
-            main {
-                background-color: inherit;
-                display: flex;
-                align-items: center;
-                gap: 0.5em;
-            }
-            #primary {
-                display: block;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                overflow: hidden;
-                text-transform: capitalize;
-                color: var(--text-color-normal, black);
-            }
-            #secondary {
-                display: block;
-                font-size: smaller;
-                color: var(--text-color-disabled);
-                overflow-wrap: break-word;
-            }
-            #icon {
-            }
-        </style>
-        <main>
-            <span id="icon" class="material-symbols"></span>
-            <span class="text">
-                <span id="primary"></span>
-                <span id="secondary"></span>
-            </span>
-        </main>
-    `;
-
-    window.customElements.define('list-item', ListItem);
+    customElements.define('list-item', ListItem)
 })();

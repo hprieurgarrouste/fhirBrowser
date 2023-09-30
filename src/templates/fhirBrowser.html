@@ -1,0 +1,107 @@
+<link rel="stylesheet" href="/assets/material.css">
+<style>
+    :host {
+        background-color: var(--background-color, rgb(255, 255, 255));
+        color: var(--text-color-normal, rgb(0, 0, 0, 87%));
+        display: flex;
+        flex-direction: column;
+        font-family: Roboto, Arial, monospace;
+        font-size: 1rem;
+        font-weight: 400;
+        height: 100vh;
+        line-height: 1.5;
+    }
+
+    header {
+        background-color: var(--primary-color, #000);
+        color: #FFF;
+    }
+
+    #serverCode {
+        text-transform: capitalize;
+    }
+
+    h3 {
+        margin: 0;
+    }
+
+    main {
+        flex: 1 1 auto;
+        height: 0;
+        overflow: hidden;
+    }
+
+    main>div {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+    }
+
+    #leftPanel {
+        border-right: 1px solid var(--border-color, gray);
+        flex: none;
+        transition: all 0.3s;
+        margin-left: 0;
+        width: 300px;
+    }
+
+    #leftPanel.hidden {
+        transition: all 0.3s;
+        margin-left: -300px;
+    }
+
+    #bdy {
+        flex: 1 1 auto;
+        overflow: hidden;
+        width: 0;
+        position: relative;
+        block-size: 100%;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 100%;
+        grid-auto-rows: 100%;
+    }
+
+    @media (max-width:480px) {
+        #leftPanel {
+            background-color: var(--background-color, rgb(255, 255, 255));
+            position: static;
+            width: 100%;
+        }
+
+        #leftPanel.hidden {
+            margin-left: -100%;
+        }
+    }
+</style>
+<header>
+    <app-bar id="header" caption="">
+        <round-button slot="left" id="navigation" title="Menu" data-icon="menu" hidden></round-button>
+        <span id="appTitle" slot="middle">FHIR Browser</span>
+        <span id="serverCode" slot="middle"></span>
+        <color-scheme slot="right"></color-scheme>
+        <round-button slot="right" id="serverDialogToggle" title="Connections" data-icon="public"></round-button>
+        <round-button slot="right" id="aboutDialogToggle" title="About" data-icon="help"></round-button>
+    </app-bar>
+</header>
+<main>
+    <div>
+        <app-left-panel id="leftPanel" class="hidden">
+            <fhir-metadata id="metadata" hidden></fhir-metadata>
+        </app-left-panel>
+        <div id="bdy" style="visibility:hidden;">
+            <fhir-bundle id="bundle"></fhir-bundle>
+            <fhir-resource id="resource"></fhir-resource>
+        </div>
+    </div>
+</main>
+<app-dialog id="serverDialog" data-title="Connections" hidden>
+    <round-button slot="tools" title="setup" data-icon="settings"></round-button>
+    <fhir-server-list id="serverSelector"></fhir-server-list>
+</app-dialog>
+<app-dialog id="aboutDialog" data-title="About FHIR Browser" hidden>
+    <fhir-browser-about></fhir-browser-about>
+</app-dialog>
+<app-dialog id="serverNewDialog" data-title="New Connection" hidden>
+    <fhir-server-form></fhir-server-form>
+</app-dialog>

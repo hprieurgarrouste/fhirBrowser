@@ -1,14 +1,12 @@
+import template from "./templates/fhirResourceXml.html";
+
 (function () {
     class FhirResourceXml extends HTMLElement {
         constructor() {
             super();
             this._shadow = this.attachShadow({ mode: 'closed' });
-            this._shadow.appendChild(template.content.cloneNode(true));
+            this._shadow.innerHTML = template;
         }
-        connectedCallback() {
-            // todo
-        }
-
         clear() {
             const content = this._shadow.getElementById("content");
             content.scrollTo(0, 0);
@@ -27,38 +25,6 @@
             content.style.cursor = "default";
         }
     };
-
-    const template = document.createElement('template');
-    template.innerHTML = `
-        <link rel="stylesheet" href="./assets/material.css">
-        <style>
-            main {
-                display:flex;
-                flex-direction:column;
-                height:100%;
-            }
-            #content {
-                box-shadow: inset 0px 2px 4px 0px var(--border-color);
-                color: var(--text-color-normal, black);
-                flex: 1 1 auto;
-                font-family: monospace;
-                height:0;
-                overflow: auto;
-                padding: 1em;
-                white-space: pre;
-                margin:0;
-            }
-            @media (max-width:480px){
-                #content {
-                    line-height: 2em;
-                }
-            }
-        </style>
-        <main>
-            <pre id="content"></pre>
-        </main>
-    `;
-
-    window.customElements.define('fhir-resource-xml', FhirResourceXml);
+    customElements.define('fhir-resource-xml', FhirResourceXml);
 })();
 

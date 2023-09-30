@@ -1,3 +1,5 @@
+import template from "./templates/fhirBundle.html";
+
 import "./components/AppBar.js";
 import "./components/AppDialog.js";
 import "./components/DataTable.js";
@@ -15,7 +17,7 @@ import { PreferencesService } from "./services/Preferences.js";
         constructor() {
             super();
             this._shadow = this.attachShadow({ mode: 'closed' });
-            this._shadow.appendChild(template.content.cloneNode(true));
+            this._shadow.innerHTML = template;
             this._resourceType = null;
             this._skip = 0;
             this._pageSize = 20;
@@ -260,97 +262,5 @@ import { PreferencesService } from "./services/Preferences.js";
         }
 
     };
-
-    const template = document.createElement('template');
-    template.innerHTML = `
-        <link href="./assets/material.css" rel="stylesheet"/>
-        <style>
-            #wrapper {
-                display:flex;
-                flex-direction:row;
-                height:100%;
-                overflow: hidden;
-            }
-            #bundleCnt {
-                display:flex;
-                flex-direction:column;
-                height:100%;
-                flex: auto;
-                width: 0;
-            }
-            main {
-                flex:1 1 auto;
-                height:0;
-                border-top: 1px solid var(--border-color);
-                border-bottom: 1px solid var(--border-color);
-            }
-            #title {
-                margin:0;
-                overflow:hidden;
-                text-overflow:ellipsis;
-            }
-            linear-progress {
-                position: relative;
-                top: 0;
-            }
-            #table {
-                flex: auto;
-            }
-            fhir-search {
-                border-left: 1px solid var(--border-color);
-                flex: none;
-                transition: all 0.3s;
-                width: 400px;
-            }
-            fhir-search.hidden {
-                transition: all 0.3s;
-                margin-right: -400px;
-            }
-            @media (max-width:480px){
-                fhir-search {
-                    background-color: var(--background-color, rgb(255,255,255));
-                    position: relative;
-                    width:100%;
-                }
-                fhir-search.hidden {
-                    margin-right: -100%;
-                }
-            }
-        </style>
-        <div id="wrapper">
-            <div id="bundleCnt">
-                <header>
-                    <app-bar>
-                        <h3 slot="middle" id="title"></h3>
-                        <div class="toolbar" slot="right">
-                            <round-button id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
-                            <round-button id="download" title="Download" data-icon="download"></round-button>
-                            <round-button id="searchToggle" title="Search" data-icon="search"></round-button>
-                            <round-button id="settingsDialogToggle" title="Settings" data-icon="view_column"></round-button>
-                            <round-button id="help" title="Help" data-icon="help"></round-button>
-                        </div>
-                    </app-bar>
-                    <linear-progress></linear-progress>
-                </header>
-                <main>
-                    <data-table id="table"></data-table>
-                </main>
-                <footer>
-                    <data-table-pagination id="pagination">
-                        <div slot="rows"><span id="paginationRange"></span> of <span id="paginationCount"></span></div>
-                        <round-button slot="arrows" id="paginationFirst" title="first" data-icon="first_page" disabled></round-button>
-                        <round-button slot="arrows" id="paginationPrevious" title="previous" data-icon="chevron_left" disabled></round-button>
-                        <round-button slot="arrows" id="paginationNext" title="next" data-icon="chevron_right" disabled></round-button>
-                        <round-button slot="arrows" id="paginationLast" title="last" data-icon="last_page" disabled/>
-                    </data-table-pagination>
-                </footer>
-            </div>
-            <fhir-search id="search" class="hidden"></fhir-search>
-        </div>
-        <app-dialog id="settingsDialog" data-title="Settings" hidden>
-            <fhir-bundle-columns id="columnsSelector"></fhir-bundle-columns>
-        </app-dialog>
-    `;
-
-    window.customElements.define('fhir-bundle', FhirBundle);
+    customElements.define('fhir-bundle', FhirBundle);
 })();

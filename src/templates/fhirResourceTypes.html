@@ -1,0 +1,23 @@
+<link href="/assets/material.css" rel="stylesheet" />
+<style>
+    main {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    #list {
+        box-shadow: inset 0px 2px 4px 0px var(--border-color);
+        flex: 1 1 auto;
+        height: 0;
+        overflow: auto;
+    }
+
+    #list>* {
+        cursor: pointer;
+    }
+</style>
+<main>
+    <fhir-resource-types-filter id="filter"></fhir-resource-types-filter>
+    <div id="list"></div>
+</main>

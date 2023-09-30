@@ -1,3 +1,5 @@
+import template from "./templates/fhirSearch.html";
+
 import "./components/RoundButton.js"
 import "./fhirSearchItem.js"
 
@@ -7,7 +9,7 @@ customElements.define('fhir-search', class FhirSearch extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.appendChild(FhirSearchTemplate.content.cloneNode(true));
+        this._shadow.innerHTML = template;
     }
 
     connectedCallback() {
@@ -84,83 +86,3 @@ customElements.define('fhir-search', class FhirSearch extends HTMLElement {
     }
 
 });
-
-const FhirSearchTemplate = document.createElement('template');
-FhirSearchTemplate.innerHTML = `
-    <link rel="stylesheet" href="./assets/material.css">
-    <style>
-        #wrapper {
-            background-color: rgba(255,255,255,4%);
-            color:var(--text-color-normal, white);
-            display:flex;
-            flex-direction: column;
-            font-family: Roboto, Arial, monospace;
-            height: 100%;
-        }
-        header {
-            padding-bottom: 3px;
-        }
-        header h3 {
-            margin:0;
-        }
-        #back {
-            display: none;
-        }
-        main {
-            box-shadow: inset 0px 2px 4px 0px var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            border-top: 1px solid var(--border-color);
-            overflow: auto;
-            flex: 1 1 auto;
-            height: 0;
-            padding: 1em;
-        }
-        footer {
-            padding: 9px 16px;
-            text-align: center;
-            overflow: hidden;
-        }
-        footer input[type=button] {
-            background: none;
-            border: 1px solid var(--primary-color);
-            border-radius: 4px;
-            color: var(--primary-color);
-            cursor: pointer;
-            font: inherit;
-            padding: 5px 16px;
-            text-transform: uppercase;
-        }
-        footer input[type=button]:hover {
-            background-color: var(--hover-color);
-        }
-        @media (max-width:480px){
-            .surface {
-                left:0;
-                right: unset;
-                width:100%;
-                max-width: unset;
-                max-height: unset;
-            }
-            .overlay {
-                background-color: transparent;
-            }
-            #back {
-                display: unset;
-            }
-        }
-    </style>
-    <div id="wrapper">
-        <header>
-            <app-bar id="header">
-                <round-button slot="left" id="back" title="back" data-icon="arrow_back"></round-button>
-                <h3 id="title" slot="middle">Search</h3>
-                <round-button id="clear" title="Clear" data-icon="clear_all" slot="right"></round-button>
-                <round-button id="help" title="Help" data-icon="help" slot="right"></round-button>
-            </app-bar>
-        </header>
-        <main></main>
-        <footer>
-            <input type="button" id="apply" value="Apply"></input>
-        </footer>
-    </main>
-`;

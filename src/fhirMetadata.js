@@ -1,14 +1,16 @@
+import template from "./templates/fhirMetadata.html";
+
 import "./appTab.js";
 import "./components/TabBar.js";
 import "./fhirResourceTypes.js";
-import "./fhirServerDetails.js";
+import "./fhirCapability.js";
 
 (function () {
     class FhirMetadata extends HTMLElement {
         constructor() {
             super();
             this._shadow = this.attachShadow({ mode: 'closed' });
-            this._shadow.appendChild(template.content.cloneNode(true));
+            this._shadow.innerHTML = template;
             this._metadata = null;
         }
 
@@ -24,7 +26,7 @@ import "./fhirServerDetails.js";
 
         clear() {
             this._shadow.getElementById("resourceTypes").clear();
-            this._shadow.getElementById("serverDetails").clear();
+            this._shadow.getElementById("capability").clear();
         }
         select(resourceType) {
             this._shadow.getElementById("resourceTypes").value = resourceType;
@@ -36,47 +38,9 @@ import "./fhirServerDetails.js";
         set metadata(metadata) {
             this.clear();
             this._shadow.getElementById("resourceTypes").metadata = metadata;
-            this._shadow.getElementById("serverDetails").metadata = metadata;
+            this._shadow.getElementById("capability").metadata = metadata;
         }
 
     };
-
-    const template = document.createElement('template');
-    template.innerHTML = `
-        <style>
-            main {
-                display:flex;
-                flex-direction: column;
-                height : 100%;
-                overflow:hidden;
-                position:relative;
-            }
-            tab-bar {
-                border-bottom:1px solid var(--border-color, gray);
-            }
-            #tabsBody {
-                flex: auto;
-                height: 0;
-                overflow: hidden;
-                position: relative;
-                block-size: 100%;
-                display: grid;
-                grid-auto-flow: column;
-                grid-auto-columns: 100%;
-                grid-auto-rows: 100%;
-            }
-        </style>
-        <main>
-            <tab-bar>
-                <app-tab id="tabResources" data-target="resourceTypes" selected>Resource Types</app-tab>
-                <app-tab id="tabDetails" data-target="serverDetails">Details</app-tab>
-            </tab-bar>
-            <div id="tabsBody">
-                <fhir-resource-types id="resourceTypes"></fhir-resource-types>
-                <fhir-server-details id="serverDetails"></fhir-server-details>
-            </div>
-        </main>
-    `;
-
-    window.customElements.define('fhir-metadata', FhirMetadata);
+    customElements.define('fhir-metadata', FhirMetadata)
 })();

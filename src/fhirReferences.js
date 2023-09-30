@@ -1,13 +1,14 @@
+import template from "./templates/fhirReferences.html";
+
 import "./components/Chips.js"
 import { FhirService } from "./services/Fhir.js";
-import { AsyncService } from "./services/Async.js";
 
 (function () {
     class FhirReferences extends HTMLElement {
         constructor() {
             super();
             this._shadow = this.attachShadow({ mode: 'closed' });
-            this._shadow.appendChild(template.content.cloneNode(true));
+            this._shadow.innerHTML = template;
             this._resourceType = null;
         }
 
@@ -46,36 +47,5 @@ import { AsyncService } from "./services/Async.js";
 
     };
 
-    const template = document.createElement('template');
-    template.innerHTML = `
-        <link href="./assets/material.css" rel="stylesheet"/>
-        <style>
-            main {
-                display: flex;
-                flex-direction: column;
-                gap: 0.5em;
-                padding: 0.5em;
-            }
-            #list {
-                display: flex;
-                flex-direction: row;
-                flex-wrap: wrap;
-                gap: 0.5em;
-                max-height: 8em;
-                overflow-y: auto;
-            }
-            #list > * {
-                cursor: pointer;
-            }
-            #title {
-                font-weight: bold;
-            }
-        </style>
-        <main>
-            <section id="title">References</section>
-            <section id="list"></section>
-        </main>
-    `;
-
-    window.customElements.define('fhir-references', FhirReferences);
+    customElements.define('fhir-references', FhirReferences)
 })();

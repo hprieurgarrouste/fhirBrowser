@@ -1,0 +1,30 @@
+<link href="/assets/material.css" rel="stylesheet" />
+<style>
+    main {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        padding: 0.5em;
+    }
+
+    #list {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5em;
+        max-height: 8em;
+        overflow-y: auto;
+    }
+
+    #list>* {
+        cursor: pointer;
+    }
+
+    #title {
+        font-weight: bold;
+    }
+</style>
+<main>
+    <section id="title">References</section>
+    <section id="list"></section>
+</main>

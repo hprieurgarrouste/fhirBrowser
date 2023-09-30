@@ -1,11 +1,13 @@
+import template from "./templates/fhirCapability.html";
+
 import "./components/ListItem.js"
 
 (function () {
-    class FhirServerDetails extends HTMLElement {
+    class FhirCapability extends HTMLElement {
         constructor() {
             super();
             this._shadow = this.attachShadow({ mode: 'closed' });
-            this._shadow.appendChild(template.content.cloneNode(true));
+            this._shadow.innerHTML = template;
         }
 
         clear() {
@@ -46,20 +48,5 @@ import "./components/ListItem.js"
         }
 
     };
-
-    const template = document.createElement('template');
-    template.innerHTML = `
-        <style>
-            main {
-                height: 100%;
-                overflow-y: auto;
-            }
-            main > * {
-                cursor: default;
-            }
-        </style>
-        <main/>
-    `;
-
-    window.customElements.define('fhir-server-details', FhirServerDetails);
+    customElements.define('fhir-capability', FhirCapability);
 })();

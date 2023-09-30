@@ -1,3 +1,5 @@
+import template from "./templates/fhirBundleColumns.html";
+
 import "./components/RoundButton.js"
 import "./components/ListItem.js"
 import "./components/ListRowCheck.js"
@@ -9,7 +11,7 @@ import { PreferencesService } from "./services/Preferences.js";
         constructor() {
             super();
             this._shadow = this.attachShadow({ mode: 'closed' });
-            this._shadow.appendChild(template.content.cloneNode(true));
+            this._shadow.innerHTML = template;
             this._resourceType = null;
         }
 
@@ -114,52 +116,5 @@ import { PreferencesService } from "./services/Preferences.js";
 
         }
     };
-
-    const template = document.createElement('template');
-    template.innerHTML = `
-        <link rel="stylesheet" href="./assets/material.css">
-        <style>
-            main {
-                display:flex;
-                flex-direction: column;
-                height: 100%;
-            }
-            #content {
-                overflow: auto;
-                flex: 1 1 auto;
-                height: 0;
-            }
-            #content > * {
-                cursor: pointer;
-            }
-            #actions {
-                border-top: 1px solid var(--border-color);
-                padding: 0.5em 1em;
-                text-align: center;
-                overflow: hidden;
-            }
-            #actions input[type=button] {
-                background: none;
-                border: 1px solid var(--primary-color);
-                border-radius: 4px;
-                color: var(--primary-color);
-                cursor: pointer;
-                font: inherit;
-                padding: 5px 16px;
-                text-transform: uppercase;
-            }
-            #actions input[type=button]:hover {
-                background-color: var(--hover-color);
-            }
-        </style>
-        <main>
-            <linear-progress></linear-progress>
-            <section id="content"></section>
-            <section id="actions">
-                <input type="button" id="apply" value="Apply"></input>
-            <section>
-        </main>
-    `;
-
-    window.customElements.define('fhir-bundle-columns', FhirBundleColumns);
+    customElements.define('fhir-bundle-columns', FhirBundleColumns);
 })();

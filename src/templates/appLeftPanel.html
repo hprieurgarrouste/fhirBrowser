@@ -1,0 +1,22 @@
+<style>
+    main {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    ::slotted(*) {
+        flex: 1 1 auto;
+        height: 0;
+    }
+
+    circular-progress {
+        font-size: 2em;
+        text-align: center;
+        padding-top: 1em;
+    }
+</style>
+<main>
+    <circular-progress id="waiting" hidden></circular-progress>
+    <slot></slot>
+</main>

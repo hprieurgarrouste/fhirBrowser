@@ -1,3 +1,5 @@
+import template from "./templates/fhirResourceTypes.html";
+
 import "./components/ListRow.js"
 import "./components/ListItem.js"
 import "./fhirResourceTypesFilter.js";
@@ -9,7 +11,7 @@ import { AsyncService } from "./services/Async.js";
         constructor() {
             super();
             this._shadow = this.attachShadow({ mode: 'closed' });
-            this._shadow.appendChild(template.content.cloneNode(true));
+            this._shadow.innerHTML = template;
             this._metadata = null;
             this._resourceType = null;
         }
@@ -76,30 +78,5 @@ import { AsyncService } from "./services/Async.js";
 
     };
 
-    const template = document.createElement('template');
-    template.innerHTML = `
-        <link href="./assets/material.css" rel="stylesheet"/>
-        <style>
-            main {
-                display: flex;
-                flex-direction: column;
-                height:100%;
-            }
-            #list {
-                box-shadow: inset 0px 2px 4px 0px var(--border-color);
-                flex:1 1 auto;
-                height:0;
-                overflow:auto;
-            }
-            #list > * {
-                cursor: pointer;
-            }
-        </style>
-        <main>
-            <fhir-resource-types-filter id="filter"></fhir-resource-types-filter>
-            <div id="list"></div>
-        </main>
-    `;
-
-    window.customElements.define('fhir-resource-types', FhirResourceTypes);
+    customElements.define('fhir-resource-types', FhirResourceTypes)
 })();
