@@ -5,7 +5,7 @@ import "./fhirSearchItem.js"
 
 import { FhirService } from "./services/Fhir.js";
 
-customElements.define('fhir-search', class FhirSearch extends HTMLElement {
+class FhirSearch extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
@@ -85,4 +85,5 @@ customElements.define('fhir-search', class FhirSearch extends HTMLElement {
         }
     }
 
-});
+}
+customElements.define('fhir-search', FhirSearch);

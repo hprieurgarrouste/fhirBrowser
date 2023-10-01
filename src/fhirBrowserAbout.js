@@ -1,12 +1,11 @@
 import template from "./templates/fhirBrowserAbout.html";
 
-(function () {
-    class FhirBrowserAbout extends HTMLElement {
-        constructor() {
-            super();
-            this._shadow = this.attachShadow({ mode: 'closed' });
-            this._shadow.innerHTML = template;
-        }
+
+class FhirBrowserAbout extends HTMLElement {
+    constructor() {
+        super();
+        this._shadow = this.attachShadow({ mode: 'closed' });
+        this._shadow.innerHTML = template;
     }
-    customElements.define('fhir-browser-about', FhirBrowserAbout);
-})();
+}
+customElements.define('fhir-browser-about', FhirBrowserAbout);
