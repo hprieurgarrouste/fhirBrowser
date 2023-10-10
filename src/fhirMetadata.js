@@ -24,6 +24,9 @@ class FhirMetadata extends HTMLElement {
     }
 
     clear() {
+        this._shadow.getElementById("serverTitle").setAttribute("data-primary", "");
+        this._shadow.getElementById("serverTitle").setAttribute("data-secondary", "");
+
         this._shadow.getElementById("resourceTypes").clear();
         this._shadow.getElementById("capability").clear();
     }
@@ -34,10 +37,13 @@ class FhirMetadata extends HTMLElement {
     /**
     * @param {FhirMetadata} metadata
     */
-    set metadata(metadata) {
+    set server(server) {
         this.clear();
-        this._shadow.getElementById("resourceTypes").metadata = metadata;
-        this._shadow.getElementById("capability").metadata = metadata;
+        this._shadow.getElementById("serverTitle").setAttribute("data-primary", server.serverCode);
+        this._shadow.getElementById("serverTitle").setAttribute("data-secondary", server.url);
+
+        this._shadow.getElementById("resourceTypes").metadata = server.capabilities;
+        this._shadow.getElementById("capability").metadata = server.capabilities;
     }
 
 };

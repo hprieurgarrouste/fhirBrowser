@@ -22,8 +22,15 @@
         grid-auto-columns: 100%;
         grid-auto-rows: 100%;
     }
+
+    #server {
+        padding: 1em;
+    }
 </style>
 <main>
+    <section id="server">
+        <list-item id="serverTitle" data-primary="" data-secondary="" data-icon=""></list-item>
+    </section>
     <tab-bar>
         <app-tab id="tabResources" data-target="resourceTypes" selected>Resource Types</app-tab>
         <app-tab id="tabDetails" data-target="capability">Details</app-tab>

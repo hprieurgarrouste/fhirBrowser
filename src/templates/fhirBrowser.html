@@ -17,10 +17,6 @@
         color: #FFF;
     }
 
-    #serverCode {
-        text-transform: capitalize;
-    }
-
     h3 {
         margin: 0;
     }
@@ -78,7 +74,6 @@
     <app-bar id="header" caption="">
         <round-button slot="left" id="navigation" title="Menu" data-icon="menu" hidden></round-button>
         <span id="appTitle" slot="middle">FHIR Browser</span>
-        <span id="serverCode" slot="middle"></span>
         <color-scheme slot="right"></color-scheme>
         <round-button slot="right" id="serverDialogToggle" title="Connections" data-icon="public"></round-button>
         <round-button slot="right" id="aboutDialogToggle" title="About" data-icon="help"></round-button>
@@ -87,7 +82,7 @@
 <main>
     <div>
         <app-left-panel id="leftPanel" class="hidden">
-            <fhir-metadata id="metadata" hidden></fhir-metadata>
+            <fhir-metadata id="metadata"></fhir-metadata>
         </app-left-panel>
         <div id="bdy" style="visibility:hidden;">
             <fhir-bundle id="bundle"></fhir-bundle>
@@ -96,7 +91,7 @@
     </div>
 </main>
 <app-dialog id="serverDialog" data-title="Connections" hidden>
-    <round-button slot="tools" title="setup" data-icon="settings"></round-button>
+    <!--<round-button id="serverNewToggle" slot="tools" title="setup" data-icon="edit"></round-button>-->
     <fhir-server-list id="serverSelector"></fhir-server-list>
 </app-dialog>
 <app-dialog id="aboutDialog" data-title="About FHIR Browser" hidden>

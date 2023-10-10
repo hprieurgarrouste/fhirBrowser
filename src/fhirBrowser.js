@@ -29,6 +29,8 @@ class FhirBrowser extends HTMLElement {
     }
 
     showResource(resourceType, id) {
+        const metadata = this._shadow.getElementById("metadata");
+        metadata.select(resourceType.type);
         const bundle = this._shadow.getElementById("bundle");
         bundle.hidden = true;
         const resource = this._shadow.getElementById("resource");
@@ -107,6 +109,10 @@ class FhirBrowser extends HTMLElement {
             this._shadow.getElementById('serverNewDialog').hidden = false;
         });
 
+        /*this._shadow.getElementById('serverNewToggle').addEventListener("click", () => {
+            this._shadow.getElementById('serverNewDialog').hidden = false;
+        });*/
+
         const preferedServer = PreferencesService.get("server");
         if (preferedServer) {
             SettingsService.get(preferedServer).then((server) => {
@@ -122,16 +128,12 @@ class FhirBrowser extends HTMLElement {
             PreferencesService.set("server", serverCode);
             this._shadow.getElementById("serverDialog").hidden = true;
             this._shadow.getElementById("bdy").style.visibility = "hidden";
-            this._shadow.getElementById("serverCode").innerText = ` : ${FhirService.server.serverCode}`;
             this._shadow.getElementById("leftPanel").classList.add("hidden");
             this._shadow.getElementById("navigation").hidden = true;
-            const metadataElm = this._shadow.getElementById("metadata");
-            metadataElm.clear();
             SnackbarsService.show(`Connected to "${serverCode}" server.`);
+            this._shadow.getElementById("metadata").server = FhirService.server;
             this._shadow.getElementById("leftPanel").classList.remove("hidden");
             this._shadow.getElementById("navigation").hidden = false;
-            metadataElm.metadata = FhirService.server.capabilities;
-            metadataElm.hidden = false;
             location.hash = "";
         }).catch(error => {
             SnackbarsService.show(`An error occurred while connecting to the server "${serverCode}"`,

@@ -1,7 +1,5 @@
 import template from "./templates/appLeftPanel.html";
 
-import "./components/CircularProgress.js";
-
 class AppLeftPanel extends HTMLElement {
     constructor() {
         super();

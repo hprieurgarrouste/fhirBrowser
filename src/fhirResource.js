@@ -105,7 +105,7 @@ class FhirResource extends HTMLElement {
         const copyBtn = this._shadow.getElementById("copy");
         const downloadBtn = this._shadow.getElementById("download");
 
-        this._shadow.getElementById('title').innerText = `${resourceType.type} : ${resourceId}`;
+        this._shadow.getElementById('title').innerText = resourceType.type;
         header.classList.remove('error');
         this._shadow.getElementById("error").hidden = true;
         tabBar.hidden = false;
