@@ -37,16 +37,29 @@
 </style>
 <div id="wrapper">
     <main>
-        <text-field placeholder="Code"></text-field>
-        <text-field placeholder="Url"></text-field>
-        <server-auth id="authMethod" placeholder="Authorization" value="No Auth"></datalist>
+        <text-field id="key" placeholder="Code" required></text-field>
+        <text-field id="url" placeholder="Url"></text-field>
+        <server-auth id="authMethod" placeholder="Authorization" value="No Auth">
         </server-auth>
-        <text-field id="apiKey" placeholder="Key" hidden></text-field>
-        <text-field id="apiValue" placeholder="Value" hidden></text-field>
-        <text-field id="basicUsername" placeholder="Username" hidden></text-field>
-        <text-field id="basicPassword" placeholder="Password" hidden></text-field>
+        <section id="apiSection" hidden>
+            <text-field id=" apiKey" placeholder="Key"></text-field>
+            <text-field id="apiValue" placeholder="Value"></text-field>
+        </section>
+        <section id="basicSection" hidden>
+            <text-field id="basicUsername" placeholder="Username"></text-field>
+            <text-field id="basicPassword" placeholder="Password"></text-field>
+        </section>
+        <section id="oauthSection" hidden>
+            <text-field id="oauthTokenurl" placeholder="Access Token URL"></text-field>
+            <text-field id="oauthClientid" placeholder="Client ID"></text-field>
+            <text-field id="oauthClientsecret" placeholder="Client Secret"></text-field>
+            <text-field id="oauthGranttype" placeholder="Grant Type" value="password" readonly></text-field>
+            <text-field id="oauthUsername" placeholder="Username"></text-field>
+            <text-field id="oauthPassword" placeholder="Password"></text-field>
+        </section>
     </main>
     <footer>
+        <input type="button" id="cancel" value="Cancel"></input>
         <input type="button" id="apply" value="Apply"></input>
     </footer>
 </div>

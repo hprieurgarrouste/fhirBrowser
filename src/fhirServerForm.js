@@ -25,19 +25,40 @@ class FhirServerForm extends HTMLElement {
         });
 
         function applyClick(event) {
-            const parameters = [];
-            const fields = content.querySelectorAll("fhir-search-item");
-            fields.forEach(field => {
-                let value = field.value;
-                if (value) {
-                    parameters.push(value);
+            const method = this._shadow.getElementById("authMethod").value;
+            let server = {
+                url: this._shadow.getElementById("url").value,
+                auth: {
+                    method: method,
+                    setup: {}
                 }
-            });
+            };
+            switch (method) {
+                case "API Key":
+                    server.auth.setup.key = this._shadow.getElementById("apiKey").value;
+                    server.auth.setup.value = this._shadow.getElementById("apiValue").value;
+                    break;
+                case "Basic":
+                    server.auth.setup.username = this._shadow.getElementById("basicUsername").value;
+                    server.auth.setup.password = this._shadow.getElementById("basicPassword").value;
+                    break;
+                case "OAuth 2":
+                    server.auth.setup.access_token_url = this._shadow.getElementById("oauthTokenurl").value;
+                    server.auth.setup.client_id = this._shadow.getElementById("oauthClientid").value;
+                    server.auth.setup.client_secret = this._shadow.getElementById("oauthClientsecret").value;
+                    server.auth.setup.grant_type = this._shadow.getElementById("oauthGranttype").value;
+                    server.auth.setup.username = this._shadow.getElementById("oauthUsername").value;
+                    server.auth.setup.password = this._shadow.getElementById("oauthPassword").value;
+                    break;
+                default:
+                    break;
+            }
             this.dispatchEvent(new CustomEvent("apply", {
                 bubbles: false,
                 cancelable: false,
-                "detail": {
-                    "parameters": parameters
+                detail: {
+                    key: this._shadow.getElementById("key").value,
+                    server: server
                 }
             }));
             event.preventDefault();
@@ -45,10 +66,9 @@ class FhirServerForm extends HTMLElement {
         }
 
         this._shadow.getElementById("authMethod").addEventListener("change", ({ detail }) => {
-            this._shadow.getElementById("apiKey").hidden = ("API Key" !== detail.value);
-            this._shadow.getElementById("apiValue").hidden = ("API Key" !== detail.value);
-            this._shadow.getElementById("basicUsername").hidden = ("Basic" !== detail.value);
-            this._shadow.getElementById("basicPassword").hidden = ("Basic" !== detail.value);
+            this._shadow.getElementById("apiSection").hidden = ("API Key" !== detail.value);
+            this._shadow.getElementById("basicSection").hidden = ("Basic" !== detail.value);
+            this._shadow.getElementById("oauthSection").hidden = ("OAuth 2" !== detail.value);
         });
     }
 
