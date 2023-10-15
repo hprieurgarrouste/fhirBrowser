@@ -19,6 +19,7 @@ class FhirResource extends HTMLElement {
         this._shadow.innerHTML = template;
         this._resourceType = null;
         this._resourceId = null;
+        this._resource = {};
         this._xmlLoaded = false;
     }
     connectedCallback() {
@@ -31,13 +32,25 @@ class FhirResource extends HTMLElement {
         });
 
         this._shadow.getElementById('download').addEventListener("click", () => {
-            const file = new File([JSON.stringify(this._resource)], this._resource.id, {
-                type: 'data:text/json;charset=utf-8',
+            let content = this.getCurrentContent(), type, ext;
+            switch (content.type) {
+                case "xml":
+                    type = 'data:text/xml;charset=utf-8';
+                    ext = 'xml';
+                    break;
+                case "json":
+                default:
+                    type = 'data:text/json;charset=utf-8';
+                    ext = 'json';
+                    break;
+            }
+            const file = new File([content.value], this._resourceId, {
+                'type': type
             });
             const url = URL.createObjectURL(file);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `${this._resourceType.type}#${file.name}.json`;
+            link.download = `${this._resourceType.type}#${file.name}.${ext}`;
             this._shadow.appendChild(link);
             link.click();
             this._shadow.removeChild(link);
@@ -45,24 +58,22 @@ class FhirResource extends HTMLElement {
         });
 
         this._shadow.getElementById('copy').addEventListener("click", () => {
-            navigator.clipboard.writeText(JSON.stringify(this._resource)).then(function () {
+            let content = this.getCurrentContent().value;
+            navigator.clipboard.writeText(content).then(function () {
                 SnackbarsService.show("Copying to clipboard was successful");
             }, function (err) {
-                console.error('Async: Could not copy text: ', err);
+                SnackbarsService.error("Could not copy text");
             });
         });
 
         this._shadow.getElementById('share').addEventListener("click", () => {
-            const fileName = `${this._resourceType.type}.${this._resource.id}.txt`;
-            const file = new File([JSON.stringify(this._resource)], fileName, { type: 'text/plain' });
+            let content = this.getCurrentContent().value;
+            const fileName = `${this._resourceType.type}.${this._resourceId}.txt`;
+            const file = new File([content], fileName, { type: 'text/plain' });
             navigator.share({
                 "title": fileName,
                 "files": [file]
-            }).then(() => {
-                console.log('sharing was successful!');
-            }, (err) => {
-                console.error('Could not share resource: ', err);
-            });;
+            });
         });
 
         this._shadow.querySelector("tab-bar").addEventListener('click', ({ detail }) => {
@@ -70,14 +81,15 @@ class FhirResource extends HTMLElement {
             const xmlView = this._shadow.getElementById('xmlView');
             this._shadow.getElementById("jsonView").hidden = (tabId !== 'tabJson');
             this._shadow.getElementById("xmlView").hidden = (tabId !== 'tabXml');
-            if (tabId == 'tabXml' && !this._xmlLoaded) {
+            if (tabId == 'tabXml' && !this._resource.xml) {
                 FhirService.readXml(this._resourceType.type, this._resourceId).then(resource => {
                     const parser = new DOMParser();
                     const xml = parser.parseFromString(resource, "application/xml");
+                    this._resource.xml = resource;
                     xmlView.source = xml;
                     this._xmlLoaded = true;
                 }).catch((e) => {
-                    //todo
+                    this._resource.xml = null;
                 });
             }
         });
@@ -85,6 +97,22 @@ class FhirResource extends HTMLElement {
         this._shadow.querySelector('fhir-references').addEventListener('referenceClick', ({ detail }) => {
             location.hash = `#${detail.resourceType}?${this._resourceType.type.toLowerCase()}=${this._resourceId}`;
         });
+    }
+
+    getCurrentContent() {
+        let content = {};
+        switch (this._shadow.querySelector('app-tab[selected]').id) {
+            case "tabXml":
+                content.value = this._resource.xml;
+                content.type = 'xml';
+                break;
+            case "tabJson":
+            default:
+                content = JSON.stringify(this._resource.json);
+                content.type = 'json';
+                break;
+        }
+        return content;
     }
 
     load({ resourceType, resourceId }) {
@@ -113,13 +141,14 @@ class FhirResource extends HTMLElement {
 
         xmlView.clear();
         this._xmlLoaded = false;
+        this._resource = {};
 
         jsonView.clear();
         FhirService.read(resourceType.type, resourceId).then(resource => {
             this._resourceType = resourceType;
             this._resourceId = resourceId;
 
-            this._resource = resource;
+            this._resource.json = resource;
             jsonView.source = resource;
             shareBtn.hidden = false;
             copyBtn.hidden = false;
@@ -132,7 +161,7 @@ class FhirResource extends HTMLElement {
             tabBar.hidden = true;
             jsonView.hidden = true;
             xmlView.hidden = true;
-            this._resource = null;
+            this._resource.json = null;
             shareBtn.hidden = true;
             copyBtn.hidden = true;
             downloadBtn.hidden = true;
