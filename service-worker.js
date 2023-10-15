@@ -13,7 +13,7 @@ Copyright 2021 Google LLC
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-const PRECACHE = "firebrowser-v0.7.2";
+const PRECACHE = "firebrowser-v0.7.3";
 const RUNTIME = "runtime";
 
 // A list of local resources we always want to be cached.
@@ -21,15 +21,13 @@ const PRECACHE_URLS = [
   "./", // Alias for index.html
   "./index.html",
   "./fhirBrowser.js",
-  "./assets/material.css",
   "./assets/favicon.png",
   "./assets/icon_x192.png",
   "./assets/icon_x512.png",
   "./assets/maskable_icon_x192.png",
   "./assets/maskable_icon_x512.png",
-  "./assets/MaterialIcons.woff2",
-  "./assets/material-symbols-outlined.woff2",
   "./assets/material-symbols-sharp.woff2",
+  "./assets/material.css",
   "./assets/Roboto-Regular.ttf",
 ];
 
