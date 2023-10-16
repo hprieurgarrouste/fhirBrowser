@@ -13,7 +13,8 @@
     }
 
     #jsonView,
-    #xmlView {
+    #xmlView,
+    #ttlView {
         flex: 1 1 auto;
         height: 0;
     }
@@ -42,10 +43,12 @@
     </app-bar>
     <tab-bar>
         <app-tab id="tabJson" selected>Json</app-tab>
-        <app-tab id="tabXml">Xml</app-tab>
+        <app-tab id="tabXml" hidden>Xml</app-tab>
+        <app-tab id="tabTtl" hidden>Ttl</app-tab>
     </tab-bar>
     <fhir-resource-json id="jsonView"></fhir-resource-json>
-    <fhir-resource-xml id="xmlView"></fhir-resource-xml>
+    <fhir-resource-xml id="xmlView" hidden></fhir-resource-xml>
+    <fhir-resource-ttl id="ttlView" hidden></fhir-resource-ttl>
     <span id="error"></span>
     <div id="refPanel">
         <fhir-references></fhir-references>

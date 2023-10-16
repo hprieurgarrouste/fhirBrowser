@@ -45,6 +45,30 @@ export class FhirService {
         return ref;
     }
 
+    static formatEnable(format) {
+        let formats = [];
+        switch (format) {
+            case "json":
+                formats.push("json");
+                formats.push("application/fhir+json");
+                formats.push("html/json");
+                break;
+            case "xml":
+                formats.push("xml");
+                formats.push("application/fhir+xml");
+                formats.push("html/xml");
+                break;
+            case "ttl":
+                formats.push("ttl");
+                formats.push("application/x-turtle");
+                formats.push("html/turtle");
+                break;
+        }
+        let x = this.server.capabilities.format.some(f => {
+            return formats.includes(f);
+        });
+        return x;
+    }
     static async capabilities(server) {
         const url = new URL(`${server.url}/metadata`);
         url.searchParams.set("_format", "json");
@@ -89,6 +113,15 @@ export class FhirService {
         const url = new URL(`${this._server.url}/${type}/${id}`);
         url.searchParams.set("_format", "xml");
         url.searchParams.set("_pretty", "true");
+        const response = await fetch(url, {
+            "headers": this._server.headers
+        });
+        return response.text();
+    }
+
+    static async readTtl(type, id) {
+        const url = new URL(`${this._server.url}/${type}/${id}`);
+        url.searchParams.set("_format", "ttl");
         const response = await fetch(url, {
             "headers": this._server.headers
         });
