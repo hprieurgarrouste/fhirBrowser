@@ -18,7 +18,7 @@ class ListItem extends HTMLElement {
                 this._shadow.getElementById("primary").innerText = newValue;
                 break;
             case "data-secondary":
-                this._shadow.getElementById("secondary").innerText = newValue;
+                this._shadow.getElementById("secondary").innerHTML = newValue;
                 break;
             default:
                 break;

@@ -21,6 +21,15 @@ class FhirCapability extends HTMLElement {
         make("copyright", metadata.copyright);
         make("description", metadata.description);
         make("fhirVersion", metadata.fhirVersion);
+
+        const ul = document.createElement('UL');
+        metadata.format.forEach((f) => {
+            const li = document.createElement('LI');
+            li.innerText = f;
+            ul.appendChild(li);
+        });
+        make("format", ul.outerHTML);
+
         if (metadata.implementation) {
             make("implementation description", metadata.implementation.description);
             make("implementation name", metadata.implementation.name);
@@ -34,6 +43,7 @@ class FhirCapability extends HTMLElement {
             make("software version", metadata.software.version);
             make("software release date", metadata.software.releaseDate);
         }
+
         function make(name, value) {
             if (typeof value === "undefined") return;
 
