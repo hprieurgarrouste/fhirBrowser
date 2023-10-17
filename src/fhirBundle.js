@@ -208,7 +208,7 @@ class FhirBundle extends HTMLElement {
     beautifyDate(stringdate) {
         const date = new Date(stringdate);
         try {
-            return date.toLocaleString(undefined, this._dateOptions) + "<br><small>" + date.toLocaleString(undefined, this._timeOptions) + "</small>";
+            return `${date.toLocaleString(undefined, this._dateOptions)}<br>${date.toLocaleString(undefined, this._timeOptions)}`;
         } catch (e) {
             return stringdate;
         }
@@ -223,10 +223,17 @@ class FhirBundle extends HTMLElement {
                     let row = {};
                     this._columns.forEach(column => {
                         let value = entry.resource;
-                        column.split('.').every(expr => {
+                        let path = column.split('.');
+                        path.every((expr, idx) => {
                             value = eval("value[expr]");
                             if (value === null || typeof value === "undefined") return false;
-                            if (Array.isArray(value)) value = value[0];
+                            if (Array.isArray(value)) {
+                                if (idx == path.length - 1) {
+                                    value = value.join(', ');
+                                } else {
+                                    value = value[0];
+                                }
+                            }
                             return true;
                         })
                         if (column === "meta.lastUpdated") value = this.beautifyDate(value);
