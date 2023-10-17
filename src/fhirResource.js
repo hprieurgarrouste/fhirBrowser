@@ -23,8 +23,14 @@ class FhirResource extends HTMLElement {
         this._resource = {};
     }
     connectedCallback() {
-        this._shadow.getElementById("back").addEventListener('click', () => {
-            location.hash = `#${this._resourceType.type}`;
+        this._shadow.getElementById("back").addEventListener('click', (event) => {
+            //location.hash = `#${this._resourceType.type}`;
+            event.preventDefault();
+            event.stopPropagation();
+            this.dispatchEvent(new CustomEvent("showBundle", {
+                bubbles: true,
+                cancelable: false
+            }));
         });
 
         this._shadow.getElementById("help").addEventListener('click', () => {

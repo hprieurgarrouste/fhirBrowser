@@ -109,6 +109,10 @@ class FhirBrowser extends HTMLElement {
             this._shadow.getElementById('serverNewDialog').hidden = false;
         });
 
+        this._shadow.getElementById("resource").addEventListener('showBundle', () => {
+            this._shadow.getElementById("bundle").hidden = false;
+        });
+
         /*this._shadow.getElementById('serverNewToggle').addEventListener("click", () => {
             this._shadow.getElementById('serverNewDialog').hidden = false;
         });*/
