@@ -29,6 +29,8 @@ class FhirBrowser extends HTMLElement {
     }
 
     showResource(resourceType, id) {
+        const bdy = this._shadow.getElementById("bdy");
+        bdy.style.visibility = "visible";
         const metadata = this._shadow.getElementById("metadata");
         metadata.select(resourceType.type);
         const bundle = this._shadow.getElementById("bundle");
@@ -133,11 +135,9 @@ class FhirBrowser extends HTMLElement {
             PreferencesService.set("server", serverCode);
             this._shadow.getElementById("serverDialog").hidden = true;
             this._shadow.getElementById("bdy").style.visibility = "hidden";
-            this._shadow.getElementById("navigation").hidden = true;
             this._shadow.getElementById("metadata").server = FhirService.server;
             this._shadow.getElementById("leftPanel").classList.remove("hidden");
-            this._shadow.getElementById("navigation").hidden = false;
-            location.hash = "";
+            this.locationHandler();
         }).catch(error => {
             SnackbarsService.show(`An error occurred while connecting to the server "${serverCode}"`,
                 undefined,
