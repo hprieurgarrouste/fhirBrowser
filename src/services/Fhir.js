@@ -21,7 +21,9 @@ export class FhirService {
             "3.5.0": "R4",
             "3.3.0": "R4",
             "3.2.0": "R4",
-            "3.0.2": "R3"
+            "3.0.2": "STU3",
+            "3.0.1": "STU3",
+            "3.0.0": "STU3"
         }
         return release[this._server.capabilities.fhirVersion] || null;
     }
