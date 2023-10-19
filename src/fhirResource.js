@@ -131,7 +131,7 @@ class FhirResource extends HTMLElement {
                 break;
             case "tabJson":
             default:
-                content = JSON.stringify(this._resource.json);
+                content.value = JSON.stringify(this._resource.json);
                 content.type = 'json';
                 break;
         }
