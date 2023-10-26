@@ -31,6 +31,9 @@ class FhirBrowser extends HTMLElement {
     showResource(resourceType, id) {
         const bdy = this._shadow.getElementById("bdy");
         bdy.style.visibility = "visible";
+        if (window.matchMedia("(max-width: 480px)").matches) {
+            this._shadow.getElementById("leftPanel").classList.add("hidden");
+        }
         const metadata = this._shadow.getElementById("metadata");
         metadata.select(resourceType.type);
         const bundle = this._shadow.getElementById("bundle");
@@ -95,6 +98,7 @@ class FhirBrowser extends HTMLElement {
         });
 
         this._shadow.getElementById("serverSelector").addEventListener('serverchanged', ({ detail }) => {
+            location.hash = ``;
             this.connect(detail.serverCode, detail.server);
         });
 
