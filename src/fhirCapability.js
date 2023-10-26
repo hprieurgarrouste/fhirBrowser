@@ -1,6 +1,7 @@
 import template from "./templates/fhirCapability.html";
 
 import "./components/ListItem.js"
+import { FhirService } from "./services/Fhir";
 
 class FhirCapability extends HTMLElement {
     constructor() {
@@ -20,7 +21,7 @@ class FhirCapability extends HTMLElement {
 
         make("copyright", metadata.copyright);
         make("description", metadata.description);
-        make("fhirVersion", metadata.fhirVersion);
+        make("fhirVersion", `${metadata.fhirVersion} (${FhirService.release})`);
 
         const ul = document.createElement('UL');
         metadata.format.forEach((f) => {
