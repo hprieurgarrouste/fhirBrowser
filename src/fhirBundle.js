@@ -60,11 +60,14 @@ class FhirBundle extends HTMLElement {
         });
 
         searchPanel.addEventListener('apply', ({ detail }) => {
-            this._filters = detail.parameters;
-            this.loadPage();
             if (window.matchMedia("(max-width: 480px)").matches) {
                 searchPanel.classList.add("hidden");
             }
+            const hash = [];
+            detail.parameters.forEach(parameter => {
+                hash.push(`${parameter.name}=${encodeURIComponent(parameter.value)}`);
+            });
+            location.hash = `#${this._resourceType.type}?${hash.join('&')}`;
         });
 
         this._shadow.getElementById('copy').addEventListener("click", () => {
@@ -137,6 +140,10 @@ class FhirBundle extends HTMLElement {
 
 
         this.loadPage();
+    }
+
+    get resourceType() {
+        return this._resourceType;
     }
 
     loadPage(link = {
