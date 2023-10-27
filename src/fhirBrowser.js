@@ -137,6 +137,7 @@ class FhirBrowser extends HTMLElement {
             this._shadow.getElementById("bdy").style.visibility = "hidden";
             this._shadow.getElementById("metadata").server = FhirService.server;
             this._shadow.getElementById("leftPanel").classList.remove("hidden");
+            this._shadow.getElementById("navigation").hidden = false;
             this.locationHandler();
         }).catch(error => {
             SnackbarsService.show(`An error occurred while connecting to the server "${serverCode}"`,

@@ -22,8 +22,7 @@ class FhirSearch extends HTMLElement {
         });
 
         this._shadow.getElementById("clear").addEventListener("click", (event) => {
-            const fields = content.querySelectorAll("fhir-search-item");
-            fields.forEach(field => field.clear());
+            this.clear();
             event.preventDefault();
             event.stopPropagation();
         });
@@ -49,22 +48,41 @@ class FhirSearch extends HTMLElement {
         });
 
         function applyClick() {
-            const parameters = [];
+            if (window.matchMedia("(max-width: 480px)").matches) {
+                this.classList.add("hidden");
+            }
+            const hash = [];
             const fields = content.querySelectorAll("fhir-search-item");
-            fields.forEach(field => {
-                let value = field.value;
+            fields.forEach(({ value }) => {
                 if (value) {
-                    parameters.push(value);
+                    hash.push(`${value.name}=${encodeURIComponent(value.value)}`);
                 }
             });
-            this.dispatchEvent(new CustomEvent("apply", {
-                bubbles: false,
-                cancelable: false,
-                "detail": {
-                    "parameters": parameters
-                }
-            }));
+            location.hash = `#${this._resourceType.type}` + ((hash.length) ? `?${hash.join('&')}` : '');
         }
+    }
+
+    clear() {
+        const content = this._shadow.querySelector("main");
+        const fields = content.querySelectorAll("fhir-search-item");
+        fields.forEach(field => field.clear());
+    }
+
+    /**
+     * @param {any} filters
+     */
+    set filters(filters) {
+        const content = this._shadow.querySelector("main");
+        const fields = content.querySelectorAll("fhir-search-item");
+        this.clear();
+        filters.forEach(filter => {
+            const fieldName = filter.name.split(':')[0];
+            fields.forEach(field => {
+                if (field.name == fieldName) {
+                    field.value = filter;
+                }
+            });
+        });
     }
 
     /**
@@ -72,6 +90,7 @@ class FhirSearch extends HTMLElement {
      */
     set metadata(metadata) {
         const content = this._shadow.querySelector("main");
+        this._resourceType = metadata;
         content.scrollTop = 0;
         while (content.firstChild) content.removeChild(content.lastChild);
         if (metadata.searchParam) {

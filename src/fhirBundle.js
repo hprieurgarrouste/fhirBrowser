@@ -125,7 +125,9 @@ class FhirBundle extends HTMLElement {
         this._resourceType = resourceType;
         this._filters = filters;
 
-        this._shadow.getElementById("search").metadata = resourceType;
+        const searchPanel = this._shadow.getElementById("search");
+        searchPanel.metadata = resourceType;
+        searchPanel.filters = filters;
 
         const pref = PreferencesService.get("columns", {});
         this._columns = pref[resourceType.type] || ["id", "meta.lastUpdated"];
@@ -137,7 +139,6 @@ class FhirBundle extends HTMLElement {
         this._columns.forEach(column => {
             dataTable.addColumn(column);
         });
-
 
         this.loadPage();
     }

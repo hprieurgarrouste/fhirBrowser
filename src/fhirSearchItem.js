@@ -17,6 +17,38 @@ class FhirSearchItem extends HTMLElement {
         fields.forEach(field => field.value = "");
     }
 
+    set value(oValue) {
+        let field;
+        const aValue = oValue.value.split('|');
+        const aName = oValue.name.split(':');
+        switch (this._search.type) {
+            case "token":
+                field = this._shadow.querySelector('fhir-search-text:not([data-type])');
+                if (aValue[1]) {
+                    const system = this._shadow.querySelector('fhir-search-text[data-type="system"]');
+                    system.value = aValue[0];
+                    field.value = aValue[1];
+                } else {
+                    field.value = aValue[0];
+                }
+                break;
+            case "string":
+            case "reference":
+                if (aName[1]) {
+                    const modifier = this._shadow.querySelector('fhir-search-modifier');
+                    modifier.value = aName[1];
+                }
+                field = this._shadow.querySelector('fhir-search-text');
+                field.value = oValue.value;
+                break;
+            case "date":
+            case "datetime":
+                break;
+            default:
+                break;
+        }
+    }
+
     get value() {
         let field;
         switch (this._search.type) {
@@ -61,6 +93,10 @@ class FhirSearchItem extends HTMLElement {
                 break;
         }
         return null;
+    }
+
+    get name() {
+        return this._search.name;
     }
 
     init(search) {
