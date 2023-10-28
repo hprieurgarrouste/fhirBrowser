@@ -9,6 +9,7 @@ class FhirReferences extends HTMLElement {
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
         this._resourceType = null;
+        this._resourceId = null;
     }
 
     connectedCallback() {
@@ -16,13 +17,7 @@ class FhirReferences extends HTMLElement {
         main.addEventListener("click", ({ target }) => {
             const chip = target.closest("app-chips");
             if (chip) {
-                this.dispatchEvent(new CustomEvent("referenceClick", {
-                    bubbles: false,
-                    cancelable: false,
-                    'detail': {
-                        'resourceType': chip.dataset.resource
-                    }
-                }));
+                location.hash = `#${chip.dataset.resource}?${this._resourceType.type.toLowerCase()}=${this._resourceId}`;
             }
         });
     }
@@ -32,16 +27,23 @@ class FhirReferences extends HTMLElement {
         while (list.firstChild) list.removeChild(list.lastChild);
     }
 
-    load(references, resourceType, resourceId) {
+    load(resourceType, resourceId) {
+        this._resourceType = resourceType;
+        this._resourceId = resourceId;
         this.clear();
         const list = this._shadow.getElementById('list');
-        references.forEach(ref => {
-            let chip = document.createElement("app-chips");
-            chip.setAttribute("data-icon", FhirService.ResourceIcon(ref));
-            chip.setAttribute("data-text", ref);
-            chip.setAttribute("data-resource", ref);
-            list.appendChild(chip);
-        });
+        const references = FhirService.references(resourceType);
+        if (references.length) {
+            references.forEach(ref => {
+                let chip = document.createElement("app-chips");
+                chip.setAttribute("data-icon", FhirService.ResourceIcon(ref));
+                chip.setAttribute("data-text", ref);
+                chip.setAttribute("data-resource", ref);
+                list.appendChild(chip);
+            });
+            return true;
+        }
+        return false;
     }
 
 };

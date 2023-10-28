@@ -102,10 +102,6 @@ class FhirResource extends HTMLElement {
             }
 
         });
-
-        this._shadow.querySelector('fhir-references').addEventListener('referenceClick', ({ detail }) => {
-            location.hash = `#${detail.resourceType}?${this._resourceType.type.toLowerCase()}=${this._resourceId}`;
-        });
     }
 
     getCurrentContent() {
@@ -129,15 +125,11 @@ class FhirResource extends HTMLElement {
     }
 
     load({ resourceType, resourceId }) {
-        const references = FhirService.references(resourceType);
-        const refPanel = this._shadow.getElementById('refPanel');
-        if (references.length) {
-            this._shadow.querySelector('fhir-references').load(references);
-            refPanel.style.display = 'flex';
-        } else {
-            refPanel.style.display = 'none';
-        }
         if (resourceType === this._resourceType && resourceId === this._resourceId) return;
+
+        const anyReferences = this._shadow.querySelector('fhir-references').load(resourceType, resourceId);
+        this._shadow.getElementById('refPanel').style.display = anyReferences ? 'flex' : 'none';
+
         const header = this._shadow.getElementById('header');
         const tabBar = this._shadow.querySelector('tab-bar');
         const jsonView = this._shadow.getElementById('jsonView');
