@@ -86,22 +86,23 @@ class FhirSearch extends HTMLElement {
     }
 
     /**
-     * @param {any} metadata
+     * @param {any} resourceType
      */
-    set metadata(metadata) {
+    set metadata(resourceType) {
+        if (resourceType.type == this._resourceType) return;
+        this._resourceType = resourceType;
         const content = this._shadow.querySelector("main");
-        this._resourceType = metadata;
         content.scrollTop = 0;
         while (content.firstChild) content.removeChild(content.lastChild);
-        if (metadata.searchParam) {
-            const sorted = metadata.searchParam.sort((s1, s2) => s1.name < s2.name ? -1 : s1.name > s2.name ? 1 : 0);
-            sorted.forEach(search => {
+        resourceType?.searchParam
+            .sort((s1, s2) => s1.name.localeCompare(s2.name))
+            .forEach(search => {
                 const item = document.createElement("fhir-search-item");
                 if (item.init(search)) {
                     content.appendChild(item);
                 }
             });
-        }
+
     }
 
 }
