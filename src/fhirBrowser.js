@@ -3,6 +3,7 @@ import template from "./templates/fhirBrowser.html";
 import "./components/AppBar.js";
 import "./components/AppDialog.js";
 import "./components/ColorScheme.js";
+import "./components/CircularProgress.js";
 import "./appLeftPanel.js";
 import "./fhirBrowserAbout.js";
 import "./fhirBundle.js";
@@ -130,6 +131,8 @@ class FhirBrowser extends HTMLElement {
     }
 
     connect(serverCode, server) {
+        const waiting = this._shadow.getElementById('waiting');
+        waiting.style.visibility = 'visible';
         FhirService.connect(serverCode, server).then(() => {
             SnackbarsService.show(`Connected to "${serverCode}" server.`);
             PreferencesService.set("server", serverCode);
@@ -145,6 +148,8 @@ class FhirBrowser extends HTMLElement {
                 undefined,
                 'error'
             );
+        }).finally(() => {
+            waiting.style.visibility = 'hidden';
         });
     }
 

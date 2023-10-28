@@ -58,6 +58,20 @@
         grid-auto-rows: 100%;
     }
 
+    #waiting {
+        align-items: center;
+        background-color: rgba(0, 0, 0, 32%);
+        display: flex;
+        font-size: 5em;
+        justify-content: center;
+        left: 0;
+        min-height: 100%;
+        min-width: 100%;
+        position: absolute;
+        top: 0;
+        visibility: hidden;
+    }
+
     @media (max-width:480px) {
         #leftPanel {
             background-color: var(--background-color, rgb(255, 255, 255));
@@ -100,3 +114,6 @@
 <app-dialog id="serverNewDialog" data-title="New Connection" hidden>
     <fhir-server-form></fhir-server-form>
 </app-dialog>
+<div id="waiting">
+    <circular-progress></circular-progress>
+</div>
