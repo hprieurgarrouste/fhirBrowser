@@ -48,15 +48,20 @@ class FhirResourceTypes extends HTMLElement {
     }
 
     set value(resourceType) {
-        if (resourceType != this._resourceType) {
-            const list = this._shadow.getElementById('list');
-            const rows = Array.from(list.childNodes).filter(r => r.dataset.type === resourceType);
-            if (rows?.length) {
-                this._resourceType = resourceType;
-                this._shadow.querySelector("[selected]")?.removeAttribute("selected");
-                rows[0].setAttribute("selected", "");
-                rows[0].scrollIntoView();
+        if (resourceType) {
+            if (resourceType != this._resourceType) {
+                const list = this._shadow.getElementById('list');
+                const rows = Array.from(list.childNodes).filter(r => r.dataset.type === resourceType);
+                if (rows?.length) {
+                    this._resourceType = resourceType;
+                    this._shadow.querySelector("[selected]")?.removeAttribute("selected");
+                    rows[0].setAttribute("selected", "");
+                    rows[0].scrollIntoView();
+                }
             }
+        } else {
+            this._shadow.querySelector("[selected]")?.removeAttribute("selected");
+            this._shadow.getElementById('list').scrollTop = 0;
         }
     }
 

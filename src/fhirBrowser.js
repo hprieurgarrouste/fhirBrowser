@@ -35,8 +35,6 @@ class FhirBrowser extends HTMLElement {
         if (window.matchMedia("(max-width: 480px)").matches) {
             this._shadow.getElementById("leftPanel").classList.add("hidden");
         }
-        const metadata = this._shadow.getElementById("metadata");
-        metadata.select(resourceType.type);
         const bundle = this._shadow.getElementById("bundle");
         bundle.hidden = true;
         const resource = this._shadow.getElementById("resource");
@@ -53,8 +51,6 @@ class FhirBrowser extends HTMLElement {
         }
         const bundle = this._shadow.getElementById("bundle");
         bundle.hidden = false;
-        const metadata = this._shadow.getElementById("metadata");
-        metadata.select(resourceType.type);
         bundle.load(resourceType, search);
     }
 

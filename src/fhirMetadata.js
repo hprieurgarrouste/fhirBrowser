@@ -11,6 +11,22 @@ class FhirMetadata extends HTMLElement {
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
         this._metadata = null;
+        window.addEventListener("hashchange", this.locationHandler);
+    }
+
+    locationHandler = async () => {
+        let hash = window.location.hash.replace('#', '').trim();
+        if (hash.length) {
+            let resourceType = '';
+            if (hash.indexOf('?') > 0) {
+                resourceType = hash.split('?')[0];
+            } else {
+                resourceType = hash.split("/")[0];
+            }
+            this._shadow.getElementById("resourceTypes").value = resourceType;
+        } else {
+            this._shadow.getElementById("resourceTypes").value = null;
+        }
     }
 
     connectedCallback() {
@@ -23,27 +39,16 @@ class FhirMetadata extends HTMLElement {
         });
     }
 
-    clear() {
-        this._shadow.getElementById("serverTitle").setAttribute("data-primary", "");
-        this._shadow.getElementById("serverTitle").setAttribute("data-secondary", "");
-
-        this._shadow.getElementById("resourceTypes").clear();
-        this._shadow.getElementById("capability").clear();
-    }
-    select(resourceType) {
-        this._shadow.getElementById("resourceTypes").value = resourceType;
-    }
-
     /**
-    * @param {FhirMetadata} metadata
+    * @param {FhirMetadata} server
     */
     set server(server) {
-        this.clear();
         this._shadow.getElementById("serverTitle").setAttribute("data-primary", server.serverCode);
         this._shadow.getElementById("serverTitle").setAttribute("data-secondary", server.url);
 
         this._shadow.getElementById("resourceTypes").metadata = server.capabilities;
         this._shadow.getElementById("capability").metadata = server.capabilities;
+        this.locationHandler();
     }
 
 };
