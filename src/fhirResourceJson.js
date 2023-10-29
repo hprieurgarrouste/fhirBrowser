@@ -49,7 +49,7 @@ class FhirResourceJson extends HTMLElement {
         }
         function parse(obj) {
             let dl = document.createElement('dl');
-            for (const [key, value] of Object.entries(obj)) {
+            for (const [key, value] of Object.entries(obj).sort((o1, o2) => { return o1[0].localeCompare(o2[0]) })) {
                 const dt = document.createElement('dt');
 
                 const keyElm = document.createElement('span');
