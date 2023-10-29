@@ -14,8 +14,10 @@ class FhirReferences extends HTMLElement {
 
     connectedCallback() {
         const main = this._shadow.querySelector('main');
-        main.addEventListener("click", ({ target }) => {
-            const chip = target.closest("app-chips");
+        main.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const chip = event.target.closest("app-chips");
             if (chip) {
                 location.hash = `#${chip.dataset.resource}?${this._resourceType.type.toLowerCase()}=${this._resourceId}`;
             }
