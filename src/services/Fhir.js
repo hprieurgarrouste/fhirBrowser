@@ -198,17 +198,23 @@ export class FhirService {
 
     static async oauth2_getToken(setup) {
         let urlParams = {
-            "client_id": setup.client_id,
-            "client_secret": setup.client_secret,
-            "grant_type": setup.grant_type,
-            "username": setup.username,
-            "password": setup.password
+            "grant_type": setup.grant_type
+            //"client_id": setup.client_id,
+            //"client_secret": setup.client_secret,
+            //"username": setup.username,
+            //"password": setup.password
         }
+        const headers = {
+            "Content-type": "application/x-www-form-urlencoded"
+        };
+        if ("client_credentials" == setup.grant_type) {
+            const auth = btoa(`${setup.client_id}:${setup.client_secret}`);
+            headers.Authorization = `Basic ${auth}`;
+        }
+
         let result = new URLSearchParams(urlParams);
         const response = await fetch(setup.access_token_url, {
-            "headers": {
-                "Content-type": "application/x-www-form-urlencoded"
-            },
+            "headers": headers,
             "method": "POST",
             "body": result.toString()
         });
