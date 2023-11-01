@@ -84,6 +84,8 @@ class FhirBrowser extends HTMLElement {
             } else {
                 this.showBundle(resourceType, queryParams);
             }
+        } else {
+            this._shadow.getElementById("bdy").style.visibility = "hidden";
         }
     }
 
