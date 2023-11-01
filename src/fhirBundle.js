@@ -53,21 +53,8 @@ class FhirBundle extends HTMLElement {
             location.hash = `#${this._resourceType.type}/${detail.resourceId}`;
         });
 
-        const searchPanel = this._shadow.getElementById('search');
-
         this._shadow.getElementById('searchToggle').addEventListener('click', () => {
-            searchPanel.classList.toggle("hidden");
-        });
-
-        searchPanel.addEventListener('apply', ({ detail }) => {
-            if (window.matchMedia("(max-width: 480px)").matches) {
-                searchPanel.classList.add("hidden");
-            }
-            const hash = [];
-            detail.parameters.forEach(parameter => {
-                hash.push(`${parameter.name}=${encodeURIComponent(parameter.value)}`);
-            });
-            location.hash = `#${this._resourceType.type}?${hash.join('&')}`;
+            this._shadow.getElementById('search')?.classList.toggle("hidden");
         });
 
         this._shadow.getElementById('copy').addEventListener("click", () => {
@@ -124,10 +111,6 @@ class FhirBundle extends HTMLElement {
         if (resourceType === this._resourceType && JSON.stringify(this._filters) === JSON.stringify(filters)) return;
         this._resourceType = resourceType;
         this._filters = filters;
-
-        const searchPanel = this._shadow.getElementById("search");
-        searchPanel.metadata = resourceType;
-        searchPanel.filters = filters;
 
         const pref = PreferencesService.get("columns", {});
         this._columns = pref[resourceType.type] || ["id", "meta.lastUpdated"];
