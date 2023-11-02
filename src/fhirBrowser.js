@@ -72,9 +72,9 @@ class FhirBrowser extends HTMLElement {
             } else {
                 const hashparts = hash.split("/");
                 resourceName = hashparts[0];
-                id = hashparts[1] || '';
+                id = hash.slice(resourceName.length + 1) || '';
             }
-            const resourceType = FhirService.server.capabilities.rest[0].resource.filter(res => res.type === resourceName)[0];
+            const resourceType = FhirService.server.capabilities.rest[0].resource.find(res => res.type === resourceName);
             if (!resourceType) {
                 SnackbarsService.show(`Resource "${resourceType}" not found!`);
                 return;

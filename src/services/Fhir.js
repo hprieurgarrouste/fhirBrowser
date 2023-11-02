@@ -111,6 +111,16 @@ export class FhirService {
         return response.json();
     }
 
+    static async readHistory(type, id) {
+        const url = new URL(`${this._server.url}/${type}/${id}/_history`);
+        url.searchParams.set("_summary", "text");
+        url.searchParams.set("_format", "json");
+        const response = await fetch(url, {
+            "headers": this._server.headers
+        });
+        return response.json();
+    }
+
     static async readXml(type, id) {
         const url = new URL(`${this._server.url}/${type}/${id}`);
         url.searchParams.set("_format", "xml");
@@ -158,6 +168,18 @@ export class FhirService {
         parameters.forEach(parameter => {
             url.searchParams.set(parameter.name, parameter.value);
         });
+        const response = await fetch(url, {
+            "headers": this._server.headers
+        });
+        if (!response.ok) {
+            throw response
+        }
+        return response.json();
+    }
+
+    static async execute(request) {
+        const url = new URL(`${this._server.url}/${request}`);
+        url.searchParams.set("_format", "json");
         const response = await fetch(url, {
             "headers": this._server.headers
         });

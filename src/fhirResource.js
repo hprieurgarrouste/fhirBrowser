@@ -9,6 +9,7 @@ import "./fhirResourceXml.js";
 import "./fhirResourceTtl.js";
 import "./components/Chips.js";
 import "./fhirReferences.js";
+//import "./fhirHistory.js";
 
 import { FhirService } from "./services/Fhir.js";
 import { SnackbarsService } from "./services/Snackbars.js";
@@ -167,6 +168,9 @@ class FhirResource extends HTMLElement {
             shareBtn.hidden = false;
             copyBtn.hidden = false;
             downloadBtn.hidden = false;
+
+            //const historyPanel = this._shadow.querySelector('fhir-history');
+            //historyPanel.load(resourceType, resource);
         }).catch((e) => {
             header.classList.add('error');
             const error = this._shadow.getElementById("error");
