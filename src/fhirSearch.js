@@ -17,11 +17,11 @@ class FhirSearch extends HTMLElement {
     connectedCallback() {
         const content = this._shadow.querySelector("main");
 
-        this._shadow.getElementById("back").addEventListener('click', (event) => {
-            this.classList.add("hidden");
+        this._shadow.querySelector('side-panel').onClose = ((event) => {
+            this.classList.add('hidden');
             event.preventDefault();
             event.stopPropagation();
-        });
+        }).bind(this);
 
         this._shadow.getElementById("clear").addEventListener("click", (event) => {
             this.clear();
