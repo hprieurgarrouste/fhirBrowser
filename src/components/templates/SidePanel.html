@@ -1,0 +1,53 @@
+<link rel="stylesheet" href="/assets/material.css">
+<style>
+    main {
+        background-color: var(--background-color, white);
+        color: var(--text-color-normal, white);
+        display: flex;
+        flex-direction: column;
+        font-family: Roboto, Arial, monospace;
+        height: 100%;
+    }
+
+    header {
+        padding-bottom: 3px;
+    }
+
+    header h3 {
+        margin: 0;
+    }
+
+    #content {
+        border-top: 1px solid var(--border-color);
+        box-shadow: inset 0px 2px 4px 0px var(--border-color);
+        overflow: auto;
+        flex: 1 1 auto;
+        height: 0;
+    }
+
+    @media (max-width:480px) {
+        main {
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+        }
+    }
+</style>
+<main>
+    <header slot="header">
+        <app-bar>
+            <section slot="left">
+                <slot name="appBarLeft"></slot>
+            </section>
+            <h3 id="title" slot="middle">Side panel</h3>
+            <section slot="right">
+                <slot name="appBarRight"></slot>
+                <round-button id="close" title="Close" data-icon="close"></round-button>
+            </section>
+        </app-bar>
+    </header>
+    <section id="content">
+        <slot name="main"></slot>
+    </section>
+</main>
