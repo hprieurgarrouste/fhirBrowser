@@ -63,11 +63,14 @@
         <div class="overlay">
             <section id="header">
                 <app-bar>
-                    <round-button id="close" title="Close" data-icon="close" slot="left"></round-button>
+                    <section slot="left">
+                        <slot name="appBarLeft"></slot>
+                    </section>
                     <h3 id="title" slot="middle"></h3>
-                    <div slot="right">
-                        <slot name="tools"></slot>
-                    </div>
+                    <section slot="right">
+                        <slot name="appBarRight"></slot>
+                        <round-button id="close" title="Close" data-icon="close" slot="left"></round-button>
+                    </section>
                 </app-bar>
             </section>
             <section id="content">
