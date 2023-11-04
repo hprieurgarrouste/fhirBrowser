@@ -2,8 +2,22 @@
 <style>
     #wrapper {
         display: flex;
+        flex-direction: row;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    #resourceCnt {
+        display: flex;
         flex-direction: column;
         height: 100%;
+        flex: auto;
+        width: 0;
+    }
+
+    main {
+        flex: 1 1 auto;
+        height: 0;
     }
 
     #title {
@@ -28,29 +42,55 @@
         padding: 1em;
     }
 
-    #refPanel {
-        border-top: 1px solid var(--border-color, gray);
+    fhir-references {
+        border-left: 1px solid var(--border-color);
+        flex: none;
+        transition: all 0.3s;
+        width: 300px;
+    }
+
+    fhir-references.hidden {
+        transition: all 0.3s;
+        margin-right: -300px;
+    }
+
+    @media (max-width:480px) {
+        fhir-references {
+            background-color: var(--background-color, rgb(255, 255, 255));
+            position: relative;
+            width: 100%;
+        }
+
+        fhir-references.hidden {
+            margin-right: -100%;
+        }
     }
 </style>
 <div id="wrapper">
-    <app-bar id="header">
-        <h3 slot="middle" id="title"></h3>
-        <round-button slot="right" id="help" title="Help" data-icon="help"></round-button>
-        <round-button slot="right" id="share" title="Share" data-icon="share"></round-button>
-        <round-button slot="right" id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
-        <round-button slot="right" id="download" title="Download" data-icon="download"></round-button>
-    </app-bar>
-    <!--<fhir-history></fhir-history>-->
-    <tab-bar>
-        <app-tab id="tabJson" selected>Json</app-tab>
-        <app-tab id="tabXml" hidden>Xml</app-tab>
-        <app-tab id="tabTtl" hidden>Ttl</app-tab>
-    </tab-bar>
-    <fhir-resource-json id="jsonView"></fhir-resource-json>
-    <fhir-resource-xml id="xmlView" hidden></fhir-resource-xml>
-    <fhir-resource-ttl id="ttlView" hidden></fhir-resource-ttl>
-    <span id="error"></span>
-    <div id="refPanel">
-        <fhir-references></fhir-references>
-    </div>
+    <section id="resourceCnt">
+        <header>
+            <app-bar id="header">
+                <round-button slot="left" id="help" title="Help" data-icon="help"></round-button>
+                <h3 slot="middle" id="title"></h3>
+                <round-button slot="right" id="share" title="Share" data-icon="share"></round-button>
+                <round-button slot="right" id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
+                <round-button slot="right" id="download" title="Download" data-icon="download"></round-button>
+                <round-button slot="right" id="referencesToggle" title="References"
+                    data-icon="article_shortcut"></round-button>
+            </app-bar>
+        </header>
+        <!--<fhir-history></fhir-history>-->
+        <main>
+            <tab-bar>
+                <app-tab id="tabJson" selected>Json</app-tab>
+                <app-tab id="tabXml" hidden>Xml</app-tab>
+                <app-tab id="tabTtl" hidden>Ttl</app-tab>
+            </tab-bar>
+            <fhir-resource-json id="jsonView"></fhir-resource-json>
+            <fhir-resource-xml id="xmlView" hidden></fhir-resource-xml>
+            <fhir-resource-ttl id="ttlView" hidden></fhir-resource-ttl>
+            <span id="error"></span>
+        </main>
+    </section>
+    <fhir-references slot="main" class="hidden"></fhir-references>
 </div>

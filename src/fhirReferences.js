@@ -1,6 +1,8 @@
 import template from "./templates/fhirReferences.html";
 
-import "./components/Chips.js"
+import "./components/ListItem.js";
+import "./components/ListRow.js";
+import "./components/RoundButton.js";
 import { FhirService } from "./services/Fhir.js";
 
 class FhirReferences extends HTMLElement {
@@ -13,15 +15,20 @@ class FhirReferences extends HTMLElement {
     }
 
     connectedCallback() {
-        const main = this._shadow.querySelector('main');
-        main.addEventListener("click", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            const chip = event.target.closest("app-chips");
-            if (chip) {
-                location.hash = `#${chip.dataset.resource}?${this._resourceType.type.toLowerCase()}=${this._resourceId}`;
+        this._shadow.getElementById('list').addEventListener("click", (event) => {
+            const item = event.target.closest("list-row");
+            if (item) {
+                location.hash = `#${item.dataset.id}?${this._resourceType.type.toLowerCase()}=${this._resourceId}`;
+            } else {
+                event.preventDefault();
+                event.stopPropagation();
             }
         });
+        this._shadow.querySelector('side-panel').onClose = ((event) => {
+            this.classList.add('hidden');
+            event.preventDefault();
+            event.stopPropagation();
+        }).bind(this);
     }
 
     clear() {
@@ -36,12 +43,14 @@ class FhirReferences extends HTMLElement {
         const list = this._shadow.getElementById('list');
         const references = FhirService.references(resourceType);
         if (references.length) {
-            references.forEach(ref => {
-                let chip = document.createElement("app-chips");
-                chip.setAttribute("data-icon", FhirService.ResourceIcon(ref));
-                chip.setAttribute("data-text", ref);
-                chip.setAttribute("data-resource", ref);
-                list.appendChild(chip);
+            references.sort((r1, r2) => r1.localeCompare(r2)).forEach(ref => {
+                const row = document.createElement('list-row');
+                row.setAttribute("data-id", ref);
+                const item = document.createElement('list-item');
+                item.setAttribute("data-icon", FhirService.ResourceIcon(ref));
+                item.setAttribute("data-primary", ref);
+                row.appendChild(item);
+                list.appendChild(row);
             });
             return true;
         }

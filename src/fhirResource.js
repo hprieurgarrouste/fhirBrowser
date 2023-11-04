@@ -10,6 +10,7 @@ import "./fhirResourceTtl.js";
 import "./components/Chips.js";
 import "./fhirReferences.js";
 //import "./fhirHistory.js";
+import "./components/SidePanel.js";
 
 import { FhirService } from "./services/Fhir.js";
 import { SnackbarsService } from "./services/Snackbars.js";
@@ -77,6 +78,10 @@ class FhirResource extends HTMLElement {
             });
         });
 
+        this._shadow.getElementById('referencesToggle').addEventListener("click", () => {
+            this._shadow.querySelector('fhir-references').classList.toggle("hidden");
+        });
+
         this._shadow.querySelector("tab-bar").addEventListener('click', ({ detail }) => {
             const tabId = detail.tab.id;
             const xmlView = this._shadow.getElementById('xmlView');
@@ -128,8 +133,12 @@ class FhirResource extends HTMLElement {
     load({ resourceType, resourceId }) {
         if (resourceType === this._resourceType && resourceId === this._resourceId) return;
 
-        const anyReferences = this._shadow.querySelector('fhir-references').load(resourceType, resourceId);
-        this._shadow.getElementById('refPanel').style.display = anyReferences ? 'flex' : 'none';
+        if (this._shadow.querySelector('fhir-references').load(resourceType, resourceId)) {
+            this._shadow.getElementById('referencesToggle').hidden = false;
+        } else {
+            this._shadow.getElementById('referencesToggle').hidden = true;
+            this._shadow.querySelector('fhir-references').classList.add('hidden');
+        }
 
         const header = this._shadow.getElementById('header');
         const tabBar = this._shadow.querySelector('tab-bar');
