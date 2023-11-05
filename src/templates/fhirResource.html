@@ -42,27 +42,21 @@
         padding: 1em;
     }
 
-    fhir-references {
+    fhir-references,
+    fhir-history {
         border-left: 1px solid var(--border-color);
         flex: none;
         transition: all 0.3s;
         width: 300px;
     }
 
-    fhir-references.hidden {
-        transition: all 0.3s;
-        margin-right: -300px;
-    }
-
     @media (max-width:480px) {
-        fhir-references {
+
+        fhir-references,
+        fhir-history {
             background-color: var(--background-color, rgb(255, 255, 255));
             position: relative;
             width: 100%;
-        }
-
-        fhir-references.hidden {
-            margin-right: -100%;
         }
     }
 </style>
@@ -77,9 +71,9 @@
                 <round-button slot="right" id="download" title="Download" data-icon="download"></round-button>
                 <round-button slot="right" id="referencesToggle" title="References"
                     data-icon="article_shortcut"></round-button>
+                <round-button slot="right" id="historyToggle" title="History" data-icon="history"></round-button>
             </app-bar>
         </header>
-        <!--<fhir-history></fhir-history>-->
         <main>
             <tab-bar>
                 <app-tab id="tabJson" selected>Json</app-tab>
@@ -92,5 +86,6 @@
             <span id="error"></span>
         </main>
     </section>
-    <fhir-references slot="main" class="hidden"></fhir-references>
+    <fhir-references slot="main" hidden></fhir-references>
+    <fhir-history slot="main" hidden></fhir-history>
 </div>

@@ -1,41 +1,17 @@
 <link href="/assets/material.css" rel="stylesheet" />
 <style>
-    main {
-        display: flex;
-        flex-direction: row;
-        overflow: auto;
-    }
-
     #list {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         flex-wrap: nowrap;
-        gap: 2em;
-        padding: 0.5em;
+        overflow-y: auto;
     }
 
-    .entry {
+    #list>* {
         cursor: pointer;
-        font-size: smaller;
-        text-wrap: nowrap;
-    }
-
-    .entry.active .number {
-        background-color: var(--primary-color);
-    }
-
-    .number {
-        background-color: var(--text-color-disabled);
-        color: #fff;
-        border-radius: 50%;
-        padding: 0 0.4em;
-        min-width: 1em;
-        min-height: 1em;
-        text-align: center;
-        display: inline-block;
-        margin-right: 0.5em;
     }
 </style>
-<main>
-    <section id="list"></section>
-</main>
+<side-panel data-title="History">
+    <round-button id="help" title="Help" data-icon="help" slot="appBarLeft"></round-button>
+    <section id="list" slot="main"></section>
+</side-panel>

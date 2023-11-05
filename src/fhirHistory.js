@@ -9,21 +9,36 @@ class FhirHistory extends HTMLElement {
         this._shadow.innerHTML = template;
         this._resourceType = null;
         this._resourceId = null;
+        this._versionId = null;
     }
 
     connectedCallback() {
-        const main = this._shadow.querySelector('main');
-        main.addEventListener("click", (event) => {
+        this._shadow.getElementById('list').addEventListener("click", (event) => {
             event.preventDefault();
             event.stopPropagation();
-            const div = event.target.closest("div");
-            if (div) {
-                if (div.classList.contains('active')) return;
-                this._shadow.getElementById('list').querySelectorAll('div[class~="active"]').forEach(n => n.classList.remove('active'));
-                div.classList.add('active');
-                location.hash = `#${this._resourceType}/${this._resourceId}/_history/${div.dataset.versionId}`;
+            const item = event.target.closest("list-row");
+            if (item) {
+                if (item.hasAttribute('selected')) return;
+                this._shadow.querySelector("list-row[selected]")?.removeAttribute("selected");
+                item.setAttribute("selected", "")
+                location.hash = `#${this._resourceType}/${this._resourceId}/_history/${item.dataset.versionid}`;
+            } else {
+                event.preventDefault();
+                event.stopPropagation();
             }
         });
+
+        this._shadow.getElementById('help').addEventListener('click', (event) => {
+            window.open(`https://hl7.org/fhir/${FhirService.release}/http.html#history`, "FhirBrowserHelp");
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        this._shadow.querySelector('side-panel').onClose = ((event) => {
+            this.hidden = true;
+            event.preventDefault();
+            event.stopPropagation();
+        }).bind(this);
     }
 
     clear() {
@@ -32,58 +47,49 @@ class FhirHistory extends HTMLElement {
     }
 
     load(resourceType, resource) {
-        this.hidden = true;
         if (!resourceType.interaction.find(({ code }) => 'vread' == code)) return;
-        if (resourceType.type == this._resourceType && resource.id == this._resourceId && resource.meta.versionId == this._versionId) return;
+        if (resourceType.type == this._resourceType && resource.id == this._resourceId && resource.meta?.versionId == this._versionId) return;
 
         const list = this._shadow.getElementById('list');
         if (resourceType.type !== this._resourceType || resource.id !== this._resourceId) {
             this._resourceType = resourceType.type;
             this._resourceId = resource.id;
-            this._versionId = resource.meta.versionId;
-            while (list.firstChild) list.removeChild(list.lastChild);
-            const historyEntry = document.createElement("template");
-            historyEntry.innerHTML = `<div class="entry"><span class="number">4</span><span class="text"></span></div>`;
+            this._versionId = resource.meta?.versionId;
+            this.clear();
             FhirService.readHistory(resourceType.type, resource.id).then(response => {
                 if ('Bundle' == response.resourceType && 'history' == response.type && response.total > 1) {
-                    let n = response.total;
                     response.entry.forEach(element => {
-                        const df = historyEntry.content.cloneNode(true);
-                        const div = df.querySelector('div');
-                        const vId = element.resource.meta.versionId;
-                        div.dataset.versionId = vId;
-                        if (this._versionId == vId) {
-                            div.classList.add('active');
+                        const row = document.createElement('list-row');
+                        row.setAttribute("data-versionid", element.resource.meta.versionId);
+                        if (this._versionId == element.resource.meta.versionId) {
+                            row.setAttribute("selected", "");
                         }
-                        df.querySelector('span[class="number"]').textContent = n--;
                         const date = new Date(element.resource.meta.lastUpdated);
-                        df.querySelector('span[class="text"]').innerHTML = `${date.toLocaleString(undefined, {
+                        const item = document.createElement('list-item');
+                        item.setAttribute("data-icon", "commit");
+                        item.setAttribute("data-primary", `${date.toLocaleString(undefined, {
                             year: "numeric",
                             month: "2-digit",
                             day: "2-digit"
-                        })} ${date.toLocaleString(undefined, {
+                        })}`);
+                        item.setAttribute("data-secondary", `${date.toLocaleString(undefined, {
                             hour: "2-digit",
                             minute: "2-digit",
                             second: "2-digit",
                             timeZoneName: "short"
-                        })}`;
-                        list.appendChild(df);
+                        })}`);
+                        row.appendChild(item);
+                        list.appendChild(row);
                     });
-                    this.hidden = false;
+                    return true;
                 }
             });
         } else {
-            list.querySelectorAll('div').forEach(div => {
-                if (resource.meta.versionId == div.dataset.versionId) {
-                    div.classList.add('active');
-                } else {
-                    div.classList.remove('active');
-                }
-            });
-            this.hidden = false;
+            this._shadow.querySelector("list-row[selected]")?.removeAttribute("selected");
+            this._shadow.querySelector(`list-row[data-versionid="${resource.meta.versionId}"]`)?.setAttribute("selected", "");
         }
+        return false;
     }
-
 };
 
 customElements.define('fhir-history', FhirHistory)

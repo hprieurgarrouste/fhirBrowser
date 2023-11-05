@@ -8,9 +8,9 @@ import "./fhirResourceJson.js";
 import "./fhirResourceXml.js";
 import "./fhirResourceTtl.js";
 import "./components/Chips.js";
-import "./fhirReferences.js";
-//import "./fhirHistory.js";
 import "./components/SidePanel.js";
+import "./fhirReferences.js";
+import "./fhirHistory.js";
 
 import { FhirService } from "./services/Fhir.js";
 import { SnackbarsService } from "./services/Snackbars.js";
@@ -79,7 +79,14 @@ class FhirResource extends HTMLElement {
         });
 
         this._shadow.getElementById('referencesToggle').addEventListener("click", () => {
-            this._shadow.querySelector('fhir-references').classList.toggle("hidden");
+            const panel = this._shadow.querySelector('fhir-references');
+            if (panel.hidden) this._shadow.querySelector('fhir-history').hidden = true;
+            panel.hidden = !panel.hidden;
+        });
+        this._shadow.getElementById('historyToggle').addEventListener("click", () => {
+            const panel = this._shadow.querySelector('fhir-history');
+            if (panel.hidden) this._shadow.querySelector('fhir-references').hidden = true;
+            panel.hidden = !panel.hidden;
         });
 
         this._shadow.querySelector("tab-bar").addEventListener('click', ({ detail }) => {
@@ -133,11 +140,18 @@ class FhirResource extends HTMLElement {
     load({ resourceType, resourceId }) {
         if (resourceType === this._resourceType && resourceId === this._resourceId) return;
 
+        if (!resourceType.interaction.find(({ code }) => 'vread' == code)) {
+            this._shadow.getElementById('historyToggle').hidden = true;
+            this._shadow.querySelector('fhir-history').hidden = true;
+        } else {
+            this._shadow.getElementById('historyToggle').hidden = false;
+        }
+
         if (this._shadow.querySelector('fhir-references').load(resourceType, resourceId)) {
             this._shadow.getElementById('referencesToggle').hidden = false;
         } else {
             this._shadow.getElementById('referencesToggle').hidden = true;
-            this._shadow.querySelector('fhir-references').classList.add('hidden');
+            this._shadow.querySelector('fhir-references').hidden = true;
         }
 
         const header = this._shadow.getElementById('header');
@@ -178,8 +192,8 @@ class FhirResource extends HTMLElement {
             copyBtn.hidden = false;
             downloadBtn.hidden = false;
 
-            //const historyPanel = this._shadow.querySelector('fhir-history');
-            //historyPanel.load(resourceType, resource);
+            this._shadow.querySelector('fhir-history').load(resourceType, resource);
+
         }).catch((e) => {
             header.classList.add('error');
             const error = this._shadow.getElementById("error");

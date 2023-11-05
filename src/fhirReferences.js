@@ -25,7 +25,7 @@ class FhirReferences extends HTMLElement {
             }
         });
         this._shadow.querySelector('side-panel').onClose = ((event) => {
-            this.classList.add('hidden');
+            this.hidden = true;
             event.preventDefault();
             event.stopPropagation();
         }).bind(this);
