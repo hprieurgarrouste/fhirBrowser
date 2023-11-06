@@ -140,6 +140,11 @@ class FhirResource extends HTMLElement {
     load({ resourceType, resourceId }) {
         if (resourceType === this._resourceType && resourceId === this._resourceId) return;
 
+        if (window.matchMedia("(max-width: 480px)").matches) {
+            this._shadow.querySelector("fhir-references").hidden = true;
+            this._shadow.querySelector("fhir-history").hidden = true;
+        }
+
         if (!resourceType.interaction.find(({ code }) => 'vread' == code)) {
             this._shadow.getElementById('historyToggle').hidden = true;
             this._shadow.querySelector('fhir-history').hidden = true;

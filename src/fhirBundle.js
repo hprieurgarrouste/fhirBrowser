@@ -109,6 +109,11 @@ class FhirBundle extends HTMLElement {
     load(resourceType, filters = []) {
         this._shadow.getElementById("settingsDialog").hidden = true;
         if (resourceType === this._resourceType && JSON.stringify(this._filters) === JSON.stringify(filters)) return;
+
+        if (window.matchMedia("(max-width: 480px)").matches) {
+            this._shadow.getElementById('search')?.classList.add("hidden");
+        }
+
         this._resourceType = resourceType;
         this._filters = filters;
 
