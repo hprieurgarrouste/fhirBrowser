@@ -42,12 +42,15 @@
         padding: 1em;
     }
 
+    #tabs {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
     fhir-references,
     fhir-history {
         border-left: 1px solid var(--border-color);
-        flex: none;
-        transition: all 0.3s;
-        width: 300px;
     }
 
     @media (max-width:480px) {
@@ -75,15 +78,17 @@
             </app-bar>
         </header>
         <main>
-            <tab-bar>
-                <app-tab id="tabJson" selected>Json</app-tab>
-                <app-tab id="tabXml" hidden>Xml</app-tab>
-                <app-tab id="tabTtl" hidden>Ttl</app-tab>
-            </tab-bar>
-            <fhir-resource-json id="jsonView"></fhir-resource-json>
-            <fhir-resource-xml id="xmlView" hidden></fhir-resource-xml>
-            <fhir-resource-ttl id="ttlView" hidden></fhir-resource-ttl>
-            <span id="error"></span>
+            <section id="tabs">
+                <tab-bar>
+                    <app-tab id="tabJson" selected>Json</app-tab>
+                    <app-tab id="tabXml" hidden>Xml</app-tab>
+                    <app-tab id="tabTtl" hidden>Ttl</app-tab>
+                </tab-bar>
+                <fhir-resource-json id="jsonView"></fhir-resource-json>
+                <fhir-resource-xml id="xmlView" hidden></fhir-resource-xml>
+                <fhir-resource-ttl id="ttlView" hidden></fhir-resource-ttl>
+                <span id="error"></span>
+            </section>
         </main>
     </section>
     <fhir-references slot="main" hidden></fhir-references>
