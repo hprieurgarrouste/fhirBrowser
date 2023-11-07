@@ -122,6 +122,7 @@ class FhirBrowser extends HTMLElement {
         if (preferedServer) {
             SettingsService.get(preferedServer).then((server) => {
                 this.connect(preferedServer, server);
+                this._shadow.getElementById('serverSelector').select(preferedServer);
             });
         } else {
             this._shadow.getElementById('serverDialog').hidden = false;

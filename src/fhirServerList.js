@@ -40,6 +40,11 @@ class FhirServerList extends HTMLElement {
         });
     }
 
+    select(serverKey) {
+        this._shadow.querySelector("list-row[selected]")?.removeAttribute("selected");
+        this._shadow.querySelector(`list-row[data-id="${serverKey}"]`)?.setAttribute("selected", "true");
+    }
+
     serverChanged(serverKey) {
         const server = this._conf[serverKey];
         this.dispatchEvent(new CustomEvent("serverchanged", {
