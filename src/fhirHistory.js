@@ -66,7 +66,7 @@ class FhirHistory extends HTMLElement {
                         }
                         const date = new Date(element.resource.meta.lastUpdated);
                         const item = document.createElement('list-item');
-                        item.setAttribute("data-icon", "commit");
+                        item.setAttribute("data-icon", "line_end_circle");
                         item.setAttribute("data-primary", `${date.toLocaleString(undefined, {
                             year: "numeric",
                             month: "2-digit",
