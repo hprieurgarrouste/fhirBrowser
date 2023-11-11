@@ -1,10 +1,16 @@
 <link href="/assets/material.css" rel="stylesheet" />
 <style>
-    #list {
+    main {
         display: flex;
         flex-direction: column;
-        flex-wrap: nowrap;
+        height: 100%;
+    }
+
+    #list {
+        border-top: 1px solid var(--border-color);
         overflow-y: auto;
+        flex: 1 1 auto;
+        height: 0;
     }
 
     #list>* {
@@ -12,5 +18,8 @@
     }
 </style>
 <side-panel data-title="References">
-    <section id="list" slot="main"></section>
+    <main slot="main">
+        <list-filter></list-filter>
+        <section id="list"></section>
+    </main>
 </side-panel>
