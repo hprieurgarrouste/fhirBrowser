@@ -18,7 +18,7 @@ class FhirReferences extends HTMLElement {
         this._shadow.getElementById('list').addEventListener("click", (event) => {
             const item = event.target.closest("list-row");
             if (item) {
-                location.hash = `#${item.dataset.id}?${this._resourceType.type.toLowerCase()}=${this._resourceId}`;
+                location.hash = `#${item.dataset.target}?${item.dataset.search}=${this._resourceId}`;
             } else {
                 event.preventDefault();
                 event.stopPropagation();
@@ -41,20 +41,23 @@ class FhirReferences extends HTMLElement {
         this._resourceId = resourceId;
         this.clear();
         const list = this._shadow.getElementById('list');
-        const references = FhirService.references(resourceType);
-        if (references.length) {
-            references.sort((r1, r2) => r1.localeCompare(r2)).forEach(ref => {
-                const row = document.createElement('list-row');
-                row.setAttribute("data-id", ref);
-                const item = document.createElement('list-item');
-                item.setAttribute("data-icon", FhirService.ResourceIcon(ref));
-                item.setAttribute("data-primary", ref);
-                row.appendChild(item);
-                list.appendChild(row);
+        const references = FhirService.references(resourceType.type);
+        if (references) {
+            Object.entries(references).forEach(([key, value]) => {
+                value.forEach(v => {
+                    const row = document.createElement('list-row');
+                    row.setAttribute("data-target", key);
+                    row.setAttribute("data-search", v.name);
+                    const item = document.createElement('list-item');
+                    item.setAttribute("data-icon", FhirService.ResourceIcon(key));
+                    item.setAttribute("data-primary", `${key}.${v.name}`);
+                    item.setAttribute("data-secondary", v.documentation.length > 100 ? `${v.documentation.substring(0, 100)}...` : v.documentation);
+                    row.appendChild(item);
+                    list.appendChild(row);
+                })
             });
-            return true;
         }
-        return false;
+        return list.children.length > 0;
     }
 
 };

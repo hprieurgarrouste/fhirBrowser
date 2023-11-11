@@ -1,6 +1,10 @@
+import fhirIconSet from '../assets/fhirIconSet.json';
+import fhirReferences from '../assets/references.json';
+
 export class FhirService {
     static {
         this._server = null;
+        this._references = {};
     }
 
     /**
@@ -40,11 +44,7 @@ export class FhirService {
     }
 
     static references(resourceType) {
-        const ref = [];
-        this._server.capabilities.rest[0].resource
-            .filter(resource => resource?.searchParam?.find((searchParam) => searchParam.type === 'reference' && searchParam.name === resourceType.type.toLowerCase()))
-            .forEach(resource => ref.push(resource.type));
-        return ref;
+        return this._references[resourceType];
     }
 
     static formatEnable(format) {
@@ -215,7 +215,50 @@ export class FhirService {
             server.serverCode = code;
             server.capabilities = metadata;
             FhirService.server = server;
+            this._references = this.parseReferences(metadata);
         });
+
+    }
+
+    static parseReferences(metadata) {
+        const serverReferences = {};
+        const serverResources = metadata.rest[0].resource;
+        metadata.rest[0].resource.forEach((serverResource) => {
+            const fhirReference = fhirReferences[this.release][serverResource.type];
+            if (fhirReference) {
+                //clone fhirReference
+                const serverReference = JSON.parse(JSON.stringify(fhirReference));
+                //remove unsupported resource target
+                Object.entries(serverReference).forEach(([key, value]) => {
+                    let serverTarget = serverResources.find(target => key == target.type);
+                    if (!serverTarget) {
+                        delete serverReference[key];
+                    } else if (!serverTarget.searchParam) {
+                        delete serverReference[key];
+                    } else {
+                        //remove unsupported search parameter
+                        serverReference[key].forEach((searchCode, index) => {
+                            const searchParam = serverTarget.searchParam.find(searchParam => searchCode == searchParam.name);
+                            if (searchParam) {
+                                serverReference[key][index] = {
+                                    "name": searchCode,
+                                    "documentation": searchParam.documentation
+                                }
+                            } else {
+                                serverReference[key].splice(index, 1);
+                            }
+                        });
+                        if (serverReference[key].length === 0) {
+                            delete serverReference[key];
+                        }
+                    }
+                });
+                if (Object.keys(serverReference).length !== 0) {
+                    serverReferences[serverResource.type] = serverReference;
+                }
+            }
+        });
+        return serverReferences;
     }
 
     static async oauth2_getToken(setup) {
@@ -243,160 +286,7 @@ export class FhirService {
         return response.json();
     }
 
-
     static ResourceIcon(resource) {
-        const fhirIconSet = {
-            'account': 'account_balance_wallet',
-            'accountreport': 'account_balance_wallet',
-            'activitydefinition': 'quiz',
-            'adverseevent': 'emergency_home',
-            'allergyintolerance': 'allergy',
-            'appointment': 'today',
-            'appointmentresponse': 'event_available',
-            'auditevent': 'browse_activity',
-            'basic': 'shapes',
-            'binary': 'data_object',
-            'biologicallyderivedproduct': 'fork_right',
-            'bodystructure': 'skeleton',
-            'bundle': 'format_paragraph',
-            'capabilitystatement': 'campaign',
-            'careplan': 'flowsheet',
-            'careteam': 'groups',
-            'catalogentry': 'description',
-            'chargeitem': 'sell',
-            'chargeitemdefinition': 'sell',
-            'claim': 'request_quote',
-            'claimresponse': 'task',
-            'clinicalimpression': 'comment',
-            'codesystem': 'data_array',
-            'communication': 'mail',
-            'communicationrequest': 'outgoing_mail',
-            'compartmentdefinition': 'category',
-            'composition': 'blender',
-            'conceptmap': 'integration_instructions',
-            'condition': 'coronavirus',
-            'consent': 'done',
-            'contract': 'contract',
-            'coverage': 'shield',
-            'coverageeligibilityrequest': 'policy',
-            'coverageeligibilityresponse': 'verified_user',
-            'detectedissue': 'bug_report',
-            'device': 'electrical_services',
-            'devicedefinition': 'inventory_2',
-            'devicemetric': 'health_metrics',
-            'devicerequest': 'unknown_document',
-            'deviceusestatement': 'home_iot_device',
-            'diagnosticreport': 'diagnosis',
-            'documentmanifest': 'dataset',
-            'documentreference': 'bookmarks',
-            'effectevidencesynthesis': 'clinical_notes',
-            'encounter': 'medical_services',
-            'enrollmentrequest': 'contact_support',
-            'enrollmentresponse': 'support_agent',
-            'endpoint': 'location_on',
-            'episodeofcare': 'blood_pressure',
-            'evidence': 'search_check',
-            'evidencevariable': 'troubleshoot',
-            'eventdefinition': 'event_note',
-            'examplescenario': 'video_library',
-            'explanationofbenefit': 'speaker_notes',
-            'familymemberhistory': 'family_restroom',
-            'familimemberhistory': 'history',
-            'flag': 'flag',
-            'goal': 'sports_score',
-            'graphdefinition': 'bar_chart',
-            'group': 'group',
-            'guidanceresponse': 'mark_email_read',
-            'healthcareservice': 'mixture_med',
-            'implementationguide': 'developer_guide',
-            'imagingstudy': 'radiology',
-            'immunization': 'immunology',
-            'immunizationevaluation': 'microbiology',
-            'immunizationrecommendation': 'mixture_med',
-            'insuranceplan': 'payments',
-            'invoice': 'receipt_long',
-            'library': 'local_library',
-            'linkage': 'link',
-            'list': 'list',
-            'location': 'pin_drop',
-            'manifest': 'dataset',
-            'measure': 'scale',
-            'measurereport': 'lab_profile',
-            'media': 'perm_media',
-            'medicinalproduct': 'pill',
-            'medicinalproductauthorization': 'pill',
-            'medicinalproductcontraindication': 'pill_off',
-            'medicinalproductindication': 'pill',
-            'medicinalproductingredient': 'pill',
-            'medicinalproductinteraction': 'pill',
-            'medicinalproductmanufactured': 'pill',
-            'medicinalproductpackaged': 'pill',
-            'medicinalproductpharmaceutical': 'pill',
-            'medicinalproductundesirableeffect': 'sick',
-            'medication': 'medication',
-            'medicationadministration': 'medication_liquid',
-            'medicationdispense': 'prescriptions',
-            'medicationknowledge': 'medication',
-            'medicationrequest': 'medication',
-            'medicationstatement': 'medication',
-            'messagedefinition': 'developer_guide',
-            'messageheader': 'code',
-            'molecularsequence': 'genetics',
-            'namingsystem': 'import_contacts',
-            'nutritionorder': 'restaurant',
-            'observation': 'description',
-            'observationdefinition': 'file_present',
-            'operationdefinition': 'function',
-            'operationoutcome': 'function',
-            'organization': 'local_hospital',
-            'organizationaffiliation': 'account_tree',
-            'parameters': 'settings',
-            'patient': 'personal_injury',
-            'paymentnotice': 'credit_card',
-            'paymentreconciliation': 'credit_score',
-            'person': 'person',
-            'plandefinition': 'view_list',
-            'practitioner': 'stethoscope',
-            'practitionerrole': 'medical_information',
-            'procedure': 'checklist',
-            'provenance': 'deployed_code_history',
-            'questionnaire': 'assignment',
-            'questionnaireresponse': 'assignment_turned_in',
-            'relatedperson': 'family_restroom',
-            'requestgroup': 'group_work',
-            'researchdefinition': 'lab_panel',
-            'researchelementdefinition': 'labs',
-            'researchstudy': 'biotech',
-            'researchsubject': 'biotech',
-            'resource': 'description',
-            'riskevidencesynthesis': 'feedback',
-            'riskassessment': 'problem',
-            'schedule': 'calendar_month',
-            'searchparameter': 'screen_search_desktop',
-            'servicerequest': 'ecg',
-            'slot': 'view_agenda',
-            'specimen': 'colorize',
-            'specimendefinition': 'colorize',
-            'structuredefinition': 'developer_guide',
-            'structuremap': 'table',
-            'subscription': 'loyalty',
-            'substance': 'science',
-            'substancenucleicacid': 'science',
-            'substancepolymer': 'science',
-            'substanceprotein': 'science',
-            'substancereferenceinformation': 'science',
-            'substancesourcematerial': 'science',
-            'substancespecification': 'science',
-            'supplydelivery': 'deployed_code',
-            'supplyrequest': 'deployed_code_history',
-            'task': 'task',
-            'terminologycapabilities': 'developer_guide',
-            'testreport': 'integration_instructions',
-            'testscript': 'code_blocks',
-            'valueset': 'data_array',
-            'verificationresult': 'new_releases',
-            'visionprescription': 'ophthalmology'
-        };
         return fhirIconSet[resource.toLowerCase()] || 'unknown_med';
     }
 }
