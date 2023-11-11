@@ -8,12 +8,15 @@
     }
 
     #primary {
-        display: block;
+        display: inline-block;
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
-        text-transform: capitalize;
         color: var(--text-color-normal, black);
+    }
+
+    #primary:first-letter {
+        text-transform: uppercase;
     }
 
     #secondary {
