@@ -15,8 +15,6 @@ class FhirResourceTypesFilter extends HTMLElement {
             }
         });
         this._shadow.querySelector("main").addEventListener('mousedown', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
             text.focus();
         });
         text.addEventListener("input", fireChange.bind(this));
