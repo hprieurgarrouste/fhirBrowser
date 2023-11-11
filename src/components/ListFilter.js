@@ -1,6 +1,6 @@
-import template from "./templates/fhirResourceTypesFilter.html";
+import template from "./templates/ListFilter.html";
 
-class FhirResourceTypesFilter extends HTMLElement {
+class ListFilter extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
@@ -33,4 +33,4 @@ class FhirResourceTypesFilter extends HTMLElement {
     }
 };
 
-customElements.define('fhir-resource-types-filter', FhirResourceTypesFilter)
+customElements.define('list-filter', ListFilter)
