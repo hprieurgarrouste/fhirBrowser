@@ -16,12 +16,11 @@ class FhirReferences extends HTMLElement {
 
     connectedCallback() {
         this._shadow.getElementById('list').addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
             const item = event.target.closest("list-row");
             if (item) {
                 location.hash = `#${item.dataset.target}?${item.dataset.search}=${this._resourceId}`;
-            } else {
-                event.preventDefault();
-                event.stopPropagation();
             }
         });
         this._shadow.querySelector('side-panel').onClose = ((event) => {
