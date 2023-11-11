@@ -1,7 +1,18 @@
 <link rel="stylesheet" href="/assets/material.css">
 <style>
+    section {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
     main {
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
         padding: 0.5em;
+        overflow: hidden auto;
+        flex: 1 1 auto;
+        height: 0;
     }
 
     footer {
@@ -42,8 +53,10 @@
 <side-panel data-title="Search">
     <round-button id="help" title="Help" data-icon="help" slot="appBarLeft"></round-button>
     <round-button id="clear" title="Clear" data-icon="clear_all" slot="appBarRight"></round-button>
-    <main slot="main"></main>
-    <footer>
-        <input type="button" id="apply" value="Apply"></input>
-    </footer>
+    <section slot="main">
+        <main></main>
+        <footer>
+            <input type="button" id="apply" value="Apply"></input>
+        </footer>
+    </section>
 </side-panel>
