@@ -1,6 +1,6 @@
 {
   "name": "fhirbrowser",
-  "version": "0.7.8",
+  "version": "0.7.9",
   "description": "FHIR Browser",
   "main": "index.html",
   "scripts": {
