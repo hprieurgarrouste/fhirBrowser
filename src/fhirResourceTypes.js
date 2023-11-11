@@ -2,7 +2,7 @@ import template from "./templates/fhirResourceTypes.html";
 
 import "./components/ListRow.js"
 import "./components/ListItem.js"
-import "./fhirResourceTypesFilter.js";
+import "./components/ListFilter.js";
 import { FhirService } from "./services/Fhir.js";
 import { AsyncService } from "./services/Async.js";
 
