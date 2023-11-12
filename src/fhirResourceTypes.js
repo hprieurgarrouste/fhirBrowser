@@ -16,13 +16,13 @@ class FhirResourceTypes extends HTMLElement {
     }
 
     connectedCallback() {
-        this._shadow.getElementById('filter').addEventListener("filterChanged", ({ detail }) => {
-            const filter = detail.text.toLowerCase();
+        this._shadow.getElementById('filter').onChange = ((value) => {
+            const filter = value.toLowerCase();
             const list = this._shadow.getElementById('list');
             list.childNodes.forEach(row => {
                 row.hidden = !row.dataset.type.toLowerCase().includes(filter);
             });
-        });
+        }).bind(this);
 
         const list = this._shadow.getElementById('list');
         list.addEventListener("click", ({ target }) => {

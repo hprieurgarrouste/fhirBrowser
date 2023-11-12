@@ -31,13 +31,13 @@ class FhirReferences extends HTMLElement {
             event.stopPropagation();
         }).bind(this);
 
-        this._shadow.querySelector('list-filter').addEventListener("filterChanged", ({ detail }) => {
-            const filter = detail.text.toLowerCase();
+        this._shadow.querySelector('list-filter').onChange = ((value) => {
+            const filter = value.toLowerCase();
             const list = this._shadow.getElementById('list');
             list.childNodes.forEach(row => {
                 row.hidden = !(row.dataset.target.toLowerCase().includes(filter) || row.dataset.search.toLowerCase().includes(filter));
             });
-        });
+        }).bind(this);
     }
 
     clear() {
