@@ -10,11 +10,11 @@ class FhirSearch extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-        window.addEventListener("hashchange", this.locationHandler);
         this._resourceType = null;
     }
 
     connectedCallback() {
+        window.addEventListener("hashchange", this.locationHandler);
         const content = this._shadow.querySelector("main");
 
         this._shadow.querySelector('side-panel').onClose = ((event) => {

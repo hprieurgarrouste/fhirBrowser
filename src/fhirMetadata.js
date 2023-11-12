@@ -11,10 +11,9 @@ class FhirMetadata extends HTMLElement {
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
         this._metadata = null;
-        window.addEventListener("hashchange", this.locationHandler);
     }
 
-    locationHandler = async () => {
+    locationHandler = () => {
         let hash = window.location.hash.replace('#', '').trim();
         if (hash.length) {
             let resourceType = '';
@@ -30,6 +29,7 @@ class FhirMetadata extends HTMLElement {
     }
 
     connectedCallback() {
+        window.addEventListener("hashchange", this.locationHandler);
         this._shadow.querySelector("tab-bar").addEventListener('click', ({ detail }) => {
             this._shadow.getElementById(detail.tab.dataset.target).scrollIntoView({
                 behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? "auto" : "smooth",

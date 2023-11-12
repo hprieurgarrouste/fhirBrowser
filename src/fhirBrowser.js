@@ -26,7 +26,6 @@ class FhirBrowser extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-        window.addEventListener("hashchange", this.locationHandler);
     }
 
     showResource(resourceType, id) {
@@ -54,7 +53,7 @@ class FhirBrowser extends HTMLElement {
         bundle.load(resourceType, search);
     }
 
-    locationHandler = async () => {
+    locationHandler = () => {
         let hash = window.location.hash.replace('#', '').trim();
         if (hash.length) {
             let id = '';
@@ -90,6 +89,7 @@ class FhirBrowser extends HTMLElement {
     }
 
     connectedCallback() {
+        window.addEventListener("hashchange", this.locationHandler);
         SnackbarsService.container = this._shadow;
 
         this._shadow.getElementById("navigation").addEventListener('click', () => {
@@ -122,7 +122,6 @@ class FhirBrowser extends HTMLElement {
         if (preferedServer) {
             SettingsService.get(preferedServer).then((server) => {
                 this.connect(preferedServer, server);
-                this._shadow.getElementById('serverSelector').select(preferedServer);
             });
         } else {
             this._shadow.getElementById('serverDialog').hidden = false;
@@ -140,6 +139,7 @@ class FhirBrowser extends HTMLElement {
             this._shadow.getElementById("metadata").server = FhirService.server;
             this._shadow.getElementById("leftPanel").classList.remove("hidden");
             this._shadow.getElementById("navigation").hidden = false;
+            this._shadow.getElementById('serverSelector').select(serverCode);
             this.locationHandler();
         }).catch(error => {
             SnackbarsService.show(`An error occurred while connecting to the server "${serverCode}"`,

@@ -42,7 +42,11 @@ class FhirServerList extends HTMLElement {
 
     select(serverKey) {
         this._shadow.querySelector("list-row[selected]")?.removeAttribute("selected");
-        this._shadow.querySelector(`list-row[data-id="${serverKey}"]`)?.setAttribute("selected", "true");
+        const row = this._shadow.querySelector(`list-row[data-id="${serverKey}"]`);
+        if (row) {
+            row.setAttribute("selected", "true");
+            row.scrollIntoView();
+        }
     }
 
     serverChanged(serverKey) {
