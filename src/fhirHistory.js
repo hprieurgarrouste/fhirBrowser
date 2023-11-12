@@ -58,7 +58,11 @@ class FhirHistory extends HTMLElement {
             this.clear();
             FhirService.readHistory(resourceType.type, resource.id).then(response => {
                 if ('Bundle' == response.resourceType && 'history' == response.type && response.total > 1) {
-                    response.entry.forEach(element => {
+                    response.entry.sort((e1, e2) => {
+                        const d1 = new Date(e1.resource.meta.lastUpdated);
+                        const d2 = new Date(e2.resource.meta.lastUpdated);
+                        return d2 - d1;
+                    }).forEach(element => {
                         const row = document.createElement('list-row');
                         row.setAttribute("data-versionid", element.resource.meta.versionId);
                         if (this._versionId == element.resource.meta.versionId) {
