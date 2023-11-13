@@ -69,15 +69,18 @@ class FhirResourceTypes extends HTMLElement {
         this._metadata = metadata;
         this.clear();
         const list = this._shadow.getElementById('list');
-        metadata.rest[0].resource.filter(res => res.interaction.map(interaction => interaction.code).includes('search-type')).forEach(resource => {
-            const row = document.createElement('list-row');
-            row.setAttribute("data-type", resource.type);
-            const item = document.createElement('list-item');
-            item.setAttribute("data-primary", resource.type);
-            item.setAttribute("data-icon", FhirService.ResourceIcon(resource.type));
-            row.appendChild(item);
-            list.appendChild(row);
-        });
+        metadata.rest[0].resource
+            .filter(res => res.interaction.map(interaction => interaction.code).includes('search-type'))
+            .forEach(resource => {
+                const row = document.createElement('list-row');
+                row.setAttribute("data-type", resource.type);
+                const item = document.createElement('list-item');
+                item.setAttribute("data-primary", resource.type);
+                item.setAttribute("data-icon", FhirService.ResourceIcon(resource.type));
+                row.appendChild(item);
+                list.appendChild(row);
+            });
+        this._shadow.querySelector('list-filter').hidden = (list.children.length <= 10);
     }
 
 };

@@ -67,6 +67,7 @@ class FhirReferences extends HTMLElement {
                 })
             });
         }
+        this._shadow.querySelector('list-filter').hidden = (list.children.length <= 10);
         return list.children.length > 0;
     }
 
