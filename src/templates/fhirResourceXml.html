@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="/assets/material.css">
 <style>
     main {
+        --indent: 32px;
         display: flex;
         flex-direction: column;
         height: 100%;
@@ -14,8 +15,81 @@
         height: 0;
         overflow: auto;
         padding: 1em;
-        white-space: pre;
         margin: 0;
+    }
+
+    dl {
+        margin: 0;
+        padding-left: var(--indent);
+    }
+
+    #content>dl {
+        padding-left: 0;
+    }
+
+
+    dt {
+        list-style-type: none;
+    }
+
+    span.key {
+        color: var(--xml-viewer-nodes-color, black);
+    }
+
+    span.key::before {
+        content: '<';
+    }
+
+    span.key::after {
+        content: '>';
+    }
+
+    span.attributes {
+        color: var(--xml-viewer-attributes-color, black);
+    }
+
+    span.values {
+        color: var(--xml-viewer-values-color, black);
+    }
+
+    span.key.end {
+        padding-left: var(--indent);
+    }
+
+    dt,
+    dt.object>span.value::after {
+        padding-left: var(--indent);
+    }
+
+    dt.object {
+        padding-left: 0;
+    }
+
+    dt.object::before {
+        cursor: pointer;
+        content: 'expand_less ';
+        font-family: 'Material Symbols Sharp';
+        font-weight: bold;
+        line-height: inherit;
+        vertical-align: middle;
+        color: var(--text-color-disabled, black);
+    }
+
+    dt.collapsed::before {
+        content: 'expand_more ';
+    }
+
+    dt.collapsed>span dl {
+        display: none;
+    }
+
+    dt.object.collapsed span.value::after {
+        content: '...';
+        padding-left: 0;
+    }
+
+    dt.object.collapsed span.key.end {
+        padding-left: 0;
     }
 
     @media (max-width:480px) {
@@ -25,5 +99,5 @@
     }
 </style>
 <main>
-    <pre id="content"></pre>
+    <div id="content"></div>
 </main>
