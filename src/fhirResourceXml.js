@@ -36,7 +36,9 @@ class FhirResourceXml extends HTMLElement {
 
         function parse(obj) {
             let dl = document.createElement('dl');
-            Array.from(obj.children).forEach(e => {
+            Array.from(obj.children).sort((n1, n2) => {
+                return n1.nodeName.localeCompare(n2.nodeName);
+            }).forEach(e => {
                 const dt = document.createElement('dt');
 
                 let keyElm = document.createElement('span');
