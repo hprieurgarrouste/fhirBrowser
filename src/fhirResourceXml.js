@@ -1,5 +1,7 @@
 import template from "./templates/fhirResourceXml.html";
 
+import { FhirService } from "./services/Fhir.js";
+
 class FhirResourceXml extends HTMLElement {
     constructor() {
         super();
@@ -54,7 +56,18 @@ class FhirResourceXml extends HTMLElement {
                         keyElm.appendChild(atb);
                         let val = document.createElement('span');
                         val.className = "values";
-                        val.innerText = `"${a.nodeValue}"`;
+                        if ("reference" === e.nodeName && "value" === a.nodeName) {
+                            let url = a.nodeValue;
+                            if (url.startsWith(FhirService.server.url)) {
+                                url = url.slice(FhirService.server.url.length + 1);
+                            }
+                            let link = document.createElement('a');
+                            link.setAttribute("href", `#${url}`);
+                            link.appendChild(document.createTextNode(`"${a.nodeValue}"`));
+                            val.appendChild(link);
+                        } else {
+                            val.innerText = `"${a.nodeValue}"`;
+                        }
                         atb.appendChild(val);
                     });
                 }
