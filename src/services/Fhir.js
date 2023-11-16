@@ -124,7 +124,6 @@ export class FhirService {
     static async readXml(type, id) {
         const url = new URL(`${this._server.url}/${type}/${id}`);
         url.searchParams.set("_format", "xml");
-        url.searchParams.set("_pretty", "true");
         const response = await fetch(url, {
             "headers": this._server.headers
         });
