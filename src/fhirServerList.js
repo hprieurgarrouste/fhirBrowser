@@ -1,6 +1,6 @@
 import template from "./templates/FhirServerList.html";
 
-import "./components/RoundButton.js"
+import "./components/List.js"
 import "./components/ListRow.js"
 import "./components/ListItem.js"
 import { SettingsService } from "./services/Settings.js";
@@ -13,11 +13,11 @@ class FhirServerList extends HTMLElement {
         this._shadow.innerHTML = template;
     }
     connectedCallback() {
-        const nav = this._shadow.getElementById('content');
-        nav.addEventListener("click", ({ target }) => {
+        const list = this._shadow.querySelector('app-list');
+        list.addEventListener("click", ({ target }) => {
             const row = target.closest("list-row");
             if (row) {
-                nav.querySelector("[selected]")?.removeAttribute("selected");
+                list.querySelector("[selected]")?.removeAttribute("selected");
                 row.setAttribute("selected", "true");
                 this.serverChanged(row.dataset.id);
             }
@@ -26,7 +26,7 @@ class FhirServerList extends HTMLElement {
         SettingsService.getAll().then(conf => {
             this._conf = conf;
             const currentServer = FhirService.server?.serverCode;
-            const nav = this._shadow.getElementById('content');
+            const list = this._shadow.querySelector('app-list');
             for (const key of Object.keys(conf).sort((k1, k2) => k1.localeCompare(k2))) {
                 const row = document.createElement('list-row');
                 row.setAttribute("data-id", key);
@@ -35,7 +35,7 @@ class FhirServerList extends HTMLElement {
                 item.setAttribute("data-primary", key);
                 item.setAttribute("data-secondary", this._conf[key].url);
                 row.appendChild(item);
-                nav.appendChild(row);
+                list.appendChild(row);
             }
         });
     }
