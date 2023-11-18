@@ -30,7 +30,7 @@ class List extends HTMLElement {
 
     clear() {
         this._list.scrollTop = 0;
-        while (this._slot.firstChild) this._slot.removeChild(this._slot.lastChild);
+        this._slot.assignedNodes().forEach(e => this.removeChild(e));
         this._filter.clear();
     }
 

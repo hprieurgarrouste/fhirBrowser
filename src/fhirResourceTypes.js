@@ -1,10 +1,9 @@
 import template from "./templates/fhirResourceTypes.html";
 
+import "./components/List.js"
 import "./components/ListRow.js"
 import "./components/ListItem.js"
-import "./components/ListFilter.js";
 import { FhirService } from "./services/Fhir.js";
-import { AsyncService } from "./services/Async.js";
 
 class FhirResourceTypes extends HTMLElement {
     constructor() {
@@ -16,15 +15,14 @@ class FhirResourceTypes extends HTMLElement {
     }
 
     connectedCallback() {
-        this._shadow.getElementById('filter').onChange = ((value) => {
+        const list = this._shadow.querySelector('app-list');
+        list.onFilter = ((value) => {
             const filter = value.toLowerCase();
-            const list = this._shadow.getElementById('list');
             list.childNodes.forEach(row => {
                 row.hidden = !row.dataset.type.toLowerCase().includes(filter);
             });
         }).bind(this);
 
-        const list = this._shadow.getElementById('list');
         list.addEventListener("click", ({ target }) => {
             const row = target.closest("list-row");
             if (row) {
@@ -36,39 +34,32 @@ class FhirResourceTypes extends HTMLElement {
         });
     }
 
-    clear() {
-        this._shadow.getElementById('filter').clear();
-        const list = this._shadow.getElementById('list');
-        list.scrollTop = 0;
-        while (list.firstChild) list.removeChild(list.lastChild);
-    }
-
     get value() {
         return this._resourceType;
     }
 
     set value(resourceType) {
+        const list = this._shadow.querySelector('app-list');
         if (resourceType) {
             if (resourceType != this._resourceType) {
-                const list = this._shadow.getElementById('list');
                 const rows = Array.from(list.childNodes).filter(r => r.dataset.type === resourceType);
                 if (rows?.length) {
                     this._resourceType = resourceType;
-                    this._shadow.querySelector("[selected]")?.removeAttribute("selected");
+                    list.querySelector("[selected]")?.removeAttribute("selected");
                     rows[0].setAttribute("selected", "");
                     rows[0].scrollIntoView();
                 }
             }
         } else {
-            this._shadow.querySelector("[selected]")?.removeAttribute("selected");
-            this._shadow.getElementById('list').scrollTop = 0;
+            list.querySelector("[selected]")?.removeAttribute("selected");
+            list.scrollTop = 0;
         }
     }
 
     set metadata(metadata) {
         this._metadata = metadata;
-        this.clear();
-        const list = this._shadow.getElementById('list');
+        const list = this._shadow.querySelector('app-list');
+        list.clear();
         metadata.rest[0].resource
             .filter(res => res.interaction.map(interaction => interaction.code).includes('search-type'))
             .forEach(resource => {
@@ -80,7 +71,6 @@ class FhirResourceTypes extends HTMLElement {
                 row.appendChild(item);
                 list.appendChild(row);
             });
-        this._shadow.querySelector('list-filter').hidden = (list.children.length <= 10);
     }
 
 };
