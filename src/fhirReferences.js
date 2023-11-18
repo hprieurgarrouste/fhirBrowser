@@ -2,8 +2,6 @@ import template from "./templates/fhirReferences.html";
 
 import "./components/ListItem.js";
 import "./components/ListRow.js";
-import "./components/RoundButton.js";
-import "./components/ListFilter.js";
 import { FhirService } from "./services/Fhir.js";
 
 class FhirReferences extends HTMLElement {
@@ -16,7 +14,8 @@ class FhirReferences extends HTMLElement {
     }
 
     connectedCallback() {
-        this._shadow.getElementById('list').addEventListener("click", (event) => {
+        const list = this._shadow.querySelector('app-list');
+        list.addEventListener("click", (event) => {
             event.preventDefault();
             event.stopPropagation();
             const item = event.target.closest("list-row");
@@ -31,26 +30,22 @@ class FhirReferences extends HTMLElement {
             event.stopPropagation();
         }).bind(this);
 
-        this._shadow.querySelector('list-filter').onChange = ((value) => {
+        list.onFilter = ((value) => {
             const filter = value.toLowerCase();
-            const list = this._shadow.getElementById('list');
+            const list = this._shadow.querySelector('app-list');
             list.childNodes.forEach(row => {
                 row.hidden = !(row.dataset.target.toLowerCase().includes(filter) || row.dataset.search.toLowerCase().includes(filter));
             });
         }).bind(this);
     }
 
-    clear() {
-        const list = this._shadow.getElementById('list');
-        while (list.firstChild) list.removeChild(list.lastChild);
-    }
-
     load(resourceType, resourceId) {
         this._resourceType = resourceType;
         this._resourceId = resourceId;
-        this.clear();
-        this._shadow.querySelector('list-filter').clear();
-        const list = this._shadow.getElementById('list');
+
+        const list = this._shadow.querySelector('app-list');
+        list.clear();
+
         const references = FhirService.references(resourceType.type);
         if (references) {
             Object.entries(references).forEach(([key, value]) => {
@@ -67,7 +62,6 @@ class FhirReferences extends HTMLElement {
                 })
             });
         }
-        this._shadow.querySelector('list-filter').hidden = (list.children.length <= 10);
         return list.children.length > 0;
     }
 

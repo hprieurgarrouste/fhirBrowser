@@ -6,19 +6,13 @@
         height: 100%;
     }
 
-    #list {
-        overflow-y: auto;
+    app-list {
         flex: 1 1 auto;
         height: 0;
-    }
-
-    #list>* {
-        cursor: pointer;
     }
 </style>
 <side-panel data-title="References">
     <main slot="main">
-        <list-filter></list-filter>
-        <section id="list"></section>
+        <app-list></app-list>
     </main>
 </side-panel>
