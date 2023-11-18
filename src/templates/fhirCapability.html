@@ -1,11 +1,19 @@
 <style>
     main {
+        display: flex;
+        flex-direction: column;
         height: 100%;
-        overflow-y: auto;
     }
 
-    main>* {
+    app-list {
+        flex: 1 1 auto;
+        height: 0;
+    }
+
+    app-list>* {
         cursor: default;
     }
 </style>
-<main />
+<main>
+    <app-list></app-list>
+</main>

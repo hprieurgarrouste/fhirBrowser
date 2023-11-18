@@ -1,6 +1,8 @@
 import template from "./templates/fhirCapability.html";
 
+import "./components/List.js"
 import "./components/ListItem.js"
+import "./components/ListRow.js"
 import { FhirService } from "./services/Fhir";
 
 class FhirCapability extends HTMLElement {
@@ -16,8 +18,8 @@ class FhirCapability extends HTMLElement {
     }
 
     set metadata(metadata) {
-        this.clear();
-        const wrapper = this._shadow.querySelector("main");
+        const list = this._shadow.querySelector('app-list');
+        list.clear();
 
         make("copyright", metadata.copyright);
         make("description", metadata.description);
@@ -53,7 +55,7 @@ class FhirCapability extends HTMLElement {
             item.setAttribute("data-primary", name);
             item.setAttribute("data-secondary", value);
             row.appendChild(item);
-            wrapper.appendChild(row);
+            list.appendChild(row);
         }
     }
 
