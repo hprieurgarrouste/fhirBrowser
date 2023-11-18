@@ -6,14 +6,9 @@
         height: 100%;
     }
 
-    #list {
-        overflow: auto;
+    app-list {
         flex: 1 1 auto;
         height: 0;
-    }
-
-    #list>* {
-        cursor: pointer;
     }
 
     #actions {
@@ -40,8 +35,7 @@
 </style>
 <main>
     <linear-progress></linear-progress>
-    <list-filter></list-filter>
-    <section id="list"></section>
+    <app-list></app-list>
     <section id="actions">
         <input type="button" id="apply" value="Apply"></input>
     </section>

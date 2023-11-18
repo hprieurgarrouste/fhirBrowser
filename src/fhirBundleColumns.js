@@ -1,11 +1,11 @@
 import template from "./templates/fhirBundleColumns.html";
 
 import "./components/LinearProgress.js";
+import "./components/List.js";
 import "./components/ListItem.js";
 import "./components/ListRowCheck.js";
 
 import { FhirService } from "./services/Fhir.js";
-import { PreferencesService } from "./services/Preferences.js";
 
 class FhirBundleColumns extends HTMLElement {
     constructor() {
@@ -16,26 +16,21 @@ class FhirBundleColumns extends HTMLElement {
         this._release = null;
     }
 
-    clear() {
-        const list = this._shadow.getElementById("list");
-        list.scrollTop = 0;
-        while (list.firstChild) list.removeChild(list.lastChild);
-    }
-
     connectedCallback() {
-        const list = this._shadow.getElementById('list');
+        const list = this._shadow.querySelector('app-list');
         list.addEventListener("click", ({ target }) => {
             const row = target.closest("list-row-check");
-            if (row?.getAttribute("selected") !== null) {
-                row.removeAttribute("selected");
-            } else {
-                row.setAttribute("selected", "");
+            if (row) {
+                if (row.getAttribute("selected") !== null) {
+                    row.removeAttribute("selected");
+                } else {
+                    row.setAttribute("selected", "");
+                }
             }
         });
 
-        this._shadow.querySelector('list-filter').onChange = ((value) => {
+        list.onFilter = ((value) => {
             const filter = value.toLowerCase();
-            const list = this._shadow.getElementById('list');
             list.childNodes.forEach(row => {
                 row.hidden = !(row.dataset.id.toLowerCase().includes(filter));
             });
@@ -45,7 +40,7 @@ class FhirBundleColumns extends HTMLElement {
             event.preventDefault();
             event.stopPropagation();
             const columns = [];
-            this._shadow.querySelectorAll('list-row-check[selected]')?.forEach(r => columns.push(r.dataset.id));
+            list.querySelectorAll('list-row-check[selected]')?.forEach(r => columns.push(r.dataset.id));
             this.dispatchEvent(new CustomEvent("settingschanged", {
                 bubbles: true,
                 cancelable: false,
@@ -62,12 +57,11 @@ class FhirBundleColumns extends HTMLElement {
         this._resourceType = resourceType;
         this._release = FhirService.release;
 
-        this._shadow.querySelector('list-filter').clear();
-        this.clear();
+        const list = this._shadow.querySelector('app-list');
+        list.clear();
 
         this._shadow.querySelector('linear-progress').hidden = false;
         sdParse(resourceType, '').then((elements) => {
-            const list = this._shadow.getElementById('list');
             elements.sort((e1, e2) => e1.path.localeCompare(e2.path));
             elements.forEach(element => {
                 const item = document.createElement('list-item');
@@ -80,7 +74,6 @@ class FhirBundleColumns extends HTMLElement {
                 row.appendChild(item);
                 list.appendChild(row);
             });
-            this._shadow.querySelector('list-filter').hidden = (list.children.length <= 10);
             this._shadow.querySelector('linear-progress').hidden = true;
         });
 
