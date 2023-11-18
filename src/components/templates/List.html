@@ -1,0 +1,24 @@
+<link href="/assets/material.css" rel="stylesheet" />
+<style>
+    main {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    #list {
+        overflow: auto;
+        flex: 1 1 auto;
+        height: 0;
+    }
+
+    #list>* {
+        cursor: pointer;
+    }
+</style>
+<main>
+    <list-filter></list-filter>
+    <section id="list">
+        <slot></slot>
+    </section>
+</main>
