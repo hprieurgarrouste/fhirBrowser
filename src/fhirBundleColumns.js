@@ -13,6 +13,7 @@ class FhirBundleColumns extends HTMLElement {
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
         this._resourceType = null;
+        this._release = null;
     }
 
     clear() {
@@ -57,8 +58,9 @@ class FhirBundleColumns extends HTMLElement {
     }
 
     load(resourceType, selected) {
-        if (resourceType === this._resourceType) return;
+        if (resourceType === this._resourceType && FhirService.release === this._release) return;
         this._resourceType = resourceType;
+        this._release = FhirService.release;
 
         this._shadow.querySelector('list-filter').clear();
         this.clear();
