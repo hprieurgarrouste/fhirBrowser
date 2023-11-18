@@ -82,7 +82,7 @@ class FhirBundle extends HTMLElement {
 
         this._shadow.getElementById('settingsDialogToggle').addEventListener("click", () => {
             const columnsSelector = this._shadow.getElementById('columnsSelector');
-            columnsSelector.load(this._resourceType.type);
+            columnsSelector.load(this._resourceType.type, this._columns);
             this._shadow.getElementById('settingsDialog').hidden = false;
         });
 

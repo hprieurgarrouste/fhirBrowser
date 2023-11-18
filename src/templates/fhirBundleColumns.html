@@ -6,13 +6,13 @@
         height: 100%;
     }
 
-    #content {
+    #list {
         overflow: auto;
         flex: 1 1 auto;
         height: 0;
     }
 
-    #content>* {
+    #list>* {
         cursor: pointer;
     }
 
@@ -40,7 +40,8 @@
 </style>
 <main>
     <linear-progress></linear-progress>
-    <section id="content"></section>
+    <list-filter></list-filter>
+    <section id="list"></section>
     <section id="actions">
         <input type="button" id="apply" value="Apply"></input>
     </section>

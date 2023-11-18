@@ -16,14 +16,14 @@ class FhirBundleColumns extends HTMLElement {
     }
 
     clear() {
-        const content = this._shadow.getElementById("content");
-        content.scrollTop = 0;
-        while (content.firstChild) content.removeChild(content.lastChild);
+        const list = this._shadow.getElementById("list");
+        list.scrollTop = 0;
+        while (list.firstChild) list.removeChild(list.lastChild);
     }
 
     connectedCallback() {
-        const nav = this._shadow.getElementById('content');
-        nav.addEventListener("click", ({ target }) => {
+        const list = this._shadow.getElementById('list');
+        list.addEventListener("click", ({ target }) => {
             const row = target.closest("list-row-check");
             if (row?.getAttribute("selected") !== null) {
                 row.removeAttribute("selected");
@@ -32,11 +32,19 @@ class FhirBundleColumns extends HTMLElement {
             }
         });
 
+        this._shadow.querySelector('list-filter').onChange = ((value) => {
+            const filter = value.toLowerCase();
+            const list = this._shadow.getElementById('list');
+            list.childNodes.forEach(row => {
+                row.hidden = !(row.dataset.id.toLowerCase().includes(filter));
+            });
+        }).bind(this);
+
         this._shadow.getElementById("apply").addEventListener("click", (event) => {
-            const columns = [];
-            this._shadow.querySelectorAll('list-row-check[selected]')?.forEach(r => columns.push(r.dataset.id));
             event.preventDefault();
             event.stopPropagation();
+            const columns = [];
+            this._shadow.querySelectorAll('list-row-check[selected]')?.forEach(r => columns.push(r.dataset.id));
             this.dispatchEvent(new CustomEvent("settingschanged", {
                 bubbles: true,
                 cancelable: false,
@@ -48,58 +56,16 @@ class FhirBundleColumns extends HTMLElement {
 
     }
 
-    load(resourceType) {
+    load(resourceType, selected) {
         if (resourceType === this._resourceType) return;
+        this._resourceType = resourceType;
 
-        const pref = PreferencesService.get("columns", {});
-        const selected = pref[resourceType] || ["id", "meta.lastUpdated"];
+        this._shadow.querySelector('list-filter').clear();
         this.clear();
-        const elements = [];
-        const types = {};
-
-        function sdLoad(resourceType) {
-            return new Promise((resolve) => {
-                let elms = [];
-                if (types[resourceType]) {
-                    resolve(elms);
-                } else {
-                    FhirService.structureDefinition(resourceType).then(structureDefinition => {
-                        types[resourceType] = structureDefinition;
-                        structureDefinition.snapshot.element
-                            .filter(e => e.isSummary)
-                            .forEach((element) => {
-                                elms.push(element);
-                            });
-                        resolve(elms);
-                    });
-                }
-            })
-        }
-        async function sdParse(resourceType, prefix = '') {
-            const elms = await sdLoad(resourceType);
-            for (const elm of elms) {
-                if (elm.type) {
-                    const type = elm.type[0].code;
-                    const isClass = type.match(/^([A-Z][a-z]+)+$/);
-                    if (isClass) {
-                        const newPrefix = elm.path.substr(elm.path.indexOf(".") + 1);
-                        await sdParse(type, newPrefix);
-                    } else {
-                        const path = (prefix ? `${prefix}.` : '') + elm.path.substr(elm.path.indexOf(".") + 1);
-                        elements.push({
-                            'id': path,
-                            'path': path,
-                            'short': elm.short
-                        });
-                    }
-                }
-            }
-        }
 
         this._shadow.querySelector('linear-progress').hidden = false;
-        sdParse(resourceType).then(() => {
-            const nav = this._shadow.getElementById('content');
-            this._shadow.querySelector('linear-progress').hidden = true;
+        sdParse(resourceType, '').then((elements) => {
+            const list = this._shadow.getElementById('list');
             elements.sort((e1, e2) => e1.path.localeCompare(e2.path));
             elements.forEach(element => {
                 const item = document.createElement('list-item');
@@ -110,9 +76,49 @@ class FhirBundleColumns extends HTMLElement {
                 if (selected.includes(element.id))
                     row.setAttribute("selected", "");
                 row.appendChild(item);
-                nav.appendChild(row);
+                list.appendChild(row);
             });
+            this._shadow.querySelector('list-filter').hidden = (list.children.length <= 10);
+            this._shadow.querySelector('linear-progress').hidden = true;
         });
+
+        function sdParse(resourceType, path) {
+            return new Promise((resolve) => {
+                const elements = [];
+                FhirService.structureDefinition(resourceType).then((structureDefinition) => {
+                    const subPromises = [];
+                    structureDefinition.snapshot.element
+                        .filter(e => e.isSummary && e.type)
+                        .forEach((element) => {
+                            const elementName = element.path.substr(element.path.indexOf(".") + 1);
+                            //avoid infinite loops
+                            if (!path.includes(`${elementName}.`)) {
+                                const newPath = (path ? `${path}.` : '') + elementName;
+                                const type = element.type[0].code;
+                                const isClass = type.match(/^([A-Z][a-z]+)+$/);
+                                if (isClass) {
+                                    subPromises.push(sdParse(type, newPath));
+                                } else {
+                                    elements.push({
+                                        'id': newPath,
+                                        'path': newPath,
+                                        'short': element.short,
+                                        'type': type
+                                    });
+                                }
+                            }
+                        });
+                    if (subPromises.length > 0) {
+                        Promise.all(subPromises).then((values) => {
+                            values.forEach(value => elements.push(...value));
+                            resolve(elements);
+                        });
+                    } else {
+                        resolve(elements);
+                    }
+                });
+            });
+        }
 
     }
 };
