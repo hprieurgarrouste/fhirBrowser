@@ -3,6 +3,10 @@ export class SettingsService {
         this.KEY = 'conf';
     }
 
+    static setAll(conf) {
+        localStorage.setItem(this.KEY, JSON.stringify(conf));
+    }
+
     static async getAll() {
         let conf = localStorage.getItem(this.KEY);
         if (conf === null) {
