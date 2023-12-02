@@ -14,6 +14,16 @@ class ListRowCheck extends HTMLElement {
             this._shadow.querySelector("input[type=checkbox]").checked = (newValue !== null);
         }
     }
+
+    connectedCallback() {
+        this.onclick = (event) => {
+            if (this.getAttribute("selected") !== null) {
+                this.removeAttribute("selected");
+            } else {
+                this.setAttribute("selected", "");
+            }
+        }
+    }
 };
 
 customElements.define('list-row-check', ListRowCheck);
