@@ -1,12 +1,13 @@
 <link href="/assets/material.css" rel="stylesheet" />
 <style>
-    main {
+    main {}
+
+    #field {
         background-color: var(--hover-color, lightgray);
         border-bottom: 1px solid rgba(0, 0, 0, 42%);
         display: flex;
         font-size: 1em;
         position: relative;
-        margin-bottom: 1em;
     }
 
     main:focus-within {
@@ -22,6 +23,10 @@
         flex: auto;
         font: inherit;
         padding: 15px;
+    }
+
+    input[readonly] {
+        cursor: default;
     }
 
     input:focus {
@@ -66,8 +71,26 @@
     input:focus+label {
         color: var(--primary-color, black);
     }
+
+    input:invalid+label,
+    input:invalid:focus {
+        color: var(--background-error);
+        border-color: var(--background-error);
+    }
+
+    input:required+label::after {
+        content: '*';
+    }
+
+    #helper {
+        font-size: smaller;
+        margin: 0 0 1em 1em;
+    }
 </style>
 <main>
-    <input type="text" placeholder="" spellcheck="false"></input>
-    <label></label>
+    <section id="field">
+        <input type="text" placeholder="" spellcheck="false"></input>
+        <label></label>
+    </section>
+    <section id="helper"></section>
 </main>

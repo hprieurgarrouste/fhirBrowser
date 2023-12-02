@@ -7,12 +7,16 @@ class TextField extends HTMLElement {
         this._shadow.innerHTML = template;
         this._label = '';
     }
-    static get observedAttributes() { return ["placeholder", "readonly", "required", "value"]; }
+
+    static get observedAttributes() { return ["placeholder", "readonly", "required", "value", "helper"]; }
+
     attributeChangedCallback(name, oldValue, newValue) {
         const text = this._shadow.querySelector('input[type="text"]');
         switch (name) {
             case "placeholder":
                 this._label = newValue;
+                text.setAttribute('placeholder', newValue);
+                this._shadow.querySelector("label").innerText = newValue;
                 break;
             case "readonly":
                 if (newValue == null) {
@@ -31,11 +35,30 @@ class TextField extends HTMLElement {
             case "value":
                 text.setAttribute('value', newValue);
                 break;
+            case "helper":
+                this._shadow.getElementById('helper', newValue);
+                break;
         }
-        const isRequired = text.hasAttribute('required');
-        const label = this._label + (isRequired ? " *" : "");
-        text.setAttribute('placeholder', label);
-        this._shadow.querySelector("label").innerText = label;
+        //css input:required::placeholder::after dont work :(
+        if (text.hasAttribute('required')) {
+            text.setAttribute('placeholder', `${this._label}*`);
+        }
+    }
+
+    checkValidity = function () {
+        return this._shadow.querySelector('input[type="text"]').checkValidity();
+    }
+    focus = function () {
+        this._shadow.querySelector('input[type="text"]').focus();
+    }
+
+    get value() {
+        const text = this._shadow.querySelector('input[type="text"]');
+        return text.value;
+    }
+    set value(newValue) {
+        const text = this._shadow.querySelector('input[type="text"]');
+        text.value = newValue;
     }
 };
 window.customElements.define('text-field', TextField);
