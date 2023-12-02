@@ -51,15 +51,6 @@ class FhirResourceJson extends HTMLElement {
         content.appendChild(document.createTextNode("}"));
         content.style.cursor = "default";
 
-        function isUrl(value) {
-            let url;
-            try {
-                url = new URL(value);
-            } catch (_) {
-                return false;
-            }
-            return url.protocol === "http:" || url.protocol === "https:";
-        }
         function parse(obj) {
             let dl = document.createElement('dl');
             for (const [key, value] of Object.entries(obj).sort((o1, o2) => { return o1[0].localeCompare(o2[0]) })) {
@@ -83,12 +74,6 @@ class FhirResourceJson extends HTMLElement {
                         }
                         let a = document.createElement('a');
                         a.setAttribute("href", `#${url}`);
-                        a.appendChild(document.createTextNode(value));
-                        valueElm.appendChild(a);
-                    } else if (isUrl(value)) {
-                        let a = document.createElement('a');
-                        a.setAttribute("href", value);
-                        a.setAttribute("target", "_blank");
                         a.appendChild(document.createTextNode(value));
                         valueElm.appendChild(a);
                     } else {

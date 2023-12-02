@@ -189,26 +189,25 @@ export class FhirService {
     }
 
     static async connect(code, server) {
-        if (server.auth) {
-            switch (server.auth.method) {
-                case "oauth2":
-                    this.oauth2_getToken(server.auth.setup).then(response => {
-                        if (!server.headers) server.headers = {};
-                        server.headers.Authorization = `${response.token_type} ${response.access_token}`;
-                    });
-                    break;
-                case "basic":
-                    let auth = btoa(`${server.auth.setup.username}:${server.auth.setup.password}`);
+        switch (server.auth?.method) {
+            case "oauth2":
+                this.oauth2_getToken(server.auth.setup).then(response => {
                     if (!server.headers) server.headers = {};
-                    server.headers.Authorization = `Basic ${auth}`;
-                    break;
-                case "apikey":
-                    if (!server.headers) server.headers = {};
-                    server.headers[server.auth.setup.key] = server.auth.setup.value;
-                    break;
-                default:
-                    break;
-            }
+                    server.headers.Authorization = `${response.token_type} ${response.access_token}`;
+                });
+                break;
+            case "basic":
+                let auth = btoa(`${server.auth.setup.username}:${server.auth.setup.password}`);
+                if (!server.headers) server.headers = {};
+                server.headers.Authorization = `Basic ${auth}`;
+                break;
+            case "apikey":
+                if (!server.headers) server.headers = {};
+                server.headers[server.auth.setup.key] = server.auth.setup.value;
+                break;
+            case "noauth":
+            default:
+                break;
         }
         await FhirService.capabilities(server).then(metadata => {
             server.serverCode = code;

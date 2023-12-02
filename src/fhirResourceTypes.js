@@ -1,6 +1,6 @@
 import template from "./templates/fhirResourceTypes.html";
 
-import "./components/List.js"
+import "./components/AppList.js"
 import "./components/ListRow.js"
 import "./components/ListItem.js"
 import { FhirService } from "./services/Fhir.js";
@@ -16,21 +16,24 @@ class FhirResourceTypes extends HTMLElement {
 
     connectedCallback() {
         const list = this._shadow.querySelector('app-list');
-        list.onFilter = ((value) => {
-            const filter = value.toLowerCase();
-            list.childNodes.forEach(row => {
-                row.hidden = !row.dataset.type.toLowerCase().includes(filter);
-            });
-        }).bind(this);
+        list.onFilter = this.appListFilter;
+        list.addEventListener("click", this.appListClick);
+    }
 
-        list.addEventListener("click", ({ target }) => {
-            const row = target.closest("list-row");
-            if (row) {
-                list.querySelector("[selected]")?.removeAttribute("selected");
-                row.setAttribute("selected", "");
-                this._resourceType = row.dataset.type;
-                location.hash = `#${row.dataset.type}`;
-            }
+    appListClick = ({ target }) => {
+        const row = target.closest("list-row");
+        if (row) {
+            this._shadow.querySelector('app-list').querySelector("[selected]")?.removeAttribute("selected");
+            row.setAttribute("selected", "");
+            this._resourceType = row.dataset.type;
+            location.hash = `#${row.dataset.type}`;
+        }
+    }
+
+    appListFilter = (value) => {
+        const filter = value.toLowerCase();
+        this._shadow.querySelector('app-list').childNodes.forEach(row => {
+            row.hidden = !row.dataset.type.toLowerCase().includes(filter);
         });
     }
 

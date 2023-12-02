@@ -1,6 +1,6 @@
 import template from "./templates/fhirCapability.html";
 
-import "./components/List.js"
+import "./components/AppList.js"
 import "./components/ListItem.js"
 import "./components/ListRow.js"
 import { FhirService } from "./services/Fhir";

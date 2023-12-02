@@ -1,7 +1,9 @@
 import template from "./templates/fhirBundleColumns.html";
 
+import "./components/AppButton.js";
+import "./components/AppDialog.js";
+import "./components/AppList.js";
 import "./components/LinearProgress.js";
-import "./components/List.js";
 import "./components/ListItem.js";
 import "./components/ListRowCheck.js";
 
@@ -14,45 +16,64 @@ class FhirBundleColumns extends HTMLElement {
         this._shadow.innerHTML = template;
         this._resourceType = null;
         this._release = null;
+        this._onValidate = () => { };
     }
 
     connectedCallback() {
-        const list = this._shadow.querySelector('app-list');
-        list.addEventListener("click", ({ target }) => {
-            const row = target.closest("list-row-check");
-            if (row) {
-                if (row.getAttribute("selected") !== null) {
-                    row.removeAttribute("selected");
-                } else {
-                    row.setAttribute("selected", "");
-                }
-            }
-        });
+        this._shadow.querySelector('app-dialog').onClose = this.appDialogClose;
+        this._shadow.querySelector('app-list').onFilter = this.appListFilter;
 
-        list.onFilter = ((value) => {
-            const filter = value.toLowerCase();
-            list.childNodes.forEach(row => {
-                row.hidden = !(row.dataset.id.toLowerCase().includes(filter));
-            });
-        }).bind(this);
-
-        this._shadow.getElementById("apply").addEventListener("click", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            const columns = [];
-            list.querySelectorAll('list-row-check[selected]')?.forEach(r => columns.push(r.dataset.id));
-            this.dispatchEvent(new CustomEvent("settingschanged", {
-                bubbles: true,
-                cancelable: false,
-                "detail": {
-                    "columns": columns
-                }
-            }));
-        });
-
+        this._shadow.getElementById("btnCancel").onclick = this.btnCancelClick;
+        this._shadow.getElementById("btnOk").onclick = this.btnOkClick;
     }
 
-    load(resourceType, selected) {
+    btnOkClick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.hidden = true;
+        const columns = Array.from(this._shadow.querySelector('app-list').querySelectorAll('list-row-check[selected]')).map(r => r.dataset.id);
+        this._onValidate(columns);
+    }
+
+    btnCancelClick = () => {
+        this.hidden = true;
+    }
+
+    appListFilter = (value) => {
+        const filter = value.toLowerCase();
+        this._shadow.querySelector('app-list').childNodes.forEach(row => {
+            row.hidden = !(row.dataset.id.toLowerCase().includes(filter));
+        });
+    }
+
+    appDialogClose = (event) => {
+        this.hidden = true;
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    get onValidate() {
+        return this._onValidate;
+    }
+    set onValidate(promise) {
+        this._onValidate = promise;
+    }
+
+    /**
+     * @param {string[]} selected
+     */
+    set value(selected) {
+        const list = this._shadow.querySelector('app-list');
+        Array.from(list.querySelectorAll('list-row-check')).forEach(row => {
+            if (selected.includes(row.dataset.id)) {
+                row.setAttribute("selected", "");
+            } else {
+                row.removeAttribute("selected");
+            }
+        });
+    }
+
+    set resourceType(resourceType) {
         if (resourceType === this._resourceType && FhirService.release === this._release) return;
         this._resourceType = resourceType;
         this._release = FhirService.release;
@@ -69,8 +90,6 @@ class FhirBundleColumns extends HTMLElement {
                 item.setAttribute("data-secondary", element.short);
                 const row = document.createElement('list-row-check');
                 row.setAttribute("data-id", element.id);
-                if (selected.includes(element.id))
-                    row.setAttribute("selected", "");
                 row.appendChild(item);
                 list.appendChild(row);
             });

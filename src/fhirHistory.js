@@ -13,32 +13,38 @@ class FhirHistory extends HTMLElement {
     }
 
     connectedCallback() {
-        this._shadow.getElementById('list').addEventListener("click", (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            const item = event.target.closest("list-row");
-            if (item) {
-                if (item.hasAttribute('selected')) return;
-                this._shadow.querySelector("list-row[selected]")?.removeAttribute("selected");
-                item.setAttribute("selected", "")
-                location.hash = `#${this._resourceType}/${this._resourceId}/_history/${item.dataset.versionid}`;
-            } else {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-        });
+        this._shadow.getElementById('help').addEventListener('click', this.helpClick);
 
-        this._shadow.getElementById('help').addEventListener('click', (event) => {
-            window.open(`https://hl7.org/fhir/${FhirService.release}/http.html#history`, "FhirBrowserHelp");
-            event.preventDefault();
-            event.stopPropagation();
-        });
+        this._shadow.getElementById('list').addEventListener("click", this.listClick);
 
-        this._shadow.querySelector('side-panel').onClose = ((event) => {
-            this.hidden = true;
+        this._shadow.querySelector('side-panel').onClose = this.sidePanelClose;
+    }
+
+    listClick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const item = event.target.closest("list-row");
+        if (item) {
+            if (item.hasAttribute('selected')) return;
+            this._shadow.querySelector("list-row[selected]")?.removeAttribute("selected");
+            item.setAttribute("selected", "")
+            location.hash = `#${this._resourceType}/${this._resourceId}/_history/${item.dataset.versionid}`;
+        } else {
             event.preventDefault();
             event.stopPropagation();
-        }).bind(this);
+        }
+    }
+
+    helpClick = (event) => {
+        window.open(`https://hl7.org/fhir/${FhirService.release}/http.html#history`, "FhirBrowserHelp");
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    sidePanelClose = (event) => {
+        this.hidden = true;
+        event.preventDefault();
+        event.stopPropagation();
     }
 
     clear() {

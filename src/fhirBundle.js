@@ -1,7 +1,6 @@
 import template from "./templates/fhirBundle.html";
 
 import "./components/AppBar.js";
-import "./components/AppDialog.js";
 import "./components/DataTable.js";
 import "./components/DataTablePagination.js";
 import "./components/LinearProgress.js";
@@ -38,16 +37,10 @@ class FhirBundle extends HTMLElement {
     }
 
     connectedCallback() {
-        this._shadow.getElementById('help').addEventListener('click', () => {
-            window.open(FhirService.helpUrl(this._resourceType.type), "FhirBrowserHelp");
-        });
-        this._shadow.querySelector("data-table-pagination").addEventListener('click', (event) => {
-            const { target } = event;
-            if (!target.matches("round-button")) {
-                return;
-            }
-            this.loadPage(target.dataset);
-        });
+        this._shadow.getElementById('help').addEventListener('click', this.helpClick);
+
+        this._shadow.querySelector("data-table-pagination").addEventListener('click', this.paginationClick);
+
         const dataTable = this._shadow.getElementById('table');
         dataTable.addEventListener('rowclick', ({ detail }) => {
             location.hash = `#${this._resourceType.type}/${detail.resourceId}`;
@@ -57,57 +50,68 @@ class FhirBundle extends HTMLElement {
             this._shadow.getElementById('search')?.classList.toggle("hidden");
         });
 
-        this._shadow.getElementById('copy').addEventListener("click", () => {
-            navigator.clipboard.writeText(JSON.stringify(this._page)).then(function () {
-                SnackbarsService.show("Copying to clipboard was successful");
-            }, function (err) {
-                console.error('Async: Could not copy text: ', err);
-            });
-        });
+        this._shadow.getElementById('copy').addEventListener("click", this.copyClick);
 
-        this._shadow.getElementById('download').addEventListener("click", () => {
-            const fileName = `${this._resourceType.type}-${this._skip}`;
-            const file = new File([JSON.stringify(this._page)], fileName, {
-                type: 'data:text/json;charset=utf-8',
-            });
-            const url = URL.createObjectURL(file);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `${fileName}.json`;
-            this._shadow.appendChild(link);
-            link.click();
-            this._shadow.removeChild(link);
-            window.URL.revokeObjectURL(url);
-        });
+        this._shadow.getElementById('download').addEventListener("click", this.downloadClick);
 
+        const columnsSelector = this._shadow.querySelector('fhir-bundle-columns');
         this._shadow.getElementById('settingsDialogToggle').addEventListener("click", () => {
-            const columnsSelector = this._shadow.getElementById('columnsSelector');
-            columnsSelector.load(this._resourceType.type, this._columns);
-            this._shadow.getElementById('settingsDialog').hidden = false;
+            columnsSelector.value = this._columns;
+            columnsSelector.hidden = false;
         });
 
-        this._shadow.getElementById("settingsDialog").addEventListener('settingschanged', ({ detail }) => {
-            this._shadow.getElementById("settingsDialog").hidden = true;
-
-            this._columns = [];
-            detail.columns.forEach(column => {
-                this._columns.push(column);
-            });
-            const dataTable = this._shadow.getElementById('table');
-            dataTable.clear();
-            this._columns.forEach(column => dataTable.addColumn(column));
-            this.loadPage();
-
-            const pref = PreferencesService.get("columns", {});
-            pref[this._resourceType.type] = this._columns;
-            PreferencesService.set("columns", pref);
-        });
-
+        columnsSelector.onValidate = this.columnSelectorValidate;
 
     }
 
+    paginationClick = (event) => {
+        const { target } = event;
+        if (!target.matches("round-button")) {
+            return;
+        }
+        this.loadPage(target.dataset);
+    }
+
+    helpClick = () => {
+        window.open(FhirService.helpUrl(this._resourceType.type), "FhirBrowserHelp");
+    }
+
+    copyClick = () => {
+        navigator.clipboard.writeText(JSON.stringify(this._page)).then(function () {
+            SnackbarsService.show("Copying to clipboard was successful");
+        }, function (err) {
+            console.error('Async: Could not copy text: ', err);
+        });
+    }
+
+    downloadClick = () => {
+        const fileName = `${this._resourceType.type}-${this._skip}`;
+        const file = new File([JSON.stringify(this._page)], fileName, {
+            type: 'data:text/json;charset=utf-8',
+        });
+        const url = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${fileName}.json`;
+        this._shadow.appendChild(link);
+        link.click();
+        this._shadow.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    }
+
+    columnSelectorValidate = (columns) => {
+        this._columns = columns;
+        const dataTable = this._shadow.getElementById('table');
+        dataTable.clear();
+        this._columns.forEach(column => dataTable.addColumn(column));
+        this.loadPage();
+
+        const pref = PreferencesService.get("columns", {});
+        pref[this._resourceType.type] = this._columns;
+        PreferencesService.set("columns", pref);
+    }
+
     load(resourceType, filters = []) {
-        this._shadow.getElementById("settingsDialog").hidden = true;
         if (resourceType === this._resourceType && JSON.stringify(this._filters) === JSON.stringify(filters)) return;
 
         if (window.matchMedia("(max-width: 480px)").matches) {
@@ -119,6 +123,10 @@ class FhirBundle extends HTMLElement {
 
         const pref = PreferencesService.get("columns", {});
         this._columns = pref[resourceType.type] || ["id", "meta.lastUpdated"];
+
+        const columnsSelector = this._shadow.querySelector('fhir-bundle-columns');
+        columnsSelector.hidden = true;
+        columnsSelector.resourceType = resourceType.type;
 
         this._shadow.getElementById('title').innerText = resourceType.type;
 

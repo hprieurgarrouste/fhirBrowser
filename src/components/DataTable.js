@@ -24,26 +24,26 @@ class DataTable extends HTMLElement {
         for (const [, value] of Object.entries(columns)) {
             row.insertAdjacentHTML('beforeend', `<td>${value}</td>`);
         }
-        row.addEventListener("click", onRowClick.bind(this));
+        row.addEventListener("click", this.onRowClick);
         this._body.appendChild(row);
-        function onRowClick(event) {
-            event.stopPropagation();
-            let prev = this._body.querySelector(".selected");
-            if (prev) {
-                prev.classList.remove('selected');
-            }
-            let target = event.target;
-            while (target && target.nodeName !== 'TR') target = target.parentNode;
-            if (target) {
-                target.classList.add('selected');
-                this.dispatchEvent(new CustomEvent("rowclick", {
-                    bubbles: false,
-                    cancelable: false,
-                    'detail': {
-                        resourceId: target.id
-                    }
-                }));
-            }
+    }
+    onRowClick = (event) => {
+        event.stopPropagation();
+        let prev = this._body.querySelector(".selected");
+        if (prev) {
+            prev.classList.remove('selected');
+        }
+        let target = event.target;
+        while (target && target.nodeName !== 'TR') target = target.parentNode;
+        if (target) {
+            target.classList.add('selected');
+            this.dispatchEvent(new CustomEvent("rowclick", {
+                bubbles: false,
+                cancelable: false,
+                'detail': {
+                    resourceId: target.id
+                }
+            }));
         }
     }
     clear() {

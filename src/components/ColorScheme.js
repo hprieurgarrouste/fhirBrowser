@@ -10,23 +10,23 @@ class ColorScheme extends HTMLElement {
     }
 
     connectedCallback() {
-        this._shadow.addEventListener('click', this._onClick.bind(this));
-        this._setColorScheme(PreferencesService.get("colorScheme", "auto"));
+        this._shadow.addEventListener('click', this.onClick);
+        this.setColorScheme(PreferencesService.get("colorScheme", "auto"));
     }
     disconnectedCallback() {
-        this._shadow.removeEventListener('click', this._onClick);
+        this._shadow.removeEventListener('click', this.onClick);
     }
 
-    _onClick(event) {
+    onClick = (event) => {
         const schemes = ["light", "dark", "auto"];
         let colorScheme = PreferencesService.get("colorScheme", "auto");
         let i = schemes.findIndex((elm) => elm === colorScheme) + 1;
         colorScheme = schemes[i % 3];
         PreferencesService.set("colorScheme", colorScheme);
-        this._setColorScheme(colorScheme);
+        this.setColorScheme(colorScheme);
     }
 
-    _setColorScheme(colorScheme) {
+    setColorScheme = (colorScheme) => {
         let colorSchemeIcon = "";
         let scheme = colorScheme;
         switch (colorScheme) {

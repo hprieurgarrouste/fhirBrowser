@@ -15,55 +15,59 @@ class FhirSearch extends HTMLElement {
 
     connectedCallback() {
         window.addEventListener("hashchange", this.locationHandler);
-        const content = this._shadow.querySelector("main");
 
-        this._shadow.querySelector('side-panel').onClose = ((event) => {
-            this.classList.add('hidden');
-            event.preventDefault();
-            event.stopPropagation();
-        }).bind(this);
+        this._shadow.querySelector('side-panel').onClose = this.sidePanelClose;
 
-        this._shadow.getElementById("clear").addEventListener("click", (event) => {
-            this.clear();
-            event.preventDefault();
-            event.stopPropagation();
-        });
+        this._shadow.getElementById("clear").addEventListener("click", this.clearClick);
 
-        this._shadow.getElementById('help').addEventListener('click', (event) => {
-            window.open(FhirService.helpUrl("search"), "FhirBrowserHelp");
-            event.preventDefault();
-            event.stopPropagation();
-        });
+        this._shadow.getElementById('help').addEventListener('click', this.helpClick);
 
-        this._shadow.getElementById("apply").addEventListener("click", (event) => {
-            applyClick.call(this);
-            event.preventDefault();
-            event.stopPropagation();
-        });
+        this._shadow.getElementById("apply").addEventListener("click", this.applyClick);
 
-        content.addEventListener("keydown", (event) => {
-            if ('Enter' === event.code || 'NumpadEnter' === event.code) {
-                applyClick.call(this);
-                event.preventDefault();
-                event.stopPropagation();
-            }
-        });
-
-        function applyClick() {
-            if (window.matchMedia("(max-width: 480px)").matches) {
-                this.classList.add("hidden");
-            }
-            const hash = [];
-            const fields = content.querySelectorAll("fhir-search-item");
-            fields.forEach(({ value }) => {
-                if (value) {
-                    hash.push(`${value.name}=${encodeURIComponent(value.value)}`);
-                }
-            });
-            location.hash = `#${this._resourceType.type}` + ((hash.length) ? `?${hash.join('&')}` : '');
-        }
+        this._shadow.querySelector("main").addEventListener("keydown", this.mainKeyDown);
 
         this.locationHandler();
+    }
+
+    mainKeyDown = (event) => {
+        if ('Enter' === event.code || 'NumpadEnter' === event.code) {
+            this.applyClick(event);
+        }
+    }
+
+    applyClick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (window.matchMedia("(max-width: 480px)").matches) {
+            this.classList.add("hidden");
+        }
+        const hash = [];
+        const fields = this._shadow.querySelector("main").querySelectorAll("fhir-search-item");
+        fields.forEach(({ value }) => {
+            if (value) {
+                hash.push(`${value.name}=${encodeURIComponent(value.value)}`);
+            }
+        });
+        location.hash = `#${this._resourceType.type}` + ((hash.length) ? `?${hash.join('&')}` : '');
+    }
+
+    helpClick = (event) => {
+        window.open(FhirService.helpUrl("search"), "FhirBrowserHelp");
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    clearClick = (event) => {
+        this.clear();
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    sidePanelClose = (event) => {
+        this.classList.add('hidden');
+        event.preventDefault();
+        event.stopPropagation();
     }
 
     locationHandler = async () => {
