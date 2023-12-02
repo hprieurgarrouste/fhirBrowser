@@ -1,28 +1,37 @@
-import "./RoundButton.js";
-import template from "./templates/AppDialog.html";
-
+import template from "./templates/AppDialog.html"
 
 class AppDialog extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
+        this._onClose = function () {
+            this.hidden = true;
+        }
     }
+
     connectedCallback() {
-        this._shadow.getElementById('close').addEventListener("click", () => {
-            this.hidden = true;
-        });
-        this._shadow.querySelector("main").addEventListener("click", () => {
-            this.hidden = true;
+        this._shadow.querySelector("main").addEventListener("click", (event) => {
+            this.onClose(event);
         });
         this._shadow.querySelector('.surface').addEventListener("click", (event) => {
             event.stopPropagation();
         });
     }
-    static get observedAttributes() { return ["data-title"]; }
+
+    get onClose() {
+        return this._onClose;
+    }
+    set onClose(closeFct) {
+        this._onClose = closeFct;
+    }
+
+    static get observedAttributes() { return ["data-title", "centered"]; }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        if ("data-title" === name) {
+        if ("centered" == name) {
+            this._shadow.querySelector(".surface").classList.add("centered");
+        } else if ("data-title" === name) {
             this._shadow.getElementById("title").innerText = newValue;
         }
     }
