@@ -20,21 +20,6 @@
         overflow: hidden;
     }
 
-    footer input[type=button] {
-        background: none;
-        border: 1px solid var(--primary-color);
-        border-radius: 4px;
-        color: var(--primary-color);
-        cursor: pointer;
-        font: inherit;
-        padding: 5px 16px;
-        text-transform: uppercase;
-    }
-
-    footer input[type=button]:hover {
-        background-color: var(--hover-color);
-    }
-
     @media (max-width:480px) {
         .surface {
             left: 0;
@@ -55,7 +40,7 @@
     <section slot="main">
         <main></main>
         <footer>
-            <input type="button" id="apply" value="Apply"></input>
+            <app-button id="apply" value="Apply"></app-button>
         </footer>
     </section>
 </side-panel>

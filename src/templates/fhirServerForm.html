@@ -1,65 +1,77 @@
-<link rel="stylesheet" href="/assets/material.css">
 <style>
-    #wrapper {
+    main {
+        border-top: 1px solid var(--border-color);
         display: flex;
         flex-direction: column;
-        font-family: Roboto, Arial, monospace;
         height: 100%;
+        font-family: Roboto, Arial, monospace;
     }
 
-    main {
-        overflow: auto;
-        padding: 1em;
+    #content {
         flex: 1 1 auto;
         height: 0;
+        padding: 1em;
+        overflow-y: auto;
+        min-width: 40em;
+    }
+
+    #formDialog footer {
+        border-top: 1px solid var(--border-color);
     }
 
     footer {
         padding: 9px 16px;
-        text-align: center;
+        text-align: right;
         overflow: hidden;
     }
 
-    footer input[type=button] {
-        background: none;
-        border: 1px solid var(--primary-color);
-        border-radius: 4px;
-        color: var(--primary-color);
-        cursor: pointer;
-        font: inherit;
-        padding: 5px 16px;
-        text-transform: uppercase;
+    p {
+        margin: 0;
+        padding: 1em;
     }
 
-    footer input[type=button]:hover {
-        background-color: var(--hover-color);
+    @media (max-width:480px) {
+        #content {
+            min-width: unset;
+        }
     }
 </style>
-<div id="wrapper">
+<app-dialog id="formDialog" centered>
+    <round-button slot="appBarRight" id="formDelete" title="Delete" data-icon="delete"></round-button>
     <main>
-        <text-field id="key" placeholder="Code" required></text-field>
-        <text-field id="url" placeholder="Url"></text-field>
-        <server-auth id="authMethod" placeholder="Authorization" value="No Auth">
-        </server-auth>
-        <section id="apiSection" hidden>
-            <text-field id=" apiKey" placeholder="Key"></text-field>
-            <text-field id="apiValue" placeholder="Value"></text-field>
+        <section id="content">
+            <text-field id="key" placeholder="Code" required></text-field>
+            <text-field id="url" placeholder="Url" required></text-field>
+            <server-auth id="authMethod" placeholder="Authorization" value="No Auth" required></server-auth>
+            <section id="apiSection" hidden>
+                <text-field id="apiKey" placeholder="Key" required></text-field>
+                <text-field id="apiValue" placeholder="Value" required></text-field>
+            </section>
+            <section id="basicSection" hidden>
+                <text-field id="basicUsername" placeholder="Username" required></text-field>
+                <text-field id="basicPassword" placeholder="Password" required></text-field>
+            </section>
+            <section id="oauthSection" hidden>
+                <text-field id="oauthTokenurl" placeholder="Access Token URL" required></text-field>
+                <text-field id="oauthClientid" placeholder="Client ID" required></text-field>
+                <text-field id="oauthClientsecret" placeholder="Client Secret" required></text-field>
+                <text-field id="oauthGranttype" placeholder="Grant Type" value="client_credentials" required
+                    readonly></text-field>
+            </section>
         </section>
-        <section id="basicSection" hidden>
-            <text-field id="basicUsername" placeholder="Username"></text-field>
-            <text-field id="basicPassword" placeholder="Password"></text-field>
-        </section>
-        <section id="oauthSection" hidden>
-            <text-field id="oauthTokenurl" placeholder="Access Token URL"></text-field>
-            <text-field id="oauthClientid" placeholder="Client ID"></text-field>
-            <text-field id="oauthClientsecret" placeholder="Client Secret"></text-field>
-            <text-field id="oauthGranttype" placeholder="Grant Type" value="password" readonly></text-field>
-            <text-field id="oauthUsername" placeholder="Username"></text-field>
-            <text-field id="oauthPassword" placeholder="Password"></text-field>
-        </section>
+        <footer>
+            <app-button id="formCancel" value="Cancel"></app-button>
+            <app-button id="formOk" value="Ok"></app-button>
+        </footer>
     </main>
+</app-dialog>
+<app-confirm hidden>
+    <p>Delete this configuration?</p>
+</app-confirm>
+<!--<app-dialog id="deleteConfirm" centered hidden>
+    <p>Delete this configuration?</p>
     <footer>
-        <input type="button" id="cancel" value="Cancel"></input>
-        <input type="button" id="apply" value="Apply"></input>
+        <app-button id="deleteCancel" value="Cancel"></app-button>
+        <app-button id="deleteOk" value="Delete"></app-button>
     </footer>
-</div>
+</app-dialog>-->

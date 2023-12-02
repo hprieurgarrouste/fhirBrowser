@@ -104,16 +104,10 @@
         </div>
     </div>
 </main>
-<app-dialog id="serverDialog" data-title="Connections" hidden>
-    <!--<round-button id="serverNewToggle" slot="tools" title="setup" data-icon="edit"></round-button>-->
-    <fhir-server-list id="serverSelector"></fhir-server-list>
-</app-dialog>
 <app-dialog id="aboutDialog" data-title="About FHIR Browser" hidden>
     <fhir-browser-about></fhir-browser-about>
 </app-dialog>
-<app-dialog id="serverNewDialog" data-title="New Connection" hidden>
-    <fhir-server-form></fhir-server-form>
-</app-dialog>
+<fhir-server-dialog hidden></fhir-server-dialog>
 <div id="waiting">
     <circular-progress></circular-progress>
 </div>

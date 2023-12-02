@@ -9,8 +9,7 @@ import "./fhirBrowserAbout.js";
 import "./fhirBundle.js";
 import "./fhirMetadata.js";
 import "./fhirResource.js";
-import "./fhirServerList.js";
-import "./fhirServerForm.js";
+import "./fhirServerDialog.js";
 import { FhirService } from "./services/Fhir.js";
 import { PreferencesService } from "./services/Preferences.js";
 import { SettingsService } from "./services/Settings.js";
@@ -92,11 +91,16 @@ class FhirBrowser extends HTMLElement {
         window.addEventListener("hashchange", this.locationHandler);
         SnackbarsService.container = this._shadow;
 
+
         this._shadow.getElementById("navigation").addEventListener('click', () => {
             this._shadow.getElementById("leftPanel").classList.toggle("hidden");
         });
 
-        this._shadow.getElementById("serverSelector").addEventListener('serverchanged', ({ detail }) => {
+        this._shadow.getElementById('serverDialogToggle').addEventListener("click", () => {
+            const dlg = this._shadow.querySelector('fhir-server-dialog');
+            dlg.hidden = !dlg.hidden;
+        });
+        this._shadow.querySelector("fhir-server-dialog").addEventListener('serverchanged', ({ detail }) => {
             location.hash = ``;
             this.connect(detail.serverCode, detail.server);
         });
@@ -105,26 +109,13 @@ class FhirBrowser extends HTMLElement {
             this._shadow.getElementById('aboutDialog').hidden = false;
         });
 
-        this._shadow.getElementById('serverDialogToggle').addEventListener("click", () => {
-            this._shadow.getElementById('serverDialog').hidden = false;
-        });
-
-        this._shadow.getElementById('serverSelector').addEventListener("serverNew", () => {
-            this._shadow.getElementById('serverDialog').hidden = true;
-            this._shadow.getElementById('serverNewDialog').hidden = false;
-        });
-
-        /*this._shadow.getElementById('serverNewToggle').addEventListener("click", () => {
-            this._shadow.getElementById('serverNewDialog').hidden = false;
-        });*/
-
         const preferedServer = PreferencesService.get("server");
         if (preferedServer) {
             SettingsService.get(preferedServer).then((server) => {
                 this.connect(preferedServer, server);
             });
         } else {
-            this._shadow.getElementById('serverDialog').hidden = false;
+            this._shadow.querySelector('fhir-server-dialog').hidden = false;
         }
     }
 
@@ -134,12 +125,11 @@ class FhirBrowser extends HTMLElement {
         FhirService.connect(serverCode, server).then(() => {
             SnackbarsService.show(`Connected to "${serverCode}" server.`);
             PreferencesService.set("server", serverCode);
-            this._shadow.getElementById("serverDialog").hidden = true;
             this._shadow.getElementById("bdy").style.visibility = "hidden";
             this._shadow.getElementById("metadata").server = FhirService.server;
             this._shadow.getElementById("leftPanel").classList.remove("hidden");
             this._shadow.getElementById("navigation").hidden = false;
-            this._shadow.getElementById('serverSelector').select(serverCode);
+            this._shadow.querySelector('fhir-server-dialog').value = serverCode;
             this.locationHandler();
         }).catch(error => {
             SnackbarsService.show(`An error occurred while connecting to the server "${serverCode}"`,
