@@ -1,8 +1,8 @@
-import template from "./templates/List.html";
+import template from "./templates/AppList.html";
 
 import "./ListFilter.js";
 
-class List extends HTMLElement {
+class AppList extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
@@ -29,9 +29,9 @@ class List extends HTMLElement {
     }
 
     clear() {
-        this._list.scrollTop = 0;
         this._slot.assignedNodes().forEach(e => this.removeChild(e));
         this._filter.clear();
+        this._list.scrollTop = 0;
     }
 
     get onFilter() {
@@ -44,5 +44,5 @@ class List extends HTMLElement {
 
 };
 
-customElements.define('app-list', List)
+customElements.define('app-list', AppList)
 
