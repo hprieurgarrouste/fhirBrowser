@@ -109,6 +109,10 @@ class FhirBrowser extends HTMLElement {
             this._shadow.getElementById('aboutDialog').hidden = false;
         });
 
+        this._shadow.getElementById("aboutClose").onclick = () => {
+            this._shadow.getElementById('aboutDialog').hidden = true;
+        };
+
         const preferedServer = PreferencesService.get("server");
         if (preferedServer) {
             SettingsService.get(preferedServer).then((server) => {

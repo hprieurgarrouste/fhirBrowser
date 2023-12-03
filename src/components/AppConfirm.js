@@ -33,11 +33,13 @@ class AppConfirm extends HTMLElement {
         this._onValidate = validateFct;
     }
 
-    static get observedAttributes() { return ["data-title"]; }
+    static get observedAttributes() { return ["data-title", "data-ok-text"]; }
 
     attributeChangedCallback(name, oldValue, newValue) {
         if ("data-title" === name) {
             this._shadow.querySelector("h2").innerText = newValue;
+        } else if ("data-ok-text" === name) {
+            this._shadow.getElementById('btnOk').setAttribute("value", newValue);
         }
     }
 };
