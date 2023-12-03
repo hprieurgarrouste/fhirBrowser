@@ -24,98 +24,114 @@ class FhirResource extends HTMLElement {
         this._resourceId = null;
         this._resource = {};
     }
+
     connectedCallback() {
-        this._shadow.getElementById("help").addEventListener('click', () => {
-            window.open(`${FhirService.helpUrl(this._resourceType.type)}#resource`, "FhirBrowserHelp");
-        });
+        this._shadow.getElementById("help").onclick = this.helpClick;
 
-        this._shadow.getElementById('download').addEventListener("click", () => {
-            let content = this.getCurrentContent(), type, ext;
-            switch (content.type) {
-                case "ttl":
-                    type = 'data:text/plain;charset=utf-8';
-                    ext = 'txt';
-                    break;
-                case "xml":
-                    type = 'data:text/xml;charset=utf-8';
-                    ext = 'xml';
-                    break;
-                case "json":
-                default:
-                    type = 'data:text/json;charset=utf-8';
-                    ext = 'json';
-                    break;
-            }
-            const file = new File([content.value], this._resourceId, {
-                'type': type
-            });
-            const url = URL.createObjectURL(file);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `${this._resourceType.type}#${file.name}.${ext}`;
-            this._shadow.appendChild(link);
-            link.click();
-            this._shadow.removeChild(link);
-            window.URL.revokeObjectURL(url);
-        });
+        this._shadow.getElementById('download').onclick = this.downloadClick;
 
-        this._shadow.getElementById('copy').addEventListener("click", () => {
-            let content = this.getCurrentContent().value;
-            navigator.clipboard.writeText(content).then(function () {
-                SnackbarsService.show("Copying to clipboard was successful");
-            }, function (err) {
-                SnackbarsService.error("Could not copy text");
-            });
-        });
+        this._shadow.getElementById('copy').onclick = this.copyClick;
 
-        this._shadow.getElementById('share').addEventListener("click", () => {
-            let content = this.getCurrentContent().value;
-            const fileName = `${this._resourceType.type}.${this._resourceId}.txt`;
-            const file = new File([content], fileName, { type: 'text/plain' });
-            navigator.share({
-                "title": fileName,
-                "files": [file]
-            });
-        });
+        this._shadow.getElementById('share').onclick = this.shareClick;
 
-        this._shadow.getElementById('referencesToggle').addEventListener("click", () => {
-            const panel = this._shadow.querySelector('fhir-references');
-            if (panel.hidden) this._shadow.querySelector('fhir-history').hidden = true;
-            panel.hidden = !panel.hidden;
-        });
-        this._shadow.getElementById('historyToggle').addEventListener("click", () => {
-            const panel = this._shadow.querySelector('fhir-history');
-            if (panel.hidden) this._shadow.querySelector('fhir-references').hidden = true;
-            panel.hidden = !panel.hidden;
-        });
+        this._shadow.getElementById('referencesToggle').onclick = this.referenceToggleClick;
 
-        this._shadow.querySelector("tab-bar").addEventListener('click', ({ detail }) => {
-            const tabId = detail.tab.id;
-            const xmlView = this._shadow.getElementById('xmlView');
-            const ttlView = this._shadow.getElementById('ttlView');
-            this._shadow.getElementById("jsonView").hidden = (tabId !== 'tabJson');
-            xmlView.hidden = (tabId !== 'tabXml');
-            ttlView.hidden = (tabId !== 'tabTtl');
-            if (tabId == 'tabXml' && !this._resource.xml) {
-                FhirService.readXml(this._resourceType.type, this._resourceId).then(resource => {
-                    const parser = new DOMParser();
-                    const xml = parser.parseFromString(resource, "application/xml");
-                    this._resource.xml = resource;
-                    xmlView.source = xml;
-                }).catch((e) => {
-                    this._resource.xml = null;
-                });
-            } else if (tabId == 'tabTtl' && !this._resource.ttl) {
-                FhirService.readTtl(this._resourceType.type, this._resourceId).then(resource => {
-                    this._resource.ttl = resource;
-                    ttlView.source = resource;
-                }).catch((e) => {
-                    this._resource.xml = null;
-                });
-            }
+        this._shadow.getElementById('historyToggle').onclick = this.historyToggleClick;
 
-        });
+        this._shadow.querySelector("tab-bar").addEventListener('click', this.tabBarClick);
     }
+
+    helpClick = () => {
+        window.open(`${FhirService.helpUrl(this._resourceType.type)}#resource`, "FhirBrowserHelp");
+    };
+
+    downloadClick = () => {
+        let content = this.getCurrentContent(), type, ext;
+        switch (content.type) {
+            case "ttl":
+                type = 'data:text/plain;charset=utf-8';
+                ext = 'txt';
+                break;
+            case "xml":
+                type = 'data:text/xml;charset=utf-8';
+                ext = 'xml';
+                break;
+            case "json":
+            default:
+                type = 'data:text/json;charset=utf-8';
+                ext = 'json';
+                break;
+        }
+        const file = new File([content.value], this._resourceId, {
+            'type': type
+        });
+        const url = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${this._resourceType.type}#${file.name}.${ext}`;
+        this._shadow.appendChild(link);
+        link.click();
+        this._shadow.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    };
+
+    copyClick = () => {
+        let content = this.getCurrentContent().value;
+        navigator.clipboard.writeText(content).then(function () {
+            SnackbarsService.show("Copying to clipboard was successful");
+        }, function (err) {
+            SnackbarsService.error("Could not copy text");
+        });
+    };
+
+    shareClick = () => {
+        let content = this.getCurrentContent().value;
+        const fileName = `${this._resourceType.type}.${this._resourceId}.txt`;
+        const file = new File([content], fileName, { type: 'text/plain' });
+        navigator.share({
+            "title": fileName,
+            "files": [file]
+        });
+    };
+
+    referenceToggleClick = () => {
+        const panel = this._shadow.querySelector('fhir-references');
+        if (panel.hidden) this._shadow.querySelector('fhir-history').hidden = true;
+        panel.hidden = !panel.hidden;
+    };
+
+    historyToggleClick = () => {
+        const panel = this._shadow.querySelector('fhir-history');
+        if (panel.hidden) this._shadow.querySelector('fhir-references').hidden = true;
+        panel.hidden = !panel.hidden;
+    };
+
+    tabBarClick = ({ detail }) => {
+        const tabId = detail.tab.id;
+        const xmlView = this._shadow.getElementById('xmlView');
+        const ttlView = this._shadow.getElementById('ttlView');
+        this._shadow.getElementById("jsonView").hidden = (tabId !== 'tabJson');
+        xmlView.hidden = (tabId !== 'tabXml');
+        ttlView.hidden = (tabId !== 'tabTtl');
+        if (tabId == 'tabXml' && !this._resource.xml) {
+            FhirService.readXml(this._resourceType.type, this._resourceId).then(resource => {
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(resource, "application/xml");
+                this._resource.xml = resource;
+                xmlView.source = xml;
+            }).catch((e) => {
+                this._resource.xml = null;
+            });
+        } else if (tabId == 'tabTtl' && !this._resource.ttl) {
+            FhirService.readTtl(this._resourceType.type, this._resourceId).then(resource => {
+                this._resource.ttl = resource;
+                ttlView.source = resource;
+            }).catch((e) => {
+                this._resource.xml = null;
+            });
+        }
+
+    };
 
     getCurrentContent() {
         let content = {};
