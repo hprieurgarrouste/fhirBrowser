@@ -13,9 +13,9 @@ class FhirHistory extends HTMLElement {
     }
 
     connectedCallback() {
-        this._shadow.getElementById('help').addEventListener('click', this.helpClick);
+        this._shadow.getElementById('help').onclick = this.helpClick;
 
-        this._shadow.getElementById('list').addEventListener("click", this.listClick);
+        this._shadow.getElementById('list').onclick = this.listClick;
 
         this._shadow.querySelector('side-panel').onClose = this.sidePanelClose;
     }

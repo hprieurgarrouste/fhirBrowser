@@ -17,11 +17,14 @@ class FhirBundleColumns extends HTMLElement {
         this._resourceType = null;
         this._release = null;
         this._onValidate = () => { };
+        this._list = null;
     }
 
     connectedCallback() {
         this._shadow.querySelector('app-dialog').onClose = this.appDialogClose;
-        this._shadow.querySelector('app-list').onFilter = this.appListFilter;
+
+        this._list = this._shadow.querySelector('app-list');
+        this._list.onFilter = this.appListFilter;
 
         this._shadow.getElementById("btnCancel").onclick = this.btnCancelClick;
         this._shadow.getElementById("btnOk").onclick = this.btnOkClick;
@@ -31,7 +34,7 @@ class FhirBundleColumns extends HTMLElement {
         event.preventDefault();
         event.stopPropagation();
         this.hidden = true;
-        const columns = Array.from(this._shadow.querySelector('app-list').querySelectorAll('list-row-check[selected]')).map(r => r.dataset.id);
+        const columns = Array.from(this._list.querySelectorAll('list-row-check[selected]')).map(r => r.dataset.id);
         this._onValidate(columns);
     }
 
@@ -41,7 +44,7 @@ class FhirBundleColumns extends HTMLElement {
 
     appListFilter = (value) => {
         const filter = value.toLowerCase();
-        this._shadow.querySelector('app-list').childNodes.forEach(row => {
+        this._list.childNodes.forEach(row => {
             row.hidden = !(row.dataset.id.toLowerCase().includes(filter));
         });
     }
@@ -59,13 +62,9 @@ class FhirBundleColumns extends HTMLElement {
         this._onValidate = promise;
     }
 
-    /**
-     * @param {string[]} selected
-     */
-    set value(selected) {
-        const list = this._shadow.querySelector('app-list');
-        Array.from(list.querySelectorAll('list-row-check')).forEach(row => {
-            if (selected.includes(row.dataset.id)) {
+    checkValues = (values) => {
+        Array.from(this._list.querySelectorAll('list-row-check')).forEach(row => {
+            if (values.includes(row.dataset.id)) {
                 row.setAttribute("selected", "");
             } else {
                 row.removeAttribute("selected");
@@ -73,13 +72,19 @@ class FhirBundleColumns extends HTMLElement {
         });
     }
 
-    set resourceType(resourceType) {
-        if (resourceType === this._resourceType && FhirService.release === this._release) return;
+    /**
+    * @param {string} resourceType
+    * @param {string[]} values
+    */
+    load = (resourceType, values) => {
+        if (resourceType === this._resourceType && FhirService.release === this._release) {
+            this.checkValues(values);
+            return;
+        }
         this._resourceType = resourceType;
         this._release = FhirService.release;
 
-        const list = this._shadow.querySelector('app-list');
-        list.clear();
+        this._list.clear();
 
         this._shadow.querySelector('linear-progress').hidden = false;
         sdParse(resourceType, '').then((elements) => {
@@ -91,9 +96,10 @@ class FhirBundleColumns extends HTMLElement {
                 const row = document.createElement('list-row-check');
                 row.setAttribute("data-id", element.id);
                 row.appendChild(item);
-                list.appendChild(row);
+                this._list.appendChild(row);
             });
             this._shadow.querySelector('linear-progress').hidden = true;
+            this.checkValues(values);
         });
 
         function sdParse(resourceType, path) {

@@ -9,27 +9,29 @@ class FhirResourceXml extends HTMLElement {
         this._shadow.innerHTML = template;
     }
     connectedCallback() {
-        this._shadow.getElementById("content").addEventListener('click', ({ target, offsetX, offsetY, ctrlKey }) => {
-            if (target.classList.contains("object")) {
-                const key = target.childNodes[0];
-                if (key && offsetX < key.offsetLeft && offsetY < key.offsetHeight) {
-                    target.classList.toggle("collapsed");
-                    if (ctrlKey) {
-                        const collapsed = target.classList.contains("collapsed");
-                        Array.from(target.querySelectorAll('dt'))
-                            .filter(e => e.classList.contains('object'))
-                            .forEach(e => {
-                                if (collapsed) {
-                                    e.classList.add("collapsed");
-                                } else {
-                                    e.classList.remove("collapsed");
-                                }
-                            });
-                    }
+        this._shadow.getElementById("content").onclick = this.contentClick;
+    }
+
+    contentClick = ({ target, offsetX, offsetY, ctrlKey }) => {
+        if (target.classList.contains("object")) {
+            const key = target.childNodes[0];
+            if (key && offsetX < key.offsetLeft && offsetY < key.offsetHeight) {
+                target.classList.toggle("collapsed");
+                if (ctrlKey) {
+                    const collapsed = target.classList.contains("collapsed");
+                    Array.from(target.querySelectorAll('dt'))
+                        .filter(e => e.classList.contains('object'))
+                        .forEach(e => {
+                            if (collapsed) {
+                                e.classList.add("collapsed");
+                            } else {
+                                e.classList.remove("collapsed");
+                            }
+                        });
                 }
             }
-        });
-    }
+        }
+    };
 
     clear() {
         const content = this._shadow.getElementById("content");

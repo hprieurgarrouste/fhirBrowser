@@ -11,12 +11,13 @@ class FhirReferences extends HTMLElement {
         this._shadow.innerHTML = template;
         this._resourceType = null;
         this._resourceId = null;
+        this._list = null;
     }
 
     connectedCallback() {
-        const list = this._shadow.querySelector('app-list');
-        list.onclick = this.appListClick;
-        list.onFilter = this.appListFilter;
+        this._list = this._shadow.querySelector('app-list');
+        this._list.onclick = this.appListClick;
+        this._list.onFilter = this.appListFilter;
 
         this._shadow.querySelector('side-panel').onClose = this.sidePanelClose;
 
@@ -33,8 +34,7 @@ class FhirReferences extends HTMLElement {
 
     appListFilter = (value) => {
         const filter = value.toLowerCase();
-        const list = this._shadow.querySelector('app-list');
-        list.childNodes.forEach(row => {
+        this._list.childNodes.forEach(row => {
             row.hidden = !(row.dataset.target.toLowerCase().includes(filter) || row.dataset.search.toLowerCase().includes(filter));
         });
     }
@@ -49,8 +49,7 @@ class FhirReferences extends HTMLElement {
         this._resourceType = resourceType;
         this._resourceId = resourceId;
 
-        const list = this._shadow.querySelector('app-list');
-        list.clear();
+        this._list.clear();
 
         const references = FhirService.references(resourceType.type);
         if (references) {
@@ -64,11 +63,11 @@ class FhirReferences extends HTMLElement {
                     item.setAttribute("data-primary", `${key}.${v.name}`);
                     item.setAttribute("data-secondary", v.documentation.length > 100 ? `${v.documentation.substring(0, 100)}...` : v.documentation);
                     row.appendChild(item);
-                    list.appendChild(row);
+                    this._list.appendChild(row);
                 })
             });
         }
-        return list.children.length > 0;
+        return this._list.children.length > 0;
     }
 
 };

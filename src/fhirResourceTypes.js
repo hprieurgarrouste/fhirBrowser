@@ -17,7 +17,7 @@ class FhirResourceTypes extends HTMLElement {
     connectedCallback() {
         const list = this._shadow.querySelector('app-list');
         list.onFilter = this.appListFilter;
-        list.addEventListener("click", this.appListClick);
+        list.onclick = this.appListClick;
     }
 
     appListClick = ({ target }) => {

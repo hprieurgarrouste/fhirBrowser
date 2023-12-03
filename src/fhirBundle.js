@@ -34,12 +34,13 @@ class FhirBundle extends HTMLElement {
             second: "2-digit",
             timeZoneName: "short"
         }
+        this._columnsSelector = null;
     }
 
     connectedCallback() {
-        this._shadow.getElementById('help').addEventListener('click', this.helpClick);
+        this._shadow.getElementById('help').onclick = this.helpClick;
 
-        this._shadow.querySelector("data-table-pagination").addEventListener('click', this.paginationClick);
+        this._shadow.querySelector("data-table-pagination").onclick = this.paginationClick;
 
         const dataTable = this._shadow.getElementById('table');
         dataTable.addEventListener('rowclick', ({ detail }) => {
@@ -50,22 +51,23 @@ class FhirBundle extends HTMLElement {
             this._shadow.getElementById('search')?.classList.toggle("hidden");
         });
 
-        this._shadow.getElementById('copy').addEventListener("click", this.copyClick);
+        this._shadow.getElementById('copy').onclick = this.copyClick;
 
-        this._shadow.getElementById('download').addEventListener("click", this.downloadClick);
+        this._shadow.getElementById('download').onclick = this.downloadClick;
 
-        const columnsSelector = this._shadow.querySelector('fhir-bundle-columns');
-        this._shadow.getElementById('settingsDialogToggle').addEventListener("click", () => {
-            columnsSelector.value = this._columns;
-            columnsSelector.hidden = false;
-        });
+        this._columnsSelector = this._shadow.querySelector('fhir-bundle-columns')
+        this._columnsSelector.onValidate = this.columnSelectorValidate;
 
-        columnsSelector.onValidate = this.columnSelectorValidate;
+        this._shadow.getElementById('settingsDialogToggle').onclick = this.settingsDialogToggleClick;
 
     }
 
-    paginationClick = (event) => {
-        const { target } = event;
+    settingsDialogToggleClick = () => {
+        this._columnsSelector.load(this._resourceType.type, this._columns);
+        this._columnsSelector.hidden = false;
+    }
+
+    paginationClick = ({ target }) => {
         if (!target.matches("round-button")) {
             return;
         }
@@ -124,9 +126,7 @@ class FhirBundle extends HTMLElement {
         const pref = PreferencesService.get("columns", {});
         this._columns = pref[resourceType.type] || ["id", "meta.lastUpdated"];
 
-        const columnsSelector = this._shadow.querySelector('fhir-bundle-columns');
-        columnsSelector.hidden = true;
-        columnsSelector.resourceType = resourceType.type;
+        this._columnsSelector.hidden = true;
 
         this._shadow.getElementById('title').innerText = resourceType.type;
 
