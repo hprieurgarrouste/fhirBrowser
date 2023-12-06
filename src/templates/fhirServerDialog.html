@@ -4,6 +4,7 @@
         display: flex;
         flex-direction: column;
         height: 100%;
+        min-width: 400px;
     }
 
     #list {
@@ -45,6 +46,10 @@
     }
 
     @media (max-width:480px) {
+        main {
+            min-width: none;
+        }
+
         #setupClose {
             display: block;
         }
