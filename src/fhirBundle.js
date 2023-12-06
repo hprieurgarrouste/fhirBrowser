@@ -46,6 +46,7 @@ class FhirBundle extends HTMLElement {
         dataTable.addEventListener('rowclick', ({ detail }) => {
             location.hash = `#${this._resourceType.type}/${detail.resourceId}`;
         });
+        dataTable.onColumnReorder = this.handleColumnChanged;
 
         this._shadow.getElementById('searchToggle').addEventListener('click', () => {
             this._shadow.getElementById('search')?.classList.toggle("hidden");
@@ -56,10 +57,29 @@ class FhirBundle extends HTMLElement {
         this._shadow.getElementById('download').onclick = this.downloadClick;
 
         this._columnsSelector = this._shadow.querySelector('fhir-bundle-columns')
-        this._columnsSelector.onValidate = this.columnSelectorValidate;
+        this._columnsSelector.onValidate = this.handleColumnSetup;
 
         this._shadow.getElementById('settingsDialogToggle').onclick = this.settingsDialogToggleClick;
 
+    }
+
+    handleColumnSetup = (columns) => {
+        //suppression des colonnes
+        let newColumns = this._columns.filter(c => columns.includes(c));
+        //ajout des nvlles colonnes à la fin
+        newColumns.push(...columns.filter(c => !newColumns.includes(c)));
+        this.handleColumnChanged(newColumns);
+    }
+    handleColumnChanged = (columns) => {
+        this._columns = columns;
+        const dataTable = this._shadow.getElementById('table');
+        dataTable.clear();
+        this._columns.forEach(column => dataTable.addColumn(column));
+        this.loadPage();
+
+        const pref = PreferencesService.get("columns", {});
+        pref[this._resourceType.type] = this._columns;
+        PreferencesService.set("columns", pref);
     }
 
     settingsDialogToggleClick = () => {
@@ -99,18 +119,6 @@ class FhirBundle extends HTMLElement {
         link.click();
         this._shadow.removeChild(link);
         window.URL.revokeObjectURL(url);
-    }
-
-    columnSelectorValidate = (columns) => {
-        this._columns = columns;
-        const dataTable = this._shadow.getElementById('table');
-        dataTable.clear();
-        this._columns.forEach(column => dataTable.addColumn(column));
-        this.loadPage();
-
-        const pref = PreferencesService.get("columns", {});
-        pref[this._resourceType.type] = this._columns;
-        PreferencesService.set("columns", pref);
     }
 
     load(resourceType, filters = []) {

@@ -27,6 +27,7 @@
 
     th {
         text-transform: capitalize;
+        cursor: grab;
     }
 
     tbody tr {
@@ -44,6 +45,10 @@
 
     tbody tr:hover,
     tbody tr.selected {
+        background-color: var(--hover-color, rgb(0 0 0 / 4%));
+    }
+
+    tr.drag th.over {
         background-color: var(--hover-color, rgb(0 0 0 / 4%));
     }
 </style>
