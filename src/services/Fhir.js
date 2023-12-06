@@ -1,10 +1,10 @@
-import fhirIconSet from '../assets/fhirIconSet.json';
-import fhirReferences from '../assets/references.json';
+import fhirIconSet from '../assets/fhirIconSet.json'
 
 export class FhirService {
     static {
         this._server = null;
         this._references = {};
+        this._fhirReferences = null;
     }
 
     /**
@@ -218,43 +218,53 @@ export class FhirService {
 
     }
 
+    static async getAllReferences() {
+        if (!this._fhirReferences) {
+            const response = await fetch('./assets/references.json');
+            this._fhirReferences = await response.json();
+        }
+        return this._fhirReferences;
+    }
+
     static parseReferences(metadata) {
         const serverReferences = {};
         const serverResources = metadata.rest[0].resource;
-        metadata.rest[0].resource.forEach((serverResource) => {
-            const fhirReference = fhirReferences[this.release][serverResource.type];
-            if (fhirReference) {
-                //clone fhirReference
-                const serverReference = JSON.parse(JSON.stringify(fhirReference));
-                //remove unsupported resource target
-                Object.entries(serverReference).forEach(([key, value]) => {
-                    let serverTarget = serverResources.find(target => key == target.type);
-                    if (!serverTarget) {
-                        delete serverReference[key];
-                    } else if (!serverTarget.searchParam) {
-                        delete serverReference[key];
-                    } else {
-                        //remove unsupported search parameter
-                        serverReference[key].forEach((searchCode, index) => {
-                            const searchParam = serverTarget.searchParam.find(searchParam => searchCode == searchParam.name);
-                            if (searchParam) {
-                                serverReference[key][index] = {
-                                    "name": searchCode,
-                                    "documentation": searchParam.documentation
-                                }
-                            } else {
-                                serverReference[key].splice(index, 1);
-                            }
-                        });
-                        if (serverReference[key].length === 0) {
+        this.getAllReferences().then(fhirReferences => {
+            metadata.rest[0].resource.forEach((serverResource) => {
+                const fhirReference = fhirReferences[this.release][serverResource.type];
+                if (fhirReference) {
+                    //clone fhirReference
+                    const serverReference = JSON.parse(JSON.stringify(fhirReference));
+                    //remove unsupported resource target
+                    Object.entries(serverReference).forEach(([key, value]) => {
+                        let serverTarget = serverResources.find(target => key == target.type);
+                        if (!serverTarget) {
                             delete serverReference[key];
+                        } else if (!serverTarget.searchParam) {
+                            delete serverReference[key];
+                        } else {
+                            //remove unsupported search parameter
+                            serverReference[key].forEach((searchCode, index) => {
+                                const searchParam = serverTarget.searchParam.find(searchParam => searchCode == searchParam.name);
+                                if (searchParam) {
+                                    serverReference[key][index] = {
+                                        "name": searchCode,
+                                        "documentation": searchParam.documentation
+                                    }
+                                } else {
+                                    serverReference[key].splice(index, 1);
+                                }
+                            });
+                            if (serverReference[key].length === 0) {
+                                delete serverReference[key];
+                            }
                         }
+                    });
+                    if (Object.keys(serverReference).length !== 0) {
+                        serverReferences[serverResource.type] = serverReference;
                     }
-                });
-                if (Object.keys(serverReference).length !== 0) {
-                    serverReferences[serverResource.type] = serverReference;
                 }
-            }
+            })
         });
         return serverReferences;
     }
