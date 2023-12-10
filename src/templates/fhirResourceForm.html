@@ -1,0 +1,58 @@
+<style>
+    main {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+    }
+
+    #content {
+        flex: 1 1 auto;
+        height: auto;
+        overflow: auto;
+        padding: 1em;
+    }
+
+    fieldset {
+        border: 0;
+        padding: 0;
+    }
+
+    legend {
+        margin-bottom: 1em;
+        text-transform: lowercase;
+    }
+
+    legend::first-letter {
+        text-transform: uppercase;
+    }
+
+    section {
+        display: flex;
+        flex-flow: row wrap;
+        align-content: flex-start;
+        gap: 0.2em 1em;
+        border: 0 none;
+        background-color: inherit;
+        min-height: 50px;
+    }
+
+    #content.drag.over,
+    #content.drag fieldset.over,
+    section.over,
+    text-field.over {
+        border: 1px dashed black;
+        background-color: var(--hover-color, rgb(0 0 0 / 4%));
+    }
+
+
+    side-panel {
+        border-left: 1px solid var(--border-color);
+    }
+</style>
+<main>
+    <div id="content"></div>
+    <side-panel data-title="Data">
+        <linear-progress slot="main"></linear-progress>
+        <app-list slot="main"></app-list>
+    </side-panel>
+</main>

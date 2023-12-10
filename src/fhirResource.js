@@ -1,19 +1,22 @@
 import template from "./templates/fhirResource.html";
 
-import "./components/AppBar.js";
-import "./components/RoundButton.js";
-import "./appTab.js";
-import "./components/TabBar.js";
-import "./fhirResourceJson.js";
-import "./fhirResourceXml.js";
-import "./fhirResourceTtl.js";
-import "./components/Chips.js";
-import "./components/SidePanel.js";
-import "./fhirReferences.js";
-import "./fhirHistory.js";
+import "./components/AppBar"
+import "./components/Chips"
+import "./components/RoundButton"
+import "./components/SidePanel"
+import "./components/TabBar"
 
-import { FhirService } from "./services/Fhir.js";
-import { SnackbarsService } from "./services/Snackbars.js";
+import "./AppTab"
+import "./FhirHistory"
+import "./FhirReferences"
+import "./FhirResourceForm"
+import "./FhirResourceJson"
+import "./FhirResourceTtl"
+import "./FhirResourceXml"
+
+import { FhirService } from "./services/Fhir"
+import { SnackbarsService } from "./services/Snackbars"
+
 
 class FhirResource extends HTMLElement {
     constructor() {
@@ -110,9 +113,11 @@ class FhirResource extends HTMLElement {
         const tabId = detail.tab.id;
         const xmlView = this._shadow.getElementById('xmlView');
         const ttlView = this._shadow.getElementById('ttlView');
+        const formView = this._shadow.getElementById('formView');
         this._shadow.getElementById("jsonView").hidden = (tabId !== 'tabJson');
         xmlView.hidden = (tabId !== 'tabXml');
         ttlView.hidden = (tabId !== 'tabTtl');
+        formView.hidden = (tabId !== 'tabForm');
         if (tabId == 'tabXml' && !this._resource.xml) {
             FhirService.readXml(this._resourceType.type, this._resourceId).then(resource => {
                 const parser = new DOMParser();
@@ -129,6 +134,8 @@ class FhirResource extends HTMLElement {
             }).catch((e) => {
                 this._resource.xml = null;
             });
+        } else if (tabId == 'tabForm') {
+            formView.source = this._resource.json;
         }
 
     };
@@ -180,9 +187,14 @@ class FhirResource extends HTMLElement {
         const jsonView = this._shadow.getElementById('jsonView');
         const xmlView = this._shadow.getElementById('xmlView');
         const ttlView = this._shadow.getElementById('ttlView');
+        const formView = this._shadow.getElementById('formView');
         const shareBtn = this._shadow.getElementById("share");
         const copyBtn = this._shadow.getElementById("copy");
         const downloadBtn = this._shadow.getElementById("download");
+
+        const formViewEnable = false;
+        this._shadow.getElementById('tabForm').hidden = !formViewEnable;
+        formView.hidden = !formViewEnable;
 
         const ttlFormatEnable = FhirService.formatEnable("ttl");
         this._shadow.getElementById("tabTtl").hidden = !ttlFormatEnable;
