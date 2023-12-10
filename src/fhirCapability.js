@@ -1,9 +1,10 @@
 import template from "./templates/fhirCapability.html";
 
-import "./components/AppList.js"
-import "./components/ListItem.js"
-import "./components/ListRow.js"
-import { FhirService } from "./services/Fhir";
+import "./components/AppList"
+import "./components/ListItem"
+import "./components/ListRow"
+
+import { FhirService } from "./services/Fhir"
 
 class FhirCapability extends HTMLElement {
     constructor() {

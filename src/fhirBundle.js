@@ -1,15 +1,16 @@
 import template from "./templates/fhirBundle.html";
 
-import "./components/AppBar.js";
-import "./components/DataTable.js";
-import "./components/DataTablePagination.js";
-import "./components/LinearProgress.js";
-import "./fhirSearch.js";
-import "./fhirBundleColumns.js";
+import "./components/AppBar"
+import "./components/DataTable"
+import "./components/DataTablePagination"
+import "./components/LinearProgress"
 
-import { FhirService } from "./services/Fhir.js";
-import { SnackbarsService } from "./services/Snackbars.js";
-import { PreferencesService } from "./services/Preferences.js";
+import "./FhirSearch"
+import "./FhirBundleColumns"
+
+import { FhirService } from "./services/Fhir"
+import { SnackbarsService } from "./services/Snackbars"
+import { PreferencesService } from "./services/Preferences"
 
 class FhirBundle extends HTMLElement {
     constructor() {

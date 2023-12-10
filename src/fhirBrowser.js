@@ -1,19 +1,21 @@
 import template from "./templates/fhirBrowser.html";
 
-import "./components/AppBar.js";
-import "./components/AppDialog.js";
-import "./components/ColorScheme.js";
-import "./components/CircularProgress.js";
-import "./appLeftPanel.js";
-import "./fhirBrowserAbout.js";
-import "./fhirBundle.js";
-import "./fhirMetadata.js";
-import "./fhirResource.js";
-import "./fhirServerDialog.js";
-import { FhirService } from "./services/Fhir.js";
-import { PreferencesService } from "./services/Preferences.js";
-import { SettingsService } from "./services/Settings.js";
-import { SnackbarsService } from "./services/Snackbars.js";
+import "./components/AppBar"
+import "./components/AppDialog"
+import "./components/ColorScheme"
+import "./components/CircularProgress"
+
+import "./AppLeftPanel"
+import "./FhirBrowserAbout"
+import "./FhirBundle"
+import "./FhirMetadata"
+import "./FhirResource"
+import "./FhirServerDialog"
+
+import { FhirService } from "./services/Fhir"
+import { PreferencesService } from "./services/Preferences"
+import { SettingsService } from "./services/Settings"
+import { SnackbarsService } from "./services/Snackbars"
 
 /* Only register a service worker if it's supported */
 if ('serviceWorker' in navigator) {

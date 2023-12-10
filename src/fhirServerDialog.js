@@ -1,13 +1,15 @@
 import template from "./templates/FhirServerDialog.html";
 
-import "./components/AppDialog.js"
-import "./components/AppButton.js"
-import "./components/RoundButton.js"
-import "./fhirServerList.js"
-import "./fhirServerForm.js"
-import { FhirService } from "./services/Fhir.js"
-import { SettingsService } from "./services/Settings.js"
-import { SnackbarsService } from "./services/Snackbars.js";
+import "./components/AppButton"
+import "./components/AppDialog"
+import "./components/RoundButton"
+
+import "./FhirServerList"
+import "./FhirServerForm"
+
+import { FhirService } from "./services/Fhir"
+import { SettingsService } from "./services/Settings"
+import { SnackbarsService } from "./services/Snackbars"
 
 class FhirServerDialog extends HTMLElement {
     constructor() {

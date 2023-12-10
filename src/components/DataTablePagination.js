@@ -1,6 +1,6 @@
 import template from "./templates/DataTablePagination.html";
 
-import "./RoundButton.js";
+import "./RoundButton";
 
 
 class DataTablePagination extends HTMLElement {

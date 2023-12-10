@@ -1,7 +1,7 @@
 import template from "./templates/SidePanel.html";
 
-import "./RoundButton.js";
-import "./AppBar.js";
+import "./RoundButton";
+import "./AppBar";
 
 
 class SidePanel extends HTMLElement {

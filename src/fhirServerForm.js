@@ -1,9 +1,10 @@
 import template from "./templates/fhirServerForm.html"
 
-import "./components/AppButton.js"
-import "./components/AppConfirm.js"
-import "./components/TextField.js"
-import "./fhirServerNewAuth.js"
+import "./components/AppButton"
+import "./components/AppConfirm"
+import "./components/TextField"
+
+import "./FhirServerNewAuth"
 
 class FhirServerForm extends HTMLElement {
     constructor() {

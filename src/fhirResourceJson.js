@@ -1,6 +1,6 @@
 import template from "./templates/fhirResourceJson.html";
 
-import { FhirService } from "./services/Fhir.js";
+import { FhirService } from "./services/Fhir"
 
 class FhirResourceJson extends HTMLElement {
     constructor() {

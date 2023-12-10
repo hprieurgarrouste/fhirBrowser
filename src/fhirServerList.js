@@ -1,8 +1,8 @@
 import template from "./templates/FhirServerList.html";
 
-import "./components/AppList.js"
-import "./components/ListRow.js"
-import "./components/ListItem.js"
+import "./components/AppList"
+import "./components/ListRow"
+import "./components/ListItem"
 
 class FhirServerList extends HTMLElement {
     constructor() {

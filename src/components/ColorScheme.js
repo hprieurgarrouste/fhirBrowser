@@ -1,6 +1,6 @@
 import template from "./templates/ColorScheme.html";
 
-import { PreferencesService } from "../services/Preferences.js";
+import { PreferencesService } from "../services/Preferences"
 
 class ColorScheme extends HTMLElement {
     constructor() {

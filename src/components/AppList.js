@@ -1,6 +1,6 @@
 import template from "./templates/AppList.html";
 
-import "./ListFilter.js";
+import "./ListFilter";
 
 class AppList extends HTMLElement {
     constructor() {

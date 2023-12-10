@@ -1,8 +1,9 @@
 import template from "./templates/fhirReferences.html";
 
-import "./components/ListItem.js";
-import "./components/ListRow.js";
-import { FhirService } from "./services/Fhir.js";
+import "./components/ListItem"
+import "./components/ListRow"
+
+import { FhirService } from "./services/Fhir"
 
 class FhirReferences extends HTMLElement {
     constructor() {

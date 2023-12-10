@@ -1,9 +1,10 @@
 import template from "./templates/fhirSearch.html";
 
-import "./components/RoundButton.js"
-import "./fhirSearchItem.js"
+import "./components/RoundButton"
 
-import { FhirService } from "./services/Fhir.js";
+import "./FhirSearchItem"
+
+import { FhirService } from "./services/Fhir"
 
 class FhirSearch extends HTMLElement {
     constructor() {

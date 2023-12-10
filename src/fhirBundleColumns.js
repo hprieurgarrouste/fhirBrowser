@@ -1,13 +1,13 @@
 import template from "./templates/fhirBundleColumns.html";
 
-import "./components/AppButton.js";
-import "./components/AppDialog.js";
-import "./components/AppList.js";
-import "./components/LinearProgress.js";
-import "./components/ListItem.js";
-import "./components/ListRowCheck.js";
+import "./components/AppButton"
+import "./components/AppDialog"
+import "./components/AppList"
+import "./components/LinearProgress"
+import "./components/ListItem"
+import "./components/ListRowCheck"
 
-import { FhirService } from "./services/Fhir.js";
+import { FhirService } from "./services/Fhir"
 
 class FhirBundleColumns extends HTMLElement {
     constructor() {

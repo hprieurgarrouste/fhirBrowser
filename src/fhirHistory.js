@@ -1,6 +1,6 @@
 import template from "./templates/fhirHistory.html";
 
-import { FhirService } from "./services/Fhir.js";
+import { FhirService } from "./services/Fhir"
 
 class FhirHistory extends HTMLElement {
     constructor() {

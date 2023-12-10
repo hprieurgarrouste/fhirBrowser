@@ -1,9 +1,10 @@
 import template from "./templates/fhirMetadata.html";
 
-import "./appTab.js";
-import "./components/TabBar.js";
-import "./fhirResourceTypes.js";
-import "./fhirCapability.js";
+import "./components/TabBar"
+
+import "./AppTab"
+import "./FhirResourceTypes"
+import "./FhirCapability"
 
 class FhirMetadata extends HTMLElement {
     constructor() {

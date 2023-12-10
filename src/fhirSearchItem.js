@@ -1,9 +1,9 @@
 import template from "./templates/fhirSearchItem.html";
 
-import "./fhirSearchModifier.js"
-import "./fhirSearchPrefix.js"
-import "./fhirSearchText.js"
-import "./fhirSearchDate.js"
+import "./FhirSearchDate"
+import "./FhirSearchModifier"
+import "./FhirSearchPrefix"
+import "./FhirSearchText"
 
 class FhirSearchItem extends HTMLElement {
     constructor() {
