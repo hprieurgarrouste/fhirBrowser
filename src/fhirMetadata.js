@@ -43,8 +43,8 @@ class FhirMetadata extends HTMLElement {
     * @param {FhirMetadata} server
     */
     set server(server) {
-        this._shadow.getElementById("serverTitle").setAttribute("data-primary", server.capabilities?.software?.name || server.serverCode);
-        this._shadow.getElementById("serverTitle").setAttribute("data-secondary", server.capabilities?.implementation?.description || server.url);
+        this._shadow.getElementById("serverTitle").setAttribute("data-primary", server.serverCode);
+        this._shadow.getElementById("serverTitle").setAttribute("data-secondary", server.capabilities?.implementation?.description || server.capabilities?.software?.name || server.url);
 
         this._shadow.getElementById("resourceTypes").metadata = server.capabilities;
         this._shadow.getElementById("capability").metadata = server.capabilities;
