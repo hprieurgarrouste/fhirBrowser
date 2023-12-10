@@ -1,0 +1,82 @@
+<style>
+    main {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    main>section {
+        flex: 1 1 auto;
+        height: 0;
+    }
+
+    main>footer {
+        border-top: 1px solid var(--border-color);
+        padding: 9px 16px;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    main #dragZone {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+    }
+
+    #form {
+        flex: 1 1 auto;
+        height: auto;
+        padding: 1em;
+        overflow-y: auto;
+        padding-bottom: 7em;
+    }
+
+    #form fieldset {
+        border: 0;
+        padding: 0;
+    }
+
+    #form fieldset>input[type=text] {
+        border: 0 none;
+        font-family: inherit;
+        font-size: inherit;
+        margin-bottom: 1em;
+    }
+
+    #form section {
+        display: flex;
+        flex-flow: row wrap;
+        align-content: flex-start;
+        gap: 0.2em 1em;
+        border: 0 none;
+        background-color: inherit;
+        min-height: 50px;
+    }
+
+    #form.drag.over,
+    #form.drag fieldset.over,
+    #form section.over,
+    #form text-field.over {
+        border: 1px dashed black;
+        background-color: var(--hover-color, rgb(0 0 0 / 4%));
+    }
+
+    side-panel {
+        border-left: 1px solid var(--border-color);
+    }
+</style>
+<main>
+    <section>
+        <section id="dragZone">
+            <section id="form"></section>
+            <side-panel data-title="Data">
+                <linear-progress slot="main"></linear-progress>
+                <app-list slot="main"></app-list>
+            </side-panel>
+        </section>
+    </section>
+    <footer>
+        <app-button id="formCancel" value="Cancel"></app-button>
+        <app-button id="formOk" value="Apply"></app-button>
+    </footer>
+</main>

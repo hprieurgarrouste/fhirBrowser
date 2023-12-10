@@ -1,32 +1,33 @@
 <style>
     main {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         height: 100%;
     }
 
-    #content {
+    #form {
         flex: 1 1 auto;
         height: auto;
-        overflow: auto;
         padding: 1em;
+        overflow-y: auto;
+        padding-bottom: 7em;
     }
 
-    fieldset {
+    #form fieldset {
         border: 0;
         padding: 0;
     }
 
-    legend {
+    #form legend {
         margin-bottom: 1em;
         text-transform: lowercase;
     }
 
-    legend::first-letter {
+    #form legend::first-letter {
         text-transform: uppercase;
     }
 
-    section {
+    #form section {
         display: flex;
         flex-flow: row wrap;
         align-content: flex-start;
@@ -35,24 +36,7 @@
         background-color: inherit;
         min-height: 50px;
     }
-
-    #content.drag.over,
-    #content.drag fieldset.over,
-    section.over,
-    text-field.over {
-        border: 1px dashed black;
-        background-color: var(--hover-color, rgb(0 0 0 / 4%));
-    }
-
-
-    side-panel {
-        border-left: 1px solid var(--border-color);
-    }
 </style>
 <main>
-    <div id="content"></div>
-    <side-panel data-title="Data">
-        <linear-progress slot="main"></linear-progress>
-        <app-list slot="main"></app-list>
-    </side-panel>
+    <section id="form"></section>
 </main>
