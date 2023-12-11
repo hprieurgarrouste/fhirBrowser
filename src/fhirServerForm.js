@@ -24,7 +24,7 @@ class FhirServerForm extends HTMLElement {
     connectedCallback() {
         this._shadow.querySelector('app-dialog').onClose = this.appDialogClose;
 
-        this._shadow.getElementById("authMethod").addEventListener("change", this.authMethodChange);
+        this._shadow.querySelectorAll("input[name='authMethod']").forEach((input) => { input.addEventListener("change", this.authMethodChange) });
 
         this._shadow.getElementById("formCancel").onclick = this.formCancelClick;
 
@@ -68,10 +68,11 @@ class FhirServerForm extends HTMLElement {
         }
     }
 
-    authMethodChange = ({ detail }) => {
-        this._shadow.getElementById("apiSection").hidden = ("API Key" !== detail.value);
-        this._shadow.getElementById("basicSection").hidden = ("Basic" !== detail.value);
-        this._shadow.getElementById("oauthSection").hidden = ("OAuth 2" !== detail.value);
+    authMethodChange = () => {
+        const value = this._shadow.querySelector("input[name='authMethod']:checked").value;
+        this._shadow.getElementById("apiSection").hidden = ("API Key" !== value);
+        this._shadow.getElementById("basicSection").hidden = ("Basic" !== value);
+        this._shadow.getElementById("oauthSection").hidden = ("OAuth 2" !== value);
     }
 
     _onOk = (event) => {
@@ -106,8 +107,8 @@ class FhirServerForm extends HTMLElement {
 
     checkValidity = function () {
         let self = this;
-        if (check("key") && check("url") && check("authMethod")) {
-            const method = this._shadow.getElementById("authMethod").value;
+        if (check("key") && check("url")) {
+            const method = this._shadow.querySelector("input[name='authMethod']:checked").value;
             switch (method) {
                 case "No Auth":
                     return true;
@@ -151,7 +152,7 @@ class FhirServerForm extends HTMLElement {
     }
 
     get value() {
-        const method = this._shadow.getElementById("authMethod").value;
+        const method = this._shadow.querySelector("input[name='authMethod']:checked").value;
         let server = {
             serverCode: this._shadow.getElementById("key").value,
             url: this._shadow.getElementById("url").value,
@@ -197,26 +198,27 @@ class FhirServerForm extends HTMLElement {
         this._shadow.getElementById("url").value = server.url;
         switch (server?.auth?.method) {
             case "apikey":
-                this._shadow.getElementById("authMethod").value = "API Key";
+                this._shadow.getElementById("API Key").checked = true;
                 this._shadow.getElementById("apiKey").value = server.auth.setup.key;
                 this._shadow.getElementById("apiValue").value = server.auth.setup.value;
                 break;
             case "basic":
-                this._shadow.getElementById("authMethod").value = "Basic";
+                this._shadow.getElementById("Basic").checked = true;
                 this._shadow.getElementById("basicUsername").value = server.auth.setup.username;
                 this._shadow.getElementById("basicPassword").value = server.auth.setup.password;
                 break;
             case "oauth2":
-                this._shadow.getElementById("authMethod").value = "OAuth 2";
+                this._shadow.getElementById("OAuth 2").checked = true;
                 this._shadow.getElementById("oauthTokenurl").value = server.auth.setup.access_token_url;
                 this._shadow.getElementById("oauthClientid").value = server.auth.setup.client_id;
                 this._shadow.getElementById("oauthClientsecret").value = server.auth.setup.client_secret;
                 this._shadow.getElementById("oauthGranttype").value = server.auth.setup.grant_type;
                 break;
             default:
-                this._shadow.getElementById("authMethod").value = "No Auth";
+                this._shadow.getElementById("No Auth").checked = true;
                 break;
         }
+        this.authMethodChange();
     }
 
     clear() {

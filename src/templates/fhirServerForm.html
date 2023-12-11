@@ -30,6 +30,17 @@
         padding: 1em;
     }
 
+    .authMethod {
+        padding-bottom: 1em;
+    }
+
+    .authMethod label {
+        font-family: inherit;
+        font-size: inherit;
+        margin-right: 1em;
+    }
+
+
     @media (max-width:480px) {
         #content {
             min-width: unset;
@@ -42,7 +53,16 @@
         <section id="content">
             <text-field id="key" placeholder="Code" required></text-field>
             <text-field id="url" placeholder="Url" required></text-field>
-            <server-auth id="authMethod" placeholder="Authorization" value="No Auth" required></server-auth>
+            <div class="authMethod">
+                <input type="radio" id="No Auth" name="authMethod" value="No Auth" checked />
+                <label for="No Auth">No Auth</label>
+                <input type="radio" id="API Key" name="authMethod" value="API Key" />
+                <label for="API Key">API Key</label>
+                <input type="radio" id="Basic" name="authMethod" value="Basic" />
+                <label for="Basic">Basic</label>
+                <input type="radio" id="OAuth 2" name="authMethod" value="OAuth 2" />
+                <label for="OAuth 2">OAuth 2</label>
+            </div>
             <section id="apiSection" hidden>
                 <text-field id="apiKey" placeholder="Key" required></text-field>
                 <text-field id="apiValue" placeholder="Value" required></text-field>
