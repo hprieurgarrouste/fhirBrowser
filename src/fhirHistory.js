@@ -9,7 +9,6 @@ class FhirHistory extends HTMLElement {
         this._shadow.innerHTML = template;
         this._resourceType = null;
         this._resourceId = null;
-        this._versionId = null;
     }
 
     connectedCallback() {
@@ -52,15 +51,15 @@ class FhirHistory extends HTMLElement {
         while (list.firstChild) list.removeChild(list.lastChild);
     }
 
-    load(resourceType, resource) {
+    load(resourceType, resourceId) {
         if (!resourceType.interaction.find(({ code }) => 'vread' == code)) return;
-        if (resourceType.type == this._resourceType && resource.id == this._resourceId && resource.meta?.versionId == this._versionId) return;
+        if (resourceType.type == this._resourceType && resourceId == this._resourceId) return
 
-        const list = this._shadow.getElementById('list');
-        if (resourceType.type !== this._resourceType || resource.id !== this._resourceId) {
+        FhirService.read(resourceType.type, resourceId).then(resource => {
+            const list = this._shadow.getElementById('list');
             this._resourceType = resourceType.type;
             this._resourceId = resource.id;
-            this._versionId = resource.meta?.versionId;
+            const resourceVersionId = resource.meta?.versionId;
             this.clear();
             FhirService.readHistory(resourceType.type, resource.id).then(response => {
                 if ('Bundle' == response.resourceType && 'history' == response.type && response.total > 1) {
@@ -71,7 +70,7 @@ class FhirHistory extends HTMLElement {
                     }).forEach(element => {
                         const row = document.createElement('list-row');
                         row.setAttribute("data-versionid", element.resource.meta.versionId);
-                        if (this._versionId == element.resource.meta.versionId) {
+                        if (resourceVersionId == element.resource.meta.versionId) {
                             row.setAttribute("selected", "");
                         }
                         const date = new Date(element.resource.meta.lastUpdated);
@@ -91,14 +90,9 @@ class FhirHistory extends HTMLElement {
                         row.appendChild(item);
                         list.appendChild(row);
                     });
-                    return true;
                 }
             });
-        } else {
-            this._shadow.querySelector("list-row[selected]")?.removeAttribute("selected");
-            this._shadow.querySelector(`list-row[data-versionid="${resource.meta.versionId}"]`)?.setAttribute("selected", "");
-        }
-        return false;
+        });
     }
 };
 

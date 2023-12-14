@@ -132,7 +132,6 @@ class FhirBrowser extends HTMLElement {
             SnackbarsService.show(`Connected to "${serverCode}" server.`);
             PreferencesService.set("server", serverCode);
             this._shadow.getElementById("bdy").style.visibility = "hidden";
-            this._shadow.getElementById("metadata").server = FhirService.server;
             this._shadow.getElementById("leftPanel").classList.remove("hidden");
             this._shadow.getElementById("navigation").hidden = false;
             this._shadow.querySelector('fhir-server-dialog').value = serverCode;

@@ -43,7 +43,7 @@ class FhirResourceForm extends HTMLElement {
         });
     }
 
-    clear() {
+    clear = () => {
         while (this._form.firstChild) this._form.removeChild(this._form.lastChild);
     }
 
@@ -66,6 +66,7 @@ class FhirResourceForm extends HTMLElement {
         const fieldset = document.createElement('fieldset');
         fieldset.setAttribute('draggable', 'true');
         const label = document.createElement('input');
+        label.setAttribute('spellcheck', 'false');
         label.type = 'text';
         label.classList.add('label')
         label.value = name;

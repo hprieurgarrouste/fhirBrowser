@@ -123,6 +123,16 @@
         padding-left: 0;
     }
 
+    footer {
+        text-align: right;
+        padding: 0.5em;
+        border-top: 1px solid var(--border-color);
+    }
+
+    footer app-switch {
+        vertical-align: middle;
+    }
+
     @media (max-width:480px) {
         #content {
             line-height: 2em;
@@ -131,4 +141,5 @@
 </style>
 <main>
     <div id="content"></div>
+    <footer>Sorted <app-switch></app-switch></footer>
 </main>

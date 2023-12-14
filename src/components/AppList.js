@@ -28,7 +28,7 @@ class AppList extends HTMLElement {
         });
     }
 
-    clear() {
+    clear = () => {
         this._slot.assignedNodes().forEach(e => this.removeChild(e));
         this._filter.clear();
         this._list.scrollTop = 0;

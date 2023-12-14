@@ -6,7 +6,7 @@ class FhirResourceTtl extends HTMLElement {
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
     }
-    clear() {
+    clear = () => {
         const content = this._shadow.getElementById("content");
         content.scrollTo(0, 0);
         content.innerHTML = "Loading...";
