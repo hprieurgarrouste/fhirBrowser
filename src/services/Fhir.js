@@ -5,6 +5,16 @@ export class FhirService {
         this._server = null;
         this._references = {};
         this._fhirReferences = null;
+        this._serverChangeListener = [];
+    }
+
+    static addListener = (callback) => {
+        this._serverChangeListener.push(callback);
+    }
+    static dispatchServerChange = () => {
+        this._serverChangeListener.forEach(callback => {
+            callback.call();
+        })
     }
 
     /**
@@ -33,7 +43,10 @@ export class FhirService {
     }
 
     static set server(srv) {
-        this._server = srv;
+        if (srv != this._server) {
+            this._server = srv;
+            this.dispatchServerChange();
+        }
     }
     static get server() {
         return this._server;
@@ -209,13 +222,54 @@ export class FhirService {
             default:
                 break;
         }
-        await FhirService.capabilities(server).then(metadata => {
-            server.serverCode = code;
-            server.capabilities = metadata;
-            FhirService.server = server;
-            this._references = this.parseReferences(metadata);
-        });
+        const metadata = await FhirService.capabilities(server);
+        server.serverCode = code;
+        server.capabilities = metadata;
+        FhirService.server = server;
+        this._references = await this.parseReferences(metadata);
+    }
 
+    static async parseReferences(metadata) {
+        const serverReferences = {};
+        const serverResources = metadata.rest[0].resource;
+        const fhirReferences = await this.getAllReferences();
+        metadata.rest[0].resource.forEach((serverResource) => {
+            const fhirReference = fhirReferences[this.release][serverResource.type];
+            if (fhirReference) {
+                //clone fhirReference
+                const serverReference = JSON.parse(JSON.stringify(fhirReference));
+                //remove unsupported resource target
+                Object.entries(serverReference).forEach(([key, value]) => {
+                    let serverTarget = serverResources.find(target => key == target.type);
+                    if (!serverTarget) {
+                        delete serverReference[key];
+                    } else if (!serverTarget.searchParam) {
+                        delete serverReference[key];
+                    } else {
+                        //remove unsupported search parameter
+                        serverReference[key].forEach((searchCode, index) => {
+                            const searchParam = serverTarget.searchParam.find(searchParam => searchCode == searchParam.name);
+                            if (searchParam) {
+                                serverReference[key][index] = {
+                                    "name": searchCode,
+                                    "documentation": searchParam.documentation
+                                }
+                            } else {
+                                serverReference[key].splice(index, 1);
+                            }
+                        });
+                        if (serverReference[key].length === 0) {
+                            delete serverReference[key];
+                        }
+                    }
+                });
+                if (Object.keys(serverReference).length !== 0) {
+                    serverReferences[serverResource.type] = serverReference;
+                }
+            }
+        })
+
+        return serverReferences;
     }
 
     static async getAllReferences() {
@@ -224,49 +278,6 @@ export class FhirService {
             this._fhirReferences = await response.json();
         }
         return this._fhirReferences;
-    }
-
-    static parseReferences(metadata) {
-        const serverReferences = {};
-        const serverResources = metadata.rest[0].resource;
-        this.getAllReferences().then(fhirReferences => {
-            metadata.rest[0].resource.forEach((serverResource) => {
-                const fhirReference = fhirReferences[this.release][serverResource.type];
-                if (fhirReference) {
-                    //clone fhirReference
-                    const serverReference = JSON.parse(JSON.stringify(fhirReference));
-                    //remove unsupported resource target
-                    Object.entries(serverReference).forEach(([key, value]) => {
-                        let serverTarget = serverResources.find(target => key == target.type);
-                        if (!serverTarget) {
-                            delete serverReference[key];
-                        } else if (!serverTarget.searchParam) {
-                            delete serverReference[key];
-                        } else {
-                            //remove unsupported search parameter
-                            serverReference[key].forEach((searchCode, index) => {
-                                const searchParam = serverTarget.searchParam.find(searchParam => searchCode == searchParam.name);
-                                if (searchParam) {
-                                    serverReference[key][index] = {
-                                        "name": searchCode,
-                                        "documentation": searchParam.documentation
-                                    }
-                                } else {
-                                    serverReference[key].splice(index, 1);
-                                }
-                            });
-                            if (serverReference[key].length === 0) {
-                                delete serverReference[key];
-                            }
-                        }
-                    });
-                    if (Object.keys(serverReference).length !== 0) {
-                        serverReferences[serverResource.type] = serverReference;
-                    }
-                }
-            })
-        });
-        return serverReferences;
     }
 
     static async oauth2_getToken(setup) {
