@@ -1,16 +1,35 @@
 import template from "./templates/fhirResourceJson.html";
 
+import "./components/AppSwitch"
+
 import { FhirService } from "./services/Fhir"
+import { PreferencesService } from "./services/Preferences"
 
 class FhirResourceJson extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
+        this._sorted = false;
+        this._resource = null;
     }
 
     connectedCallback() {
         this._shadow.getElementById("content").onclick = this.contentClick;
+        this._sorted = PreferencesService.get('jsonView', { 'sorted': true }).sorted;
+        const sortedSwitch = this._shadow.querySelector('app-switch');
+        this._shadow.querySelector('app-switch').onclick = this.sortedClickHandler;
+        if (this._sorted) {
+            sortedSwitch.setAttribute('data-checked', '');
+        } else {
+            sortedSwitch.removeAttribute('data-checked');
+        }
+    }
+
+    sortedClickHandler = (event) => {
+        this._sorted = this._shadow.querySelector('app-switch').hasAttribute('data-checked');
+        PreferencesService.set('jsonView', { 'sorted': this._sorted });
+        this.source = this._resource;
     }
 
     contentClick = ({ target, offsetX, offsetY, ctrlKey }) => {
@@ -35,7 +54,7 @@ class FhirResourceJson extends HTMLElement {
         }
     };
 
-    clear() {
+    clear = () => {
         const content = this._shadow.getElementById("content");
         content.scrollTo(0, 0);
         content.innerHTML = "Loading...";
@@ -50,50 +69,55 @@ class FhirResourceJson extends HTMLElement {
         content.scrollTo(0, 0);
         content.innerHTML = "";
         content.appendChild(document.createTextNode("{"));
-        content.appendChild(parse(resource));
+        content.appendChild(this.parse(resource));
         content.appendChild(document.createTextNode("}"));
         content.style.cursor = "default";
+        this._resource = resource;
+    }
 
-        function parse(obj) {
-            let dl = document.createElement('dl');
-            for (const [key, value] of Object.entries(obj).sort((o1, o2) => { return o1[0].localeCompare(o2[0]) })) {
-                const dt = document.createElement('dt');
+    parse = (obj) => {
+        let dl = document.createElement('dl');
 
-                const keyElm = document.createElement('span');
-                keyElm.className = "key";
-                keyElm.innerText = key;
-                dt.appendChild(keyElm);
+        let entries = Object.entries(obj);
+        if (this._sorted) entries = entries.sort();
+        entries.forEach(([key, value]) => {
+            const dt = document.createElement('dt');
 
-                const valueElm = document.createElement('span');
-                valueElm.classList.add("value");
-                if (value === null) {
-                    valueElm.innerText = "null";
-                } else if ("string" === typeof (value)) {
-                    valueElm.classList.add("string");
-                    if (key === "reference") {
-                        let url = value;
-                        if (url.startsWith(FhirService.server.url)) {
-                            url = url.slice(FhirService.server.url.length + 1);
-                        }
-                        let a = document.createElement('a');
-                        a.setAttribute("href", `#${url}`);
-                        a.appendChild(document.createTextNode(value));
-                        valueElm.appendChild(a);
-                    } else {
-                        valueElm.innerText = value;
+            const keyElm = document.createElement('span');
+            keyElm.className = "key";
+            keyElm.innerText = key;
+            dt.appendChild(keyElm);
+
+            const valueElm = document.createElement('span');
+            valueElm.classList.add("value");
+            if (value === null) {
+                valueElm.innerText = "null";
+            } else if ("string" === typeof (value)) {
+                valueElm.classList.add("string");
+                if (key === "reference") {
+                    let url = value;
+                    if (url.startsWith(FhirService.server.url)) {
+                        url = url.slice(FhirService.server.url.length + 1);
                     }
-                } else if ("object" === typeof (value)) {
-                    dt.classList.add(Array.isArray(value) ? "array" : "object");
-                    valueElm.appendChild(parse(value));
+                    let a = document.createElement('a');
+                    a.setAttribute("href", `#${url}`);
+                    a.appendChild(document.createTextNode(value));
+                    valueElm.appendChild(a);
                 } else {
                     valueElm.innerText = value;
                 }
-                dt.appendChild(valueElm);
-
-                dl.appendChild(dt);
+            } else if ("object" === typeof (value)) {
+                dt.classList.add(Array.isArray(value) ? "array" : "object");
+                valueElm.appendChild(this.parse(value));
+            } else {
+                valueElm.innerText = value;
             }
-            return dl;
-        }
+            dt.appendChild(valueElm);
+
+            dl.appendChild(dt);
+        });
+        return dl;
     }
+
 };
 customElements.define('fhir-resource-json', FhirResourceJson);
