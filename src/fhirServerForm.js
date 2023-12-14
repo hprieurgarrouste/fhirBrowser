@@ -4,8 +4,6 @@ import "./components/AppButton"
 import "./components/AppConfirm"
 import "./components/TextField"
 
-import "./FhirServerNewAuth"
-
 class FhirServerForm extends HTMLElement {
     constructor() {
         super();
