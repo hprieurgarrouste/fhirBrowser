@@ -4,23 +4,10 @@
         flex-direction: column;
         height: 100%;
         overflow: hidden;
-        position: relative;
     }
 
-    tab-bar {
-        border-bottom: 1px solid var(--border-color, gray);
-    }
-
-    #tabsBody {
-        flex: auto;
-        height: 0;
-        overflow: hidden;
-        position: relative;
-        block-size: 100%;
-        display: grid;
-        grid-auto-flow: column;
-        grid-auto-columns: 100%;
-        grid-auto-rows: 100%;
+    app-tabs {
+        flex: 1 1 auto;
     }
 
     #server {
@@ -28,15 +15,15 @@
     }
 </style>
 <main>
-    <section id="server">
+    <header id="server">
         <list-item id="serverTitle" data-primary="" data-secondary="" data-icon=""></list-item>
-    </section>
-    <tab-bar>
-        <app-tab id="tabResources" data-target="resourceTypes" selected>Resource Types</app-tab>
-        <app-tab id="tabDetails" data-target="capability">Details</app-tab>
-    </tab-bar>
-    <div id="tabsBody">
-        <fhir-resource-types id="resourceTypes"></fhir-resource-types>
-        <fhir-capability id="capability"></fhir-capability>
-    </div>
+    </header>
+    <app-tabs>
+        <section data-caption="Resource Types">
+            <fhir-resource-types id="resourceTypes"></fhir-resource-types>
+        </section>
+        <section data-caption="Details">
+            <fhir-capability id="capability"></fhir-capability>
+        </section>
+    </app-tabs>
 </main>

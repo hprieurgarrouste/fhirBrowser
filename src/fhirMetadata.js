@@ -1,10 +1,10 @@
 import template from "./templates/fhirMetadata.html";
 
-import "./components/TabBar"
+import "./components/AppTabs"
 
-import "./AppTab"
 import "./FhirResourceTypes"
 import "./FhirCapability"
+import { FhirService } from "./services/Fhir";
 
 class FhirMetadata extends HTMLElement {
     constructor() {
@@ -12,6 +12,11 @@ class FhirMetadata extends HTMLElement {
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
         this._metadata = null;
+    }
+
+    connectedCallback() {
+        window.addEventListener("hashchange", this.locationHandler);
+        FhirService.addListener(this.serverChanged);
     }
 
     locationHandler = () => {
@@ -29,21 +34,8 @@ class FhirMetadata extends HTMLElement {
         }
     }
 
-    connectedCallback() {
-        window.addEventListener("hashchange", this.locationHandler);
-        this._shadow.querySelector("tab-bar").addEventListener('click', ({ detail }) => {
-            this._shadow.getElementById(detail.tab.dataset.target).scrollIntoView({
-                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? "auto" : "smooth",
-                block: "start",
-                inline: "start"
-            });
-        });
-    }
-
-    /**
-    * @param {FhirMetadata} server
-    */
-    set server(server) {
+    serverChanged = () => {
+        const server = FhirService.server;
         this._shadow.getElementById("serverTitle").setAttribute("data-primary", server.serverCode);
         this._shadow.getElementById("serverTitle").setAttribute("data-secondary", server.capabilities?.implementation?.description || server.capabilities?.software?.name || server.url);
 

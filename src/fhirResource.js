@@ -4,18 +4,18 @@ import "./components/AppBar"
 import "./components/Chips"
 import "./components/RoundButton"
 import "./components/SidePanel"
-import "./components/TabBar"
+import "./components/AppTabs"
 
-import "./AppTab"
 import "./FhirHistory"
 import "./FhirReferences"
-import "./FhirResourceForm"
-//import "./FhirResourceFormEditor"
+//import "./FhirResourceForm"
+import "./FhirResourceFormEditor"
 import "./FhirResourceJson"
 import "./FhirResourceTtl"
 import "./FhirResourceXml"
 
 import { FhirService } from "./services/Fhir"
+import { PreferencesService } from "./services/Preferences"
 import { SnackbarsService } from "./services/Snackbars"
 
 
@@ -27,6 +27,23 @@ class FhirResource extends HTMLElement {
         this._resourceType = null;
         this._resourceId = null;
         this._resource = {};
+    }
+
+    async getJson(type, id) {
+        let resource = null;
+        try {
+            resource = await FhirService.read(this._resourceType.type, this._resourceId);
+            this._resource.json = resource;
+            const view = this._shadow.querySelector('fhir-resource-json');
+            if (view) view.source = resource;
+        } catch (e) {
+            SnackbarsService.show('An error occurred while reading json',
+                undefined,
+                undefined,
+                'error'
+            );
+        };
+        return resource;
     }
 
     connectedCallback() {
@@ -42,7 +59,57 @@ class FhirResource extends HTMLElement {
 
         this._shadow.getElementById('historyToggle').onclick = this.historyToggleClick;
 
-        this._shadow.querySelector("tab-bar").addEventListener('click', this.tabBarClick);
+        this._shadow.querySelector("app-tabs").addEventListener('select', ({ detail }) => {
+            if (this._resourceType?.type && this._resourceId) {
+                switch (detail.caption) {
+                    case 'json':
+                        if (!this._resource.json) {
+                            this._resource.json = this.getJson(this._resourceType.type, this._resourceId);
+                        }
+                        break;
+                    case 'xml':
+                        FhirService.readXml(this._resourceType.type, this._resourceId).then(resource => {
+                            this._resource.xml = resource;
+                            const parser = new DOMParser();
+                            const xml = parser.parseFromString(resource, "application/xml");
+                            const view = this._shadow.querySelector('fhir-resource-xml');
+                            if (view) view.source = xml;
+                        }).catch((e) => {
+                            this._resource.xml = null;
+                            SnackbarsService.show('An error occurred while reading xml',
+                                undefined,
+                                undefined,
+                                'error'
+                            );
+                        });
+                        break;
+                    case 'ttl':
+                        FhirService.readTtl(this._resourceType.type, this._resourceId).then(resource => {
+                            this._resource.ttl = resource;
+                            const view = this._shadow.querySelector('fhir-resource-ttl');
+                            if (view) view.source = resource;
+                        }).catch((e) => {
+                            this._resource.ttl = null;
+                            SnackbarsService.show('An error occurred while reading ttl',
+                                undefined,
+                                undefined,
+                                'error'
+                            );
+                        });
+                        break;
+                    case 'form':
+                        const view = this._shadow.querySelector('fhir-resource-form');
+                        if (view) view.source = this._resource.json;
+                        break;
+                }
+
+                const historyPanel = this._shadow.querySelector('fhir-history');
+                if (historyPanel && !historyPanel.hidden) {
+                    historyPanel.load(this._resourceType, this._resourceId);
+                }
+            }
+        });
+        FhirService.addListener(this.serverChanged);
     }
 
     helpClick = () => {
@@ -106,53 +173,25 @@ class FhirResource extends HTMLElement {
 
     historyToggleClick = () => {
         const panel = this._shadow.querySelector('fhir-history');
-        if (panel.hidden) this._shadow.querySelector('fhir-references').hidden = true;
+        if (panel.hidden) {
+            this._shadow.querySelector('fhir-references').hidden = true;
+            panel.load(this._resourceType, this._resourceId);
+        }
         panel.hidden = !panel.hidden;
     };
 
-    tabBarClick = ({ detail }) => {
-        const tabId = detail.tab.id;
-        const xmlView = this._shadow.getElementById('xmlView');
-        const ttlView = this._shadow.getElementById('ttlView');
-        const formView = this._shadow.getElementById('formView');
-        this._shadow.getElementById("jsonView").hidden = (tabId !== 'tabJson');
-        xmlView.hidden = (tabId !== 'tabXml');
-        ttlView.hidden = (tabId !== 'tabTtl');
-        formView.hidden = (tabId !== 'tabForm');
-        if (tabId == 'tabXml' && !this._resource.xml) {
-            FhirService.readXml(this._resourceType.type, this._resourceId).then(resource => {
-                const parser = new DOMParser();
-                const xml = parser.parseFromString(resource, "application/xml");
-                this._resource.xml = resource;
-                xmlView.source = xml;
-            }).catch((e) => {
-                this._resource.xml = null;
-            });
-        } else if (tabId == 'tabTtl' && !this._resource.ttl) {
-            FhirService.readTtl(this._resourceType.type, this._resourceId).then(resource => {
-                this._resource.ttl = resource;
-                ttlView.source = resource;
-            }).catch((e) => {
-                this._resource.xml = null;
-            });
-        } else if (tabId == 'tabForm') {
-            formView.source = this._resource.json;
-        }
-
-    };
-
-    getCurrentContent() {
+    getCurrentContent = () => {
         let content = {};
-        switch (this._shadow.querySelector('app-tab[selected]').id) {
-            case "tabXml":
+        switch (this._shadow.querySelector("app-tabs").value) {
+            case "xml":
                 content.value = this._resource.xml;
                 content.type = 'xml';
                 break;
-            case "tabTtl":
+            case "ttl":
                 content.value = this._resource.ttl;
                 content.type = 'ttl';
                 break;
-            case "tabJson":
+            case "json":
             default:
                 content.value = JSON.stringify(this._resource.json);
                 content.type = 'json';
@@ -161,8 +200,48 @@ class FhirResource extends HTMLElement {
         return content;
     }
 
-    load({ resourceType, resourceId }) {
+    serverChanged = () => {
+        const tabs = this._shadow.querySelector("app-tabs");
+        while (tabs.firstChild) tabs.removeChild(tabs.lastChild);
+
+        if (FhirService.formatEnable("json")) {
+            const view = document.createElement('fhir-resource-json');
+            const section = document.createElement('section');
+            section.dataset.caption = 'json';
+            section.appendChild(view);
+            this._shadow.querySelector('app-tabs').appendChild(section);
+        }
+
+        if (FhirService.formatEnable("xml")) {
+            const view = document.createElement('fhir-resource-xml');
+            const section = document.createElement('section');
+            section.dataset.caption = 'xml';
+            section.appendChild(view);
+            this._shadow.querySelector('app-tabs').appendChild(section);
+        }
+
+        if (FhirService.formatEnable("ttl")) {
+            const view = document.createElement('fhir-resource-ttl');
+            const section = document.createElement('section');
+            section.dataset.caption = 'ttl';
+            section.appendChild(view);
+            this._shadow.querySelector('app-tabs').appendChild(section);
+        }
+
+        const formEnable = PreferencesService.get('experimental');
+        if (formEnable) {
+            const view = document.createElement('fhir-resource-form');
+            const section = document.createElement('section');
+            section.dataset.caption = 'form';
+            section.appendChild(view);
+            this._shadow.querySelector('app-tabs').appendChild(section);
+        }
+    }
+
+    load = ({ resourceType, resourceId }) => {
         if (resourceType === this._resourceType && resourceId === this._resourceId) return;
+        this._resourceType = resourceType;
+        this._resourceId = resourceId;
 
         if (window.matchMedia("(max-width: 480px)").matches) {
             this._shadow.querySelector("fhir-references").hidden = true;
@@ -183,64 +262,10 @@ class FhirResource extends HTMLElement {
             this._shadow.querySelector('fhir-references').hidden = true;
         }
 
-        const header = this._shadow.getElementById('header');
-        const tabBar = this._shadow.querySelector('tab-bar');
-        const jsonView = this._shadow.getElementById('jsonView');
-        const xmlView = this._shadow.getElementById('xmlView');
-        const ttlView = this._shadow.getElementById('ttlView');
-        const formView = this._shadow.getElementById('formView');
-        const shareBtn = this._shadow.getElementById("share");
-        const copyBtn = this._shadow.getElementById("copy");
-        const downloadBtn = this._shadow.getElementById("download");
-
-        const formViewEnable = false;
-        this._shadow.getElementById('tabForm').hidden = !formViewEnable;
-        formView.hidden = !formViewEnable;
-
-        const ttlFormatEnable = FhirService.formatEnable("ttl");
-        this._shadow.getElementById("tabTtl").hidden = !ttlFormatEnable;
-        ttlView.hidden = !ttlFormatEnable;
-
-        const xmlFormatEnable = FhirService.formatEnable("xml");
-        this._shadow.getElementById("tabXml").hidden = !xmlFormatEnable;
-        xmlView.hidden = !xmlFormatEnable;
-
         this._shadow.getElementById('title').innerText = resourceType.type;
-        header.classList.remove('error');
-        this._shadow.getElementById("error").hidden = true;
-        tabBar.hidden = false;
-        tabBar.select('tabJson');
 
         this._resource = {};
-        jsonView.clear();
-        xmlView.clear();
-        ttlView.clear();
-
-        FhirService.read(resourceType.type, resourceId).then(resource => {
-            this._resourceType = resourceType;
-            this._resourceId = resourceId;
-
-            this._resource.json = resource;
-            jsonView.source = resource;
-            shareBtn.hidden = false;
-            copyBtn.hidden = false;
-            downloadBtn.hidden = false;
-
-            this._shadow.querySelector('fhir-history').load(resourceType, resource);
-
-        }).catch((e) => {
-            header.classList.add('error');
-            const error = this._shadow.getElementById("error");
-            error.hidden = false;
-            error.innerText = e;
-            tabBar.hidden = true;
-            jsonView.hidden = true;
-            xmlView.hidden = true;
-            this._resource.json = null;
-            shareBtn.hidden = true;
-            copyBtn.hidden = true;
-            downloadBtn.hidden = true;
-        });
+        this._shadow.querySelector('app-tabs').value = 'json';
     }
 
 };

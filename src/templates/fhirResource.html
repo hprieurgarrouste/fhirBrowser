@@ -83,19 +83,7 @@
             </app-bar>
         </header>
         <main>
-            <section id="tabs">
-                <tab-bar>
-                    <app-tab id="tabJson" selected>Json</app-tab>
-                    <app-tab id="tabXml" hidden>Xml</app-tab>
-                    <app-tab id="tabTtl" hidden>Ttl</app-tab>
-                    <app-tab id="tabForm">Form</app-tab>
-                </tab-bar>
-                <fhir-resource-json id="jsonView"></fhir-resource-json>
-                <fhir-resource-xml id="xmlView" hidden></fhir-resource-xml>
-                <fhir-resource-ttl id="ttlView" hidden></fhir-resource-ttl>
-                <fhir-resource-form id="formView" hidden></fhir-resource-form>
-                <span id="error"></span>
-            </section>
+            <app-tabs></app-tabs>
         </main>
     </section>
     <fhir-references slot="main" hidden></fhir-references>
