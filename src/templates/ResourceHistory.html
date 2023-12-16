@@ -1,0 +1,20 @@
+<link href="/assets/material.css" rel="stylesheet" />
+<style>
+    #list {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+
+        background: linear-gradient(90deg, var(--background-color) calc(100% - 2px), var(--text-color-normal) 0);
+        background-size: 19px;
+        background-repeat: no-repeat;
+    }
+
+    #list>* {
+        cursor: pointer;
+    }
+</style>
+<side-panel data-title="History">
+    <round-button id="help" title="Help" data-icon="help" slot="appBarLeft"></round-button>
+    <section id="list" slot="main"></section>
+</side-panel>

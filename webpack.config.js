@@ -4,7 +4,7 @@ module.exports = {
   mode: 'production',
   cache: false,
   entry: {
-    app: './src/FhirBrowser.js'
+    app: './src/App.js'
   },
   output: {
     path: path.resolve(__dirname, '.'),

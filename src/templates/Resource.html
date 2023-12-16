@@ -1,0 +1,91 @@
+<link rel="stylesheet" href="/assets/material.css">
+<style>
+    #wrapper {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    #resourceCnt {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        flex: auto;
+        width: 0;
+    }
+
+    main {
+        flex: 1 1 auto;
+        height: 0;
+    }
+
+    #title {
+        margin: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    tab-bar {
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    #jsonView,
+    #xmlView,
+    #ttlView,
+    #formView {
+        flex: 1 1 auto;
+        height: 0;
+    }
+
+    #header.error {
+        background-color: var(--background-error, transparent);
+        color: white;
+    }
+
+    #error {
+        padding: 1em;
+    }
+
+    #tabs {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    resource-references,
+    resource-history {
+        border-left: 1px solid var(--border-color);
+    }
+
+    @media (max-width:480px) {
+
+        resource-references,
+        resource-history {
+            background-color: var(--background-color, rgb(255, 255, 255));
+            position: relative;
+            width: 100%;
+        }
+    }
+</style>
+<div id="wrapper">
+    <section id="resourceCnt">
+        <header>
+            <app-bar id="header">
+                <round-button slot="left" id="help" title="Help" data-icon="help"></round-button>
+                <h3 slot="middle" id="title"></h3>
+                <round-button slot="right" id="share" title="Share" data-icon="share"></round-button>
+                <round-button slot="right" id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
+                <round-button slot="right" id="download" title="Download" data-icon="download"></round-button>
+                <round-button slot="right" id="referencesToggle" title="References"
+                    data-icon="article_shortcut"></round-button>
+                <round-button slot="right" id="historyToggle" title="History" data-icon="history"></round-button>
+            </app-bar>
+        </header>
+        <main>
+            <app-tabs></app-tabs>
+        </main>
+    </section>
+    <resource-references slot="main" hidden></resource-references>
+    <resource-history slot="main" hidden></resource-history>
+</div>

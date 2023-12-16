@@ -5,28 +5,27 @@ class AppSwitch extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' })
         this._shadow.innerHTML = template;
-        this._input = null;
+        this._main = null;
     }
 
     static get observedAttributes() { return ['data-checked']; }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        const input = this._shadow.querySelector('input');
+        const main = this._shadow.querySelector('main');
         if ('data-checked' == name) {
             if (null === newValue) {
-                input.removeAttribute('checked');
+                main.classList.remove('checked');
             } else {
-                input.setAttribute('checked', "");
+                main.classList.add('checked');
             }
         }
     }
 
     connectedCallback() {
-        this._input = this._shadow.querySelector('input');
-        this._shadow.addEventListener('click', this.onclickHandler);
+        this._shadow.addEventListener('click', this.clickHandler);
     }
 
-    onclickHandler = (event) => {
+    clickHandler = (event) => {
         if (this.hasAttribute('data-checked')) {
             this.removeAttribute('data-checked');
         } else {

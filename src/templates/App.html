@@ -1,0 +1,109 @@
+<link rel="stylesheet" href="/assets/material.css">
+<style>
+    :host {
+        background-color: var(--background-color, rgb(255, 255, 255));
+        color: var(--text-color-normal, rgb(0, 0, 0, 87%));
+        display: flex;
+        flex-direction: column;
+        font-family: Roboto, Arial, monospace;
+        font-size: 1rem;
+        font-weight: 400;
+        height: 100vh;
+        line-height: 1.5;
+    }
+
+    header {
+        background-color: var(--primary-color, #000);
+        color: #FFF;
+    }
+
+    h3 {
+        margin: 0;
+    }
+
+    main {
+        flex: 1 1 auto;
+        height: 0;
+        overflow: hidden;
+    }
+
+    main>div {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+    }
+
+    server-panel {
+        border-right: 1px solid var(--border-color, gray);
+        flex: none;
+        transition: all 0.3s;
+        margin-left: 0;
+        width: 300px;
+    }
+
+    server-panel.hidden {
+        transition: all 0.3s;
+        margin-left: -300px;
+    }
+
+    #bdy {
+        flex: 1 1 auto;
+        overflow: hidden;
+        width: 0;
+        position: relative;
+        block-size: 100%;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 100%;
+        grid-auto-rows: 100%;
+    }
+
+    #waiting {
+        align-items: center;
+        background-color: rgba(0, 0, 0, 32%);
+        display: flex;
+        font-size: 5em;
+        justify-content: center;
+        left: 0;
+        min-height: 100%;
+        min-width: 100%;
+        position: absolute;
+        top: 0;
+        visibility: hidden;
+    }
+
+    @media (max-width:480px) {
+        server-panel {
+            background-color: var(--background-color, rgb(255, 255, 255));
+            position: static;
+            width: 100%;
+        }
+
+        server-panel.hidden {
+            margin-left: -100%;
+        }
+    }
+</style>
+<header>
+    <app-bar id="header" caption="">
+        <round-button slot="left" id="navigation" title="Menu" data-icon="menu" hidden></round-button>
+        <span id="appTitle" slot="middle">FHIR Browser</span>
+        <color-scheme slot="right"></color-scheme>
+        <round-button slot="right" id="serverDialogToggle" title="Connections" data-icon="database"></round-button>
+        <round-button slot="right" id="aboutDialogToggle" title="About" data-icon="help"></round-button>
+    </app-bar>
+</header>
+<main>
+    <div>
+        <server-panel class="hidden"></server-panel>
+        <div id="bdy" style="visibility:hidden;">
+            <fhir-bundle id="bundle"></fhir-bundle>
+            <fhir-resource id="resource"></fhir-resource>
+        </div>
+    </div>
+</main>
+<about-dialog hidden></about-dialog>
+<server-dialog hidden></server-dialog>
+<div id="waiting">
+    <circular-progress></circular-progress>
+</div>

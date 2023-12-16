@@ -1,0 +1,46 @@
+<link rel="stylesheet" href="/assets/material.css">
+<style>
+    section {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    main {
+        border-bottom: 1px solid var(--border-color);
+        padding: 0.5em;
+        overflow: hidden auto;
+        flex: 1 1 auto;
+        height: 0;
+    }
+
+    footer {
+        padding: 9px 16px;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    @media (max-width:480px) {
+        .surface {
+            left: 0;
+            right: unset;
+            width: 100%;
+            max-width: unset;
+            max-height: unset;
+        }
+
+        .overlay {
+            background-color: transparent;
+        }
+    }
+</style>
+<side-panel data-title="Search">
+    <round-button id="help" title="Help" data-icon="help" slot="appBarLeft"></round-button>
+    <round-button id="clear" title="Clear" data-icon="clear_all" slot="appBarRight"></round-button>
+    <section slot="main">
+        <main></main>
+        <footer>
+            <app-button id="apply" value="Search"></app-button>
+        </footer>
+    </section>
+</side-panel>

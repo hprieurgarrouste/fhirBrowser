@@ -1,0 +1,33 @@
+<style>
+    main {
+        background-color: var(--hover-color);
+        border-bottom: 1px solid gray;
+    }
+
+    main:focus-within {
+        border-color: var(--primary-color);
+    }
+
+    input {
+        background: none;
+        border: 0 none;
+        border-bottom: 1px solid transparent;
+        color: var(--text-color-normal);
+        flex: auto;
+        font: inherit;
+        padding: 5px;
+        width: 90px;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+</style>
+<main>
+    <input placeholder="Modifier" list="FhirSearchFieldModifierList"></input>
+    <datalist id="FhirSearchFieldModifierList">
+        <option value="contains"></option>
+        <option value="exact"></option>
+    </datalist>
+</main>

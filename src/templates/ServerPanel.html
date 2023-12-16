@@ -1,0 +1,28 @@
+<style>
+    main {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    header {
+        padding: 1em;
+    }
+
+    app-tabs {
+        flex: 1 1 auto;
+    }
+</style>
+<main>
+    <header>
+        <list-item id="serverTitle"></list-item>
+    </header>
+    <app-tabs>
+        <section data-caption="Resource Types">
+            <server-resources></server-resources>
+        </section>
+        <section data-caption="Details">
+            <server-capabilities></server-capabilities>
+        </section>
+    </app-tabs>
+</main>
