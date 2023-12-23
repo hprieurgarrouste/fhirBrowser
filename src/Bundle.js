@@ -36,6 +36,7 @@ class Bundle extends HTMLElement {
             timeZoneName: "short"
         }
         this._columnsDialog = null;
+        this._source = null;
     }
 
     connectedCallback() {
@@ -44,9 +45,7 @@ class Bundle extends HTMLElement {
         this._shadow.querySelector("data-table-pagination").onclick = this.paginationClick;
 
         const dataTable = this._shadow.getElementById('table');
-        dataTable.addEventListener('rowclick', ({ detail }) => {
-            location.hash = `#${this._resourceType.type}/${detail.resourceId}`;
-        });
+        dataTable.addEventListener('rowclick', this.onRowClick);
         dataTable.onColumnReorder = this.handleColumnChanged;
 
         this._shadow.getElementById('searchToggle').addEventListener('click', () => {
@@ -64,6 +63,14 @@ class Bundle extends HTMLElement {
 
     }
 
+    onRowClick = ({ detail }) => {
+        const entry = this._source.entry.find(({ resource }) => resource.id == detail.resourceId);
+        if (entry) {
+            const url = entry.fullUrl.replace(`${FhirService.server.url}`, '');
+            location.hash = `#${url}`;
+        }
+    }
+
     handleColumnSetup = (columns) => {
         //suppression des colonnes
         let newColumns = this._columns.filter(c => columns.includes(c));
@@ -71,12 +78,13 @@ class Bundle extends HTMLElement {
         newColumns.push(...columns.filter(c => !newColumns.includes(c)));
         this.handleColumnChanged(newColumns);
     }
+
     handleColumnChanged = (columns) => {
         this._columns = columns;
         const dataTable = this._shadow.getElementById('table');
         dataTable.clear();
         this._columns.forEach(column => dataTable.addColumn(column));
-        this.loadPage();
+        this.parsePage(this._source);
 
         const pref = PreferencesService.get("columns", {});
         pref[this._resourceType.type] = this._columns;
@@ -89,10 +97,10 @@ class Bundle extends HTMLElement {
     }
 
     paginationClick = ({ target }) => {
-        if (!target.matches("round-button")) {
-            return;
-        }
-        this.loadPage(target.dataset);
+        if ("ROUND-BUTTON" != target.nodeName) return;
+        let url = target.dataset.url;
+        url = url.replace(`${FhirService.server.url}`, '');
+        location.hash = `#${url}`;
     }
 
     helpClick = () => {
@@ -122,100 +130,8 @@ class Bundle extends HTMLElement {
         window.URL.revokeObjectURL(url);
     }
 
-    load(resourceType, filters = []) {
-        if (resourceType === this._resourceType && JSON.stringify(this._filters) === JSON.stringify(filters)) return;
-
-        if (window.matchMedia("(max-width: 480px)").matches) {
-            this._shadow.getElementById('search')?.classList.add("hidden");
-        }
-
-        this._resourceType = resourceType;
-        this._filters = filters;
-
-        const pref = PreferencesService.get("columns", {});
-        this._columns = pref[resourceType.type] || ["id", "meta.lastUpdated"];
-
-        this._columnsDialog.hidden = true;
-
-        this._shadow.getElementById('title').innerText = resourceType.type;
-
-        const dataTable = this._shadow.getElementById('table');
-        dataTable.clear();
-        this._columns.forEach(column => {
-            dataTable.addColumn(column);
-        });
-
-        this.loadPage();
-    }
-
     get resourceType() {
         return this._resourceType;
-    }
-
-    loadPage(link = {
-        url: `${FhirService.server.url}/${this._resourceType.type}?_count=${this._pageSize}`
-    }) {
-        switch (link.relation) {
-            case 'previous':
-                this._skip -= this._pageSize;
-                break;
-            case 'next':
-                this._skip += this._pageSize;
-                break;
-            case 'last':
-                this._skip = Math.floor(this._count / this._pageSize) * this._pageSize;
-                break;
-            case 'first':
-            default:
-                this._skip = 0;
-                break;
-        }
-        this._shadow.getElementById('table').removeAll();
-        const loader = this._shadow.querySelector('linear-progress');
-        loader.style.visibility = "visible";
-        FhirService.searchByLink(link.url, this._filters).then(data => {
-            this._page = data;
-            this.parsePage(data);
-            loader.style.visibility = "hidden";
-            if (typeof link.relation === 'undefined') {
-                if (data.total) {
-                    this._count = data.total;
-                    this.fillPaginationRange();
-                    this._shadow.getElementById('paginationCount').innerHTML = this._count;
-                } else {
-                    this.getCount();
-                }
-            } else {
-                this.fillPaginationRange();
-            }
-        }).catch(error => {
-            SnackbarsService.show(`An error occurred while searching`,
-                undefined,
-                undefined,
-                'error'
-            );
-        });
-    }
-
-    getCount() {
-        const paginationCount = this._shadow.getElementById('paginationCount');
-        paginationCount.innerHTML = "<circular-progress></circular-progress>";
-        FhirService.searchCount(this._resourceType.type, this._filters).then(({ total }) => {
-            this._count = total;
-            this.fillPaginationRange();
-            paginationCount.innerHTML = total?.toLocaleString() || "Unkown";
-        });
-    }
-
-    fillPaginationRange() {
-        const paginationRange = this._shadow.getElementById('paginationRange');
-        let range = '0';
-        if (typeof this._count == 'undefined') {
-            range = `${this._skip + 1}-${this._skip + this._pageSize}`;
-        } else if (this._count != 0) {
-            range = `${this._skip + 1}-${Math.min(this._skip + this._pageSize, this._count)}`;
-        }
-        paginationRange.innerText = range;
     }
 
     beautifyDate(stringdate) {
@@ -231,7 +147,6 @@ class Bundle extends HTMLElement {
         if (data.entry) {
             const dataTable = this._shadow.getElementById('table');
             data.entry
-                .filter(entry => this._resourceType.type === entry?.resource?.resourceType)
                 .forEach(entry => {
                     let row = {};
                     this._columns.forEach(column => {
@@ -258,27 +173,72 @@ class Bundle extends HTMLElement {
             const buttons = {
                 "first": this._shadow.getElementById('paginationFirst'),
                 "previous": this._shadow.getElementById('paginationPrevious'),
+                //prev is specific to firely server
+                "prev": this._shadow.getElementById('paginationPrevious'),
                 "next": this._shadow.getElementById('paginationNext'),
                 "last": this._shadow.getElementById('paginationLast')
             }
 
-            for (const [relation, button] of Object.entries(buttons)) {
+            Object.entries(buttons).forEach(([, button]) => {
                 button.setAttribute("disabled", '');
                 button.removeAttribute("data-relation");
                 button.removeAttribute("data-url");
-            }
-            let button = null;
-            data.link.forEach(link => {
-                //prev is specific to firely server
-                const rel = ("prev" === link.relation) ? "previous" : link.relation;
-                if (button = buttons[rel]) {
-                    button.removeAttribute("disabled");
-                    button.setAttribute("data-relation", rel);
-                    button.setAttribute("data-url", link.url);
-                }
+            });
+
+            data.link?.forEach(({ relation, url }) => {
+                buttons[relation]?.removeAttribute("disabled");
+                buttons[relation]?.setAttribute("data-relation", relation);
+                buttons[relation]?.setAttribute("data-url", url);
             });
         }
     }
 
+    /**
+     * @param {any} response
+     */
+    set source(response) {
+
+        let resourceType;
+        let singleResourceType = false;
+        if (response.entry?.length) {
+            const types = [...new Set(response.entry.map(entry => entry.resource.resourceType))];
+            singleResourceType = (types.length == 1);
+            if (singleResourceType) {
+                resourceType = types[0];
+            } else {
+                resourceType = 'Bundle';
+            }
+        }
+        else {
+            const hash = window.location.hash.replace('#/', '').trim();
+            resourceType = RegExp(/^\w+/).exec(hash)[0];
+        }
+
+        this._resourceType = FhirService.server.capabilities.rest[0].resource.find(res => res.type === resourceType);
+
+        let title = resourceType;
+
+        if (singleResourceType) {
+            const pref = PreferencesService.get('columns', {});
+            this._columns = pref[resourceType] || ['id', 'meta.lastUpdated'];
+            this._shadow.getElementById('settingsDialogToggle').hidden = false;
+            this._shadow.getElementById('search').hidden = false;
+        } else {
+            this._shadow.getElementById('settingsDialogToggle').hidden = true;
+            this._shadow.getElementById('search').hidden = true;
+            this._columns = ['resourceType', 'id'];
+            if ('Bundle' == resourceType) {
+                title = `${response.type} ${title.toLowerCase()}`;
+            }
+        }
+        this._shadow.getElementById('title').innerText = title;
+
+        const dataTable = this._shadow.getElementById('table');
+        dataTable.clear();
+        this._columns.forEach(column => dataTable.addColumn(column));
+
+        this._source = response;
+        this.parsePage(response);
+    }
 };
 customElements.define('fhir-bundle', Bundle);

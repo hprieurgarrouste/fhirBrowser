@@ -10,27 +10,33 @@ class ResourceXmlView extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-        this._sorted = false;
+        this._sort = false;
         this._resource = null;
     }
 
     connectedCallback() {
         this._shadow.getElementById("content").onclick = this.contentClick;
-        this._sorted = PreferencesService.get('xmlView', { 'sorted': true }).sorted;
-        const sortedSwitch = this._shadow.querySelector('app-switch');
-        this._shadow.querySelector('app-switch').onclick = this.sortedClickHandler;
-        if (this._sorted) {
-            sortedSwitch.setAttribute('data-checked', '');
+        this._sort = PreferencesService.get('xmlView', { 'sorted': false }).sorted;
+        const sortToggle = this._shadow.querySelector('app-switch');
+        this._shadow.querySelector('app-switch').parentNode.onclick = this.sortToggleClick;
+        if (this._sort) {
+            sortToggle.setAttribute('data-checked', '');
         } else {
-            sortedSwitch.removeAttribute('data-checked');
+            sortToggle.removeAttribute('data-checked');
         }
     }
 
-    sortedClickHandler = (event) => {
-        this._sorted = this._shadow.querySelector('app-switch').hasAttribute('data-checked');
-        PreferencesService.set('xmlView', { 'sorted': this._sorted });
+    sortToggleClick = ({ target }) => {
+        const sortSwitch = this._shadow.querySelector('app-switch');
+        const ATBNAME = 'data-checked';
+        if ("APP-SWITCH" !== target.nodeName) {
+            sortSwitch.hasAttribute(ATBNAME) ? sortSwitch.removeAttribute(ATBNAME) : sortSwitch.setAttribute(ATBNAME, '');
+        }
+        this._sort = sortSwitch.hasAttribute(ATBNAME);
+        PreferencesService.set('xmlView', { 'sorted': this._sort });
         this.source = this._resource;
     }
+
 
     contentClick = ({ target, offsetX, offsetY, ctrlKey }) => {
         if (target.classList.contains("object")) {
@@ -58,8 +64,18 @@ class ResourceXmlView extends HTMLElement {
         content.scrollTo(0, 0);
         content.innerHTML = "Loading...";
         content.style.cursor = "wait";
+        this._resource = null;
     }
 
+    get resourceType() {
+        return this._resource?.documentElement?.nodeName;
+    }
+    get resourceId() {
+        return this._resource?.documentElement?.querySelector('id[value]')?.getAttribute('value');
+    }
+    get source() {
+        return this._resource;
+    }
     /**
      * @param {object} resource
      */
@@ -74,7 +90,7 @@ class ResourceXmlView extends HTMLElement {
     parse = (obj) => {
         let dl = document.createElement('dl');
         let entries = Array.from(obj.children);
-        if (this._sorted) entries.sort((n1, n2) => {
+        if (this._sort) entries.sort((n1, n2) => {
             return n1.nodeName.localeCompare(n2.nodeName);
         });
         entries.forEach(e => {
@@ -94,10 +110,8 @@ class ResourceXmlView extends HTMLElement {
                     let val = document.createElement('span');
                     val.className = "values";
                     if ("reference" === e.nodeName && "value" === a.nodeName) {
-                        let url = a.nodeValue;
-                        if (url.startsWith(FhirService.server.url)) {
-                            url = url.slice(FhirService.server.url.length + 1);
-                        }
+                        let url = a.nodeValue.replace(`${FhirService.server.url}`, '')
+                        if (!url.startsWith('/') && !url.startsWith('?')) url = `/${url}`;
                         let link = document.createElement('a');
                         link.setAttribute("href", `#${url}`);
                         link.appendChild(document.createTextNode(`"${a.nodeValue}"`));

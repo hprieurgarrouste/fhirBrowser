@@ -12,6 +12,10 @@ export class SnackbarsService {
         this._container = cnt;
     }
 
+    static error(message) {
+        this.show(message, undefined, undefined, 'error');
+    }
+
     static show(message, action, delay = 4000, type = 'info') {
         let bar = document.createElement("snack-bars");
         bar.type = type;

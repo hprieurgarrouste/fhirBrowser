@@ -15,7 +15,7 @@ class ListItem extends HTMLElement {
                 this._shadow.getElementById("icon").innerText = newValue;
                 break;
             case "data-primary":
-                this._shadow.getElementById("primary").innerText = newValue;
+                this._shadow.getElementById("primary").innerHTML = newValue;
                 break;
             case "data-secondary":
                 this._shadow.getElementById("secondary").innerHTML = newValue;

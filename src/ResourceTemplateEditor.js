@@ -1,4 +1,4 @@
-import template from "./templates/ResourceFormEditor.html"
+import template from "./templates/ResourceTemplateEditor.html"
 
 import "./components/AppList"
 import "./components/SidePanel"
@@ -6,20 +6,20 @@ import "./components/TextField"
 
 import { FhirService } from "./services/Fhir"
 
-class ResourceFormEditor extends HTMLElement {
+class ResourceTemplateEditor extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
         this._resource = null;
         this._dragSrcEl = null;
-        this._form = null;
+        this._template = null;
     }
 
     connectedCallback() {
-        this._form = this._shadow.getElementById('form');
+        this._template = this._shadow.getElementById('form');
 
-        const dragZone = this._shadow.getElementById('dragZone');
+        const dragZone = this._shadow.querySelector('main');
         dragZone.ondragstart = this.onDragStart;
         dragZone.ondragover = this.onDragOver;
         dragZone.ondragenter = this.onDragEnter;
@@ -30,6 +30,8 @@ class ResourceFormEditor extends HTMLElement {
         this._list = this._shadow.querySelector('app-list');
         this._list.onFilter = this.dataListFilter;
         this._shadow.querySelector('side-panel').onClose = this.dataPanelClose;
+
+        if (this._resource) this.render();
     }
 
     dataPanelClose = () => {
@@ -44,7 +46,7 @@ class ResourceFormEditor extends HTMLElement {
     }
 
     clear = () => {
-        while (this._form.firstChild) this._form.removeChild(this._form.lastChild);
+        while (this._template.firstChild) this._template.removeChild(this._template.lastChild);
     }
 
     buildTemplate = (template) => {
@@ -58,7 +60,7 @@ class ResourceFormEditor extends HTMLElement {
                 })
                 fieldset.appendChild(section);
             });
-            this._form.appendChild(fieldset);
+            this._template.appendChild(fieldset);
         });
     }
 
@@ -122,17 +124,23 @@ class ResourceFormEditor extends HTMLElement {
      * @param {object} resource
      */
     set source(resource) {
-        if (resource.resourceType != this._resource?.resourceType) {
-            this.load(resource.resourceType);
-            let templates = JSON.parse(localStorage.getItem('templates') || '{}');
-            const template = templates[resource.resourceType];
-            if (template) {
-                this.buildTemplate(template);
-                this.cleanEmpty();
-                this.setValues(resource);
-            }
-        }
         this._resource = resource;
+        if (this._list) {
+            this.render();
+        }
+    }
+
+    render = () => {
+        this.load(this._resource.resourceType);
+        let templates = JSON.parse(localStorage.getItem('templates') || '{}');
+        const template = templates[this._resource.resourceType];
+        if (template) {
+            this.buildTemplate(template);
+            this.cleanEmpty();
+            this.setValues(this._resource);
+        } else {
+            this.clear();
+        }
     }
 
     load = (resourceType) => {
@@ -195,8 +203,8 @@ class ResourceFormEditor extends HTMLElement {
     }
 
     cleanEmpty = () => {
-        Array.from(this._form.querySelectorAll('section:not(:has(text-field))')).forEach(e => e.remove());
-        Array.from(this._form.querySelectorAll('fieldset:not(:has(section))')).forEach(e => e.remove());
+        Array.from(this._template.querySelectorAll('section:not(:has(text-field))')).forEach(e => e.remove());
+        Array.from(this._template.querySelectorAll('fieldset:not(:has(section))')).forEach(e => e.remove());
     }
 
     isDropAvailable = (src, target) => {
@@ -229,7 +237,7 @@ class ResourceFormEditor extends HTMLElement {
     }
 
     onDragStart = (event) => {
-        this._form.classList.add('drag');
+        this._template.classList.add('drag');
         this._dragSrcEl = event.target;
         this._dragSrcEl.style.opacity = '0.4';
     }
@@ -332,9 +340,9 @@ class ResourceFormEditor extends HTMLElement {
     onDragEnd = (event) => {
         this._dragSrcEl.style.opacity = '1';
         this._dragSrcEl = null;
-        this._form.classList.remove('drag');
-        this._form.querySelectorAll('[class~="over"]').forEach(e => e.classList.remove('over'));
+        this._template.classList.remove('drag');
+        this._template.querySelectorAll('[class~="over"]').forEach(e => e.classList.remove('over'));
     }
 
 };
-customElements.define('resource-form-editor', ResourceFormEditor);
+customElements.define('resource-template-editor', ResourceTemplateEditor);

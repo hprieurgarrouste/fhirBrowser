@@ -27,7 +27,7 @@ class ResourceHistory extends HTMLElement {
             if (item.hasAttribute('selected')) return;
             this._shadow.querySelector("list-row[selected]")?.removeAttribute("selected");
             item.setAttribute("selected", "")
-            location.hash = `#${this._resourceType}/${this._resourceId}/_history/${item.dataset.versionid}`;
+            location.hash = `#/${this._resourceType}/${this._resourceId}/_history/${item.dataset.versionid}`;
         } else {
             event.preventDefault();
             event.stopPropagation();

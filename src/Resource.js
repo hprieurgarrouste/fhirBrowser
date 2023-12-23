@@ -1,21 +1,17 @@
 import template from "./templates/Resource.html";
 
 import "./components/AppBar"
-import "./components/Chips"
 import "./components/RoundButton"
 import "./components/SidePanel"
 import "./components/AppTabs"
 
 import "./ResourceHistory"
 import "./ResourceReferences"
-//import "./ResourceFormView"
-import "./ResourceFormEditor"
 import "./ResourceJsonView"
 import "./ResourceTtlView"
 import "./ResourceXmlView"
 
 import { FhirService } from "./services/Fhir"
-import { PreferencesService } from "./services/Preferences"
 import { SnackbarsService } from "./services/Snackbars"
 
 
@@ -26,7 +22,7 @@ class Resource extends HTMLElement {
         this._shadow.innerHTML = template;
         this._resourceType = null;
         this._resourceId = null;
-        this._resource = {};
+        this._views = {};
     }
 
     connectedCallback() {
@@ -48,91 +44,36 @@ class Resource extends HTMLElement {
     }
 
     tabSelect = ({ detail }) => {
-        if (this._resourceType?.type && this._resourceId) {
-            switch (detail.caption) {
-                case 'json':
-                    this.getJson(this._resourceType.type, this._resourceId)
-                        .then(resource => this._shadow.querySelector('resource-json-view').source = resource);
-                    break;
-                case 'xml':
-                    this.getXml(this._resourceType.type, this._resourceId)
-                        .then(resource => {
-                            const parser = new DOMParser();
-                            const xml = parser.parseFromString(resource, "application/xml");
-                            this._shadow.querySelector('resource-xml-view').source = xml;
-                        });
-                    break;
-                case 'ttl':
-                    this.getTtl(this._resourceType.type, this._resourceId)
-                        .then(resource => this._shadow.querySelector('resource-ttl-view').source = resource);
-                    break;
-                case 'form':
-                    const resource = this.getJson(this._resourceType.type, this._resourceId);
-                    const view = this._shadow.querySelector('resource-form-editor');
-                    if (resource && view) view.source = resource;
-                    break;
-            }
+        const format = detail.caption;
+        const hashSearchParams = location.hash.match(/\?([^?]+)$/);
+        if (hashSearchParams?.length > 0) {
+            const searchParams = new URLSearchParams(hashSearchParams[1]);
+            searchParams.set('_format', format);
+            location.hash = location.hash.replace(/\?[^?]+$/, `?${searchParams.toString()}`);
+        } else {
+            location.hash = `${location.hash}?_format=${format}`;
+        }
 
-            const historyPanel = this._shadow.querySelector('resource-history');
-            if (historyPanel && !historyPanel.hidden) {
-                historyPanel.load(this._resourceType, this._resourceId);
-            }
+        const historyPanel = this._shadow.querySelector('resource-history');
+        if (historyPanel && !historyPanel.hidden) {
+            historyPanel.load(this._resourceType, this._resourceId);
         }
     }
 
-    async getJson(type, id) {
-        if (!this._resource.json) {
-            let resource = null;
-            try {
-                resource = await FhirService.read(this._resourceType.type, this._resourceId);
-            } catch (e) {
-                SnackbarsService.show('An error occurred while reading json format',
-                    undefined,
-                    undefined,
-                    'error'
-                );
-            } finally {
-                this._resource.json = resource;
-            };
-        }
-        return this._resource.json;
-    }
+    referenceToggleClick = () => {
+        const panel = this._shadow.querySelector('resource-references');
+        if (panel.hidden) this._shadow.querySelector('resource-history').hidden = true;
+        panel.hidden = !panel.hidden;
+    };
 
-    async getXml(type, id) {
-        if (!this._resource.xml) {
-            let resource = null;
-            try {
-                resource = await FhirService.readXml(this._resourceType.type, this._resourceId);
-            } catch (e) {
-                SnackbarsService.show('An error occurred while reading xml format',
-                    undefined,
-                    undefined,
-                    'error'
-                );
-            } finally {
-                this._resource.xml = resource;
-            };
+    historyToggleClick = () => {
+        const panel = this._shadow.querySelector('resource-history');
+        if (panel.hidden) {
+            this._shadow.querySelector('resource-references').hidden = true;
+            panel.load(this._resourceType, this._resourceId);
         }
-        return this._resource.xml;
-    }
-
-    async getTtl(type, id) {
-        if (!this._resource.ttl) {
-            let resource = null;
-            try {
-                resource = await FhirService.readTtl(this._resourceType.type, this._resourceId);
-            } catch (e) {
-                SnackbarsService.show('An error occurred while reading ttl format',
-                    undefined,
-                    undefined,
-                    'error'
-                );
-            } finally {
-                this._resource.ttl = resource;
-            };
-            return this._resource.ttl;
-        }
-    }
+        panel.hidden = !panel.hidden;
+    };
 
     helpClick = () => {
         window.open(`${FhirService.helpUrl(this._resourceType.type)}#resource`, "FhirBrowserHelp");
@@ -187,44 +128,31 @@ class Resource extends HTMLElement {
         });
     };
 
-    referenceToggleClick = () => {
-        const panel = this._shadow.querySelector('resource-references');
-        if (panel.hidden) this._shadow.querySelector('resource-history').hidden = true;
-        panel.hidden = !panel.hidden;
-    };
-
-    historyToggleClick = () => {
-        const panel = this._shadow.querySelector('resource-history');
-        if (panel.hidden) {
-            this._shadow.querySelector('resource-references').hidden = true;
-            panel.load(this._resourceType, this._resourceId);
-        }
-        panel.hidden = !panel.hidden;
-    };
-
     getCurrentContent = () => {
-        let content = {};
-        switch (this._shadow.querySelector("app-tabs").value) {
-            case "xml":
-                content.value = this._resource.xml;
-                content.type = 'xml';
+        const type = this._shadow.querySelector("app-tabs").value;
+        let value = this._views[type].source;
+        switch (type) {
+            case 'json':
+                value = JSON.stringify(value);
                 break;
-            case "ttl":
-                content.value = this._resource.ttl;
-                content.type = 'ttl';
+            case 'xml':
+                value = new XMLSerializer().serializeToString(value);
                 break;
-            case "json":
             default:
-                content.value = JSON.stringify(this._resource.json);
-                content.type = 'json';
                 break;
+
         }
-        return content;
+        return {
+            "type": type,
+            "value": value
+        };
     }
 
     serverChanged = () => {
         const tabs = this._shadow.querySelector("app-tabs");
         while (tabs.firstChild) tabs.removeChild(tabs.lastChild);
+
+        this._views = {};
 
         if (FhirService.formatEnable("json")) {
             const view = document.createElement('resource-json-view');
@@ -232,6 +160,7 @@ class Resource extends HTMLElement {
             section.dataset.caption = 'json';
             section.appendChild(view);
             this._shadow.querySelector('app-tabs').appendChild(section);
+            this._views.json = view;
         }
 
         if (FhirService.formatEnable("xml")) {
@@ -240,6 +169,7 @@ class Resource extends HTMLElement {
             section.dataset.caption = 'xml';
             section.appendChild(view);
             this._shadow.querySelector('app-tabs').appendChild(section);
+            this._views.xml = view;
         }
 
         if (FhirService.formatEnable("ttl")) {
@@ -248,46 +178,55 @@ class Resource extends HTMLElement {
             section.dataset.caption = 'ttl';
             section.appendChild(view);
             this._shadow.querySelector('app-tabs').appendChild(section);
-        }
-
-        const formEnable = PreferencesService.get('experimental');
-        if (formEnable) {
-            const view = document.createElement('resource-form-editor');
-            const section = document.createElement('section');
-            section.dataset.caption = 'form';
-            section.appendChild(view);
-            this._shadow.querySelector('app-tabs').appendChild(section);
+            this._views.ttl = view;
         }
     }
 
-    load = ({ resourceType, resourceId }) => {
-        if (resourceType === this._resourceType && resourceId === this._resourceId) return;
-        this._resourceType = resourceType;
-        this._resourceId = resourceId;
+    /**
+     * @param {any} resource
+     */
+    set source(resource) {
+        let format;
+        if (resource instanceof Document) {
+            format = 'xml';
+        } else if ('object' == typeof (resource)) {
+            format = 'json';
+        } else {
+            format = 'ttl';
+        }
+        if (format) {
+            const view = this._views[format];
+            view.source = resource;
+            let resourceType = view.resourceType;
+            this._shadow.getElementById('title').innerText = resourceType;
+            const resourceId = view.resourceId;
+
+            if (resourceId != this._resourceId || resourceType != this._resourceType?.type) {
+                this._resourceType = FhirService.server.capabilities.rest[0].resource.find(res => res.type === resourceType);
+                this._resourceId = resourceId;
+                Object.entries(this._views).filter(([key,]) => key != format).forEach(([, value]) => value.clear());
+            }
+            this._shadow.querySelector('app-tabs').value = format;
+        }
 
         if (window.matchMedia("(max-width: 480px)").matches) {
             this._shadow.querySelector("resource-references").hidden = true;
             this._shadow.querySelector("resource-history").hidden = true;
         }
 
-        if (!resourceType.interaction.find(({ code }) => 'vread' == code)) {
+        if (!this._resourceType.interaction.find(({ code }) => 'vread' == code)) {
             this._shadow.getElementById('historyToggle').hidden = true;
             this._shadow.querySelector('resource-history').hidden = true;
         } else {
             this._shadow.getElementById('historyToggle').hidden = false;
         }
 
-        if (this._shadow.querySelector('resource-references').load(resourceType, resourceId)) {
+        if (this._shadow.querySelector('resource-references').load(this._resourceType, this._resourceId)) {
             this._shadow.getElementById('referencesToggle').hidden = false;
         } else {
             this._shadow.getElementById('referencesToggle').hidden = true;
             this._shadow.querySelector('resource-references').hidden = true;
         }
-
-        this._shadow.getElementById('title').innerText = resourceType.type;
-
-        this._resource = {};
-        this._shadow.querySelector('app-tabs').value = 'json';
     }
 
 };

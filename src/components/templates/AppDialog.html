@@ -26,6 +26,12 @@
         transform: translateX(-50%) translateY(-50%);
     }
 
+    .surface.fullscreen {
+        width: 95%;
+        height: 95%;
+        max-width: unset;
+    }
+
     .overlay {
         background-color: rgba(255, 255, 255, 4%);
         color: var(--text-color-normal, white);
@@ -46,11 +52,18 @@
     }
 
     @media (max-width:480px) {
-        .surface {
+
+        .surface,
+        .surface.centered,
+        .surface.fullscreen {
             top: 0;
             left: 0;
+            right: unset;
+            bottom: unset;
+            transform: unset;
             height: 100%;
             width: 100%;
+            max-height: unset;
             max-width: unset;
         }
 

@@ -1,6 +1,7 @@
 import template from "./templates/AppSwitch.html";
 
 class AppSwitch extends HTMLElement {
+
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' })

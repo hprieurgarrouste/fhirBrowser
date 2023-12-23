@@ -14,11 +14,14 @@ class SidePanel extends HTMLElement {
         }
     }
 
-    static get observedAttributes() { return ["data-title"]; }
+    static get observedAttributes() { return ['data-title', 'data-closable']; }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        if ("data-title" == name) {
+        if ('data-title' == name) {
             this._shadow.getElementById("title").innerText = newValue;
+        } else if ('data-closable' == name) {
+            const closable = 'true' === newValue;
+            this._shadow.getElementById('close').hidden = !closable;
         }
     }
 

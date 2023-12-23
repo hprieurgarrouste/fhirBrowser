@@ -26,11 +26,13 @@ class AppDialog extends HTMLElement {
         this._onClose = closeFct;
     }
 
-    static get observedAttributes() { return ["data-title", "centered"]; }
+    static get observedAttributes() { return ["data-title", "centered", "fullscreen"]; }
 
     attributeChangedCallback(name, oldValue, newValue) {
         if ("centered" == name) {
             this._shadow.querySelector(".surface").classList.add("centered");
+        } else if ("fullscreen" == name) {
+            this._shadow.querySelector(".surface").classList.add("fullscreen");
         } else if ("data-title" === name) {
             this._shadow.getElementById("title").innerText = newValue;
         }

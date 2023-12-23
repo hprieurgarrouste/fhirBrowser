@@ -7,11 +7,15 @@
         height: 100%;
     }
 
+    #content,
+    resource-template-view {
+        flex: 1 1 auto;
+        height: 0;
+    }
+
     #content {
         color: var(--text-color-normal, black);
-        flex: 1 1 auto;
         font-family: monospace;
-        height: 0;
         overflow: auto;
         padding: 1em;
         white-space: nowrap;
@@ -127,10 +131,38 @@
         text-align: right;
         padding: 0.5em;
         border-top: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: row;
+        gap: 2em;
+        align-items: center;
+        min-height: 35px;
     }
 
     footer app-switch {
         vertical-align: middle;
+    }
+
+    footer>label {
+        white-space: nowrap;
+    }
+
+    footer>section {
+        flex: 1 1 auto;
+        display: flex;
+    }
+
+    #search {
+        flex: 1 1 auto;
+        width: 100%;
+        border-radius: 1em;
+        border: 1px solid var(--border-color);
+        padding: 0.5em 1em;
+    }
+
+    ::highlight(search-results),
+    ::selection {
+        background-color: #e5971a;
+        color: black;
     }
 
     @media (max-width:480px) {
@@ -141,5 +173,11 @@
 </style>
 <main>
     <div id="content"></div>
-    <footer><label>Sorted</label>&nbsp;<app-switch></app-switch></footer>
+    <resource-template-view hidden></resource-template-view>
+    <footer>
+        <label>Template<app-switch id="use-template-toggle"></app-switch></label>
+        <section><input type="text" id="search" placeholder="Search"></input></section>
+        <label>Sort<app-switch id="sort-toggle"></app-switch></label>
+        <app-button id="template-edit-button" value="edit template"></app-button>
+    </footer>
 </main>

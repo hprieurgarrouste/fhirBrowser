@@ -84,6 +84,7 @@ export class FhirService {
         });
         return x;
     }
+
     static async capabilities(server) {
         const url = new URL(`${server.url}/metadata`);
         url.searchParams.set("_format", "json");
@@ -131,73 +132,6 @@ export class FhirService {
         const response = await fetch(url, {
             "headers": this._server.headers
         });
-        return response.json();
-    }
-
-    static async readXml(type, id) {
-        const url = new URL(`${this._server.url}/${type}/${id}`);
-        url.searchParams.set("_format", "xml");
-        const response = await fetch(url, {
-            "headers": this._server.headers
-        });
-        return response.text();
-    }
-
-    static async readTtl(type, id) {
-        const url = new URL(`${this._server.url}/${type}/${id}`);
-        url.searchParams.set("_format", "ttl");
-        const response = await fetch(url, {
-            "headers": this._server.headers
-        });
-        return response.text();
-    }
-
-    static async searchByLink(linkUrl, parameters = []) {
-        const url = new URL(linkUrl);
-        url.searchParams.set("_summary", "true");
-        url.searchParams.set("_format", "json");
-        parameters.forEach(parameter => {
-            url.searchParams.set(parameter.name, parameter.value);
-        });
-        try {
-            const response = await fetch(url, {
-                "headers": this._server.headers
-            });
-            if (response.ok) {
-                return response.json();
-            } else {
-                return Promise.reject(response);
-            }
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
-
-    static async searchCount(type, parameters = []) {
-        const url = new URL(`${this._server.url}/${type}`);
-        url.searchParams.set("_summary", "count");
-        url.searchParams.set("_format", "json");
-        parameters.forEach(parameter => {
-            url.searchParams.set(parameter.name, parameter.value);
-        });
-        const response = await fetch(url, {
-            "headers": this._server.headers
-        });
-        if (!response.ok) {
-            throw response
-        }
-        return response.json();
-    }
-
-    static async execute(request) {
-        const url = new URL(`${this._server.url}/${request}`);
-        url.searchParams.set("_format", "json");
-        const response = await fetch(url, {
-            "headers": this._server.headers
-        });
-        if (!response.ok) {
-            throw response
-        }
         return response.json();
     }
 

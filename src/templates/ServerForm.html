@@ -31,6 +31,9 @@
     }
 
     .authMethod {
+        display: flex;
+        flex-flow: row wrap;
+        gap: 1em;
         padding-bottom: 1em;
     }
 
@@ -38,6 +41,7 @@
         font-family: inherit;
         font-size: inherit;
         margin-right: 1em;
+        white-space: nowrap;
     }
 
 
@@ -54,14 +58,18 @@
             <text-field id="key" placeholder="Code" required></text-field>
             <text-field id="url" placeholder="Url" required></text-field>
             <div class="authMethod">
-                <input type="radio" id="No Auth" name="authMethod" value="No Auth" checked />
-                <label for="No Auth">No Auth</label>
-                <input type="radio" id="API Key" name="authMethod" value="API Key" />
-                <label for="API Key">API Key</label>
-                <input type="radio" id="Basic" name="authMethod" value="Basic" />
-                <label for="Basic">Basic</label>
-                <input type="radio" id="OAuth 2" name="authMethod" value="OAuth 2" />
-                <label for="OAuth 2">OAuth 2</label>
+                <label for="No Auth">No Auth
+                    <input type="radio" id="No Auth" name="authMethod" value="No Auth" checked />
+                </label>
+                <label for="API Key">API Key
+                    <input type="radio" id="API Key" name="authMethod" value="API Key" />
+                </label>
+                <label for="Basic">Basic
+                    <input type="radio" id="Basic" name="authMethod" value="Basic" />
+                </label>
+                <label for="OAuth 2">OAuth 2
+                    <input type="radio" id="OAuth 2" name="authMethod" value="OAuth 2" />
+                </label>
             </div>
             <section id="apiSection" hidden>
                 <text-field id="apiKey" placeholder="Key" required></text-field>

@@ -1,8 +1,8 @@
-import template from "./templates/ResourceFormView.html"
+import template from "./templates/ResourceTemplateView.html"
 
 import "./components/TextField"
 
-class ResourceFormView extends HTMLElement {
+class ResourceTemplateView extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
@@ -16,6 +16,9 @@ class ResourceFormView extends HTMLElement {
 
     clear() {
         while (this._form.firstChild) this._form.removeChild(this._form.lastChild);
+        const p = document.createElement('p');
+        p.innerHTML = "There is no template yet for this type of resource.<br/>To create your own, click on the 'EDIT TEMPLATE' button."
+        this._form.appendChild(p);
     }
 
     buildTemplate = (template) => {
@@ -93,6 +96,8 @@ class ResourceFormView extends HTMLElement {
             this.buildTemplate(template);
             this.cleanEmpty();
             this.setValues(resource);
+        } else {
+            this.clear();
         }
     }
 
@@ -102,4 +107,4 @@ class ResourceFormView extends HTMLElement {
     }
 
 };
-customElements.define('resource-form-view', ResourceFormView);
+customElements.define('resource-template-view', ResourceTemplateView);

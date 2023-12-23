@@ -28,64 +28,70 @@ class App extends HTMLElement {
         this._shadow.innerHTML = template;
     }
 
-    showResource(resourceType, id) {
-        const bdy = this._shadow.getElementById("bdy");
-        bdy.style.visibility = "visible";
-        if (window.matchMedia("(max-width: 480px)").matches) {
-            this._shadow.querySelector("server-panel").classList.add("hidden");
+    async fetchHash(hash) {
+        const url = new URL(`${FhirService.server.url}${hash}`);
+        const timeoutId = setTimeout(() => {
+            this._shadow.getElementById('waiting').style.visibility = 'visible';
+        }, 500);
+
+        try {
+            const response = await fetch(url, {
+                "headers": FhirService.server.headers
+            });
+            if (!response.ok) {
+                throw new Error(`${response.status} ${response.statusText}`);
+            }
+            const bdy = this._shadow.getElementById("bdy");
+            bdy.style.visibility = "visible";
+            const contentType = response.headers.get("Content-Type");
+            let sourceType;
+            let source;
+            if (contentType.includes('json')) {
+                source = await response.json();
+                sourceType = source.resourceType;
+            } else if (contentType.includes('xml')) {
+                source = new DOMParser().parseFromString(await response.text(), "application/xml");
+                sourceType = source.documentElement.nodeName;
+            } else {
+                source = await response.text();
+                const match = source.match(/rdf:type\s+fhir:(\w+)/); //is TTL ?
+                if (match) sourceType = match[1];
+            }
+            if (sourceType) {
+                if ('Bundle' == sourceType) {
+                    const bundle = this._shadow.getElementById("bundle");
+                    bundle.hidden = false;
+                    bundle.source = source;
+                } else {
+                    this._shadow.getElementById("bundle").hidden = true;
+                    this._shadow.getElementById("resource").source = source;
+                }
+            } else {
+                throw new Error('Unknown response format');
+            }
+        } catch (error) {
+            SnackbarsService.show(error, undefined, undefined, 'error');
+        } finally {
+            clearTimeout(timeoutId);
+            this._shadow.getElementById('waiting').style.visibility = 'hidden'
         }
-        const bundle = this._shadow.getElementById("bundle");
-        bundle.hidden = true;
-        const resource = this._shadow.getElementById("resource");
-        resource.load({
-            "resourceType": resourceType,
-            "resourceId": id
-        });
-    }
-    showBundle(resourceType, search) {
-        const bdy = this._shadow.getElementById("bdy");
-        bdy.style.visibility = "visible";
-        if (window.matchMedia("(max-width: 480px)").matches) {
-            this._shadow.querySelector("server-panel").classList.add("hidden");
-        }
-        const bundle = this._shadow.getElementById("bundle");
-        bundle.hidden = false;
-        bundle.load(resourceType, search);
     }
 
     locationHandler = () => {
         let hash = window.location.hash.replace('#', '').trim();
         if (hash.length) {
-            let id = '';
-            let resourceName = '';
-            let queryParams = [];
-            if (hash.indexOf('?') > 0) {
-                resourceName = hash.split('?')[0];
-                queryParams = hash.slice(hash.indexOf(`?`) + 1).split(`&`).map(p => {
-                    const [key, val] = p.split(`=`)
-                    return {
-                        name: key,
-                        value: decodeURIComponent(val)
-                    }
-                });
-            } else {
-                const hashparts = hash.split("/");
-                resourceName = hashparts[0];
-                id = hash.slice(resourceName.length + 1) || '';
-            }
-            const resourceType = FhirService.server.capabilities.rest[0].resource.find(res => res.type === resourceName);
-            if (!resourceType) {
-                SnackbarsService.show(`Resource "${resourceType}" not found!`);
-                return;
-            }
-            if (id) {
-                this.showResource(resourceType, id);
-            } else {
-                this.showBundle(resourceType, queryParams);
+            this.fetchHash(hash);
+            if (window.matchMedia("(max-width: 480px)").matches) {
+                this._shadow.querySelector("server-panel").classList.add("hidden");
             }
         } else {
             this._shadow.getElementById("bdy").style.visibility = "hidden";
+            this._shadow.querySelector("server-panel").classList.remove("hidden");
         }
+    }
+
+    get container() {
+        return this._shadow;
     }
 
     connectedCallback() {
@@ -102,7 +108,6 @@ class App extends HTMLElement {
         };
 
         this._shadow.querySelector("server-dialog").addEventListener('serverchanged', ({ detail }) => {
-            location.hash = ``;
             this.connect(detail.serverCode, detail.server);
         });
 
@@ -126,17 +131,15 @@ class App extends HTMLElement {
         FhirService.connect(serverCode, server).then(() => {
             SnackbarsService.show(`Connected to "${serverCode}" server.`);
             PreferencesService.set("server", serverCode);
-            this._shadow.getElementById("bdy").style.visibility = "hidden";
-            this._shadow.querySelector("server-panel").classList.remove("hidden");
             this._shadow.getElementById("navigation").hidden = false;
             this._shadow.querySelector('server-dialog').value = serverCode;
-            this.locationHandler();
+            if (location.hash) {
+                location.hash = '';
+            } else {
+                this.locationHandler();
+            }
         }).catch(error => {
-            SnackbarsService.show(`An error occurred while connecting to the server "${serverCode}"`,
-                undefined,
-                undefined,
-                'error'
-            );
+            SnackbarsService.error(`An error occurred while connecting to the server "${serverCode}"`);
             console.log(error);
         }).finally(() => {
             waiting.style.visibility = 'hidden';

@@ -7,11 +7,18 @@ class Button extends HTMLElement {
         this._shadow.innerHTML = template;
     }
 
-    static get observedAttributes() { return ["value"]; }
+    static get observedAttributes() { return ['value', 'disabled']; }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        if (name == "value") {
-            this._shadow.querySelector('input[type="button"]').value = newValue;
+        const input = this._shadow.querySelector('input[type="button"]');
+        if (name == 'value') {
+            input.value = newValue;
+        } else if (name == 'disabled') {
+            if (null === newValue) {
+                input.removeAttribute('disabled');
+            } else {
+                input.setAttribute('disabled', '');
+            }
         }
     }
 }

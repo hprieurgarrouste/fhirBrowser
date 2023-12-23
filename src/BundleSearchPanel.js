@@ -50,7 +50,7 @@ class BundleSearchPanel extends HTMLElement {
                 hash.push(`${value.name}=${encodeURIComponent(value.value)}`);
             }
         });
-        location.hash = `#${this._resourceType.type}` + ((hash.length) ? `?${hash.join('&')}` : '');
+        location.hash = `#/${this._resourceType.type}?${hash.length ? hash.join('&') + '&' : ''}_summary=true&_format=json&_count=20`;
     }
 
     helpClick = (event) => {
@@ -72,7 +72,7 @@ class BundleSearchPanel extends HTMLElement {
     }
 
     locationHandler = async () => {
-        let hash = window.location.hash.replace('#', '').trim();
+        let hash = window.location.hash.replace('#/', '').trim();
         if (!hash || hash.indexOf('/') > 0) return;
         const resourceName = hash.split('?')[0];
         if (!resourceName) return;
@@ -87,16 +87,17 @@ class BundleSearchPanel extends HTMLElement {
                 this.metadata = resourceType;
             }
             this.clear();
-            if (hash.indexOf('?') > 0) {
-                let queryParams = hash.slice(hash.indexOf('?') + 1).split('&').map(p => {
-                    const [key, val] = p.split(`=`)
-                    return {
-                        name: key,
-                        value: decodeURIComponent(val)
-                    }
-                });
-                this.filters = queryParams;
-            }
+
+            const content = this._shadow.querySelector("main");
+            const searchParams = new URLSearchParams(hash.replace(/^[^?]+\?/, ''));
+            Array.from(searchParams).forEach(([name, value]) => {
+                const fieldName = name.split(':')[0];
+                const field = content.querySelector(`bundle-search-item[data-name="${fieldName}"`);
+                if (field) field.value = {
+                    'name': name,
+                    'value': value
+                }
+            });
         }
 
         function delay(milliseconds) {
@@ -110,18 +111,6 @@ class BundleSearchPanel extends HTMLElement {
         const content = this._shadow.querySelector("main");
         const fields = content.querySelectorAll("bundle-search-item");
         fields.forEach(field => field.clear());
-    }
-
-    /**
-     * @param {any} filters
-     */
-    set filters(filters) {
-        const content = this._shadow.querySelector("main");
-        filters.forEach(filter => {
-            const fieldName = filter.name.split(':')[0];
-            const field = content.querySelector(`bundle-search-item[data-name="${fieldName}"`);
-            if (field) field.value = filter;
-        });
     }
 
     /**

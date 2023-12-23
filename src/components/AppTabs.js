@@ -41,6 +41,13 @@ class AppTabs extends HTMLElement {
 
     headerClick = ({ target }) => {
         this.value = target.dataset.caption;
+        this.dispatchEvent(new CustomEvent("select", {
+            bubbles: false,
+            cancelable: false,
+            'detail': {
+                'caption': this.value
+            }
+        }));
     }
 
     get value() {
@@ -57,13 +64,6 @@ class AppTabs extends HTMLElement {
                 slotted.hidden = true;
             }
         })
-        this.dispatchEvent(new CustomEvent("select", {
-            bubbles: false,
-            cancelable: false,
-            'detail': {
-                'caption': caption
-            }
-        }));
     }
 
 };

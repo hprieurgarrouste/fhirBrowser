@@ -29,7 +29,7 @@ class ResourceReferences extends HTMLElement {
         event.stopPropagation();
         const item = event.target.closest("list-row");
         if (item) {
-            location.hash = `#${item.dataset.target}?${item.dataset.search}=${this._resourceId}`;
+            location.hash = `#/${item.dataset.target}?${item.dataset.search}=${this._resourceId}`;
         }
     }
 

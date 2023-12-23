@@ -1,8 +1,9 @@
 import template from "./templates/ServerResources.html";
 
-import "./components/AppList.js"
-import "./components/ListItem.js"
-import "./components/ListRow.js"
+import "./components/AppList"
+import "./components/AppBadge"
+import "./components/ListItem"
+import "./components/ListRow"
 
 import { FhirService } from "./services/Fhir.js"
 
@@ -23,7 +24,7 @@ class ServerResources extends HTMLElement {
     }
 
     locationHandler = () => {
-        let hash = window.location.hash.replace('#', '').trim();
+        let hash = window.location.hash.replace('#/', '').trim();
         if (hash.length) {
             let resourceType = '';
             if (hash.indexOf('?') > 0) {
@@ -49,10 +50,25 @@ class ServerResources extends HTMLElement {
                 const item = document.createElement('list-item');
                 item.setAttribute("data-primary", resource.type);
                 item.setAttribute("data-icon", FhirService.ResourceIcon(resource.type));
+                const count = makeTrailling(resource);
+                if (count) item.appendChild(count);
                 row.appendChild(item);
                 list.appendChild(row);
             });
         this.locationHandler();
+
+        function makeTrailling(resource) {
+            const count = resource.extension
+                ?.find(x => 'http://hl7api.sourceforge.net/hapi-fhir/res/extdefs.html#resourceCount' == x.url)
+                ?.valueDecimal;
+            if (count) {
+                const badge = document.createElement('app-badge');
+                badge.slot = 'trailling';
+                badge.value = count;
+                return badge;
+            }
+            return null;
+        }
     }
 
     appListClick = ({ target }) => {
@@ -61,7 +77,7 @@ class ServerResources extends HTMLElement {
             this._shadow.querySelector('app-list').querySelector("[selected]")?.removeAttribute("selected");
             row.setAttribute("selected", "");
             this._resourceType = row.dataset.type;
-            location.hash = `#${row.dataset.type}`;
+            location.hash = `#/${row.dataset.type}?_summary=true&_format=json&_count=20`;
         }
     }
 
@@ -78,19 +94,19 @@ class ServerResources extends HTMLElement {
 
     set value(resourceType) {
         const list = this._shadow.querySelector('app-list');
-        if (resourceType) {
-            if (resourceType != this._resourceType) {
-                const rows = Array.from(list.childNodes).filter(r => r.dataset.type === resourceType);
-                if (rows?.length) {
-                    this._resourceType = resourceType;
-                    list.querySelector("[selected]")?.removeAttribute("selected");
-                    rows[0].setAttribute("selected", "");
-                    rows[0].scrollIntoView();
-                }
-            }
-        } else {
+        if (!resourceType) {
             list.querySelector("[selected]")?.removeAttribute("selected");
             list.scrollTop = 0;
+            return;
+        }
+        if (resourceType != this._resourceType) {
+            const row = Array.from(list.childNodes).find(r => r.dataset.type === resourceType);
+            if (row) {
+                this._resourceType = resourceType;
+                list.querySelector("[selected]")?.removeAttribute("selected");
+                row.setAttribute("selected", "");
+                row.scrollIntoView();
+            }
         }
     }
 

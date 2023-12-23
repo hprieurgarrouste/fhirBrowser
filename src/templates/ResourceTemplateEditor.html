@@ -1,34 +1,15 @@
 <style>
     main {
         display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-
-    main>section {
-        flex: 1 1 auto;
-        height: 0;
-    }
-
-    main>footer {
-        border-top: 1px solid var(--border-color);
-        padding: 9px 16px;
-        text-align: center;
-        overflow: hidden;
-    }
-
-    main #dragZone {
-        display: flex;
         flex-direction: row;
         height: 100%;
+        overflow: hidden;
     }
 
     #form {
         flex: 1 1 auto;
-        height: auto;
+        overflow: auto;
         padding: 1em;
-        overflow-y: auto;
-        padding-bottom: 7em;
     }
 
     #form fieldset {
@@ -67,17 +48,9 @@
     }
 </style>
 <main>
-    <section>
-        <section id="dragZone">
-            <section id="form"></section>
-            <side-panel data-title="Data">
-                <linear-progress slot="main"></linear-progress>
-                <app-list slot="main"></app-list>
-            </side-panel>
-        </section>
-    </section>
-    <footer>
-        <app-button id="formCancel" value="Cancel"></app-button>
-        <app-button id="formOk" value="Apply"></app-button>
-    </footer>
+    <section id="form"></section>
+    <side-panel data-title="Data" data-closable="false">
+        <linear-progress slot="main"></linear-progress>
+        <app-list slot="main"></app-list>
+    </side-panel>
 </main>

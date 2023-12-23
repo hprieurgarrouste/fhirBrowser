@@ -18,32 +18,32 @@ class ServerCapabilities extends HTMLElement {
         const list = this._shadow.querySelector('app-list');
         list.clear();
 
-        const metadata = FhirService.server?.capabilities;
+        const capabilityStatement = FhirService.server?.capabilities;
 
-        make("copyright", metadata.copyright);
-        make("description", metadata.description);
-        make("fhirVersion", `${metadata.fhirVersion} (${FhirService.release})`);
+        make("copyright", capabilityStatement.copyright);
+        make("description", capabilityStatement.description);
+        make("fhirVersion", `${capabilityStatement.fhirVersion} (${FhirService.release})`);
 
         const ul = document.createElement('UL');
-        metadata.format.forEach((f) => {
+        capabilityStatement.format.forEach((f) => {
             const li = document.createElement('LI');
             li.innerText = f;
             ul.appendChild(li);
         });
         make("format", ul.outerHTML);
 
-        if (metadata.implementation) {
-            make("implementation description", metadata.implementation.description);
-            make("implementation name", metadata.implementation.name);
-            make("implementation url", metadata.implementation.url);
+        if (capabilityStatement.implementation) {
+            make("implementation description", capabilityStatement.implementation.description);
+            make("implementation name", capabilityStatement.implementation.name);
+            make("implementation url", capabilityStatement.implementation.url);
         }
-        make("language", metadata.language);
-        make("name", metadata.name);
-        make("publisher", metadata.publisher);
-        if (metadata.software) {
-            make("software name", metadata.software.name);
-            make("software version", metadata.software.version);
-            make("software release date", metadata.software.releaseDate);
+        make("language", capabilityStatement.language);
+        make("name", capabilityStatement.name);
+        make("publisher", capabilityStatement.publisher);
+        if (capabilityStatement.software) {
+            make("software name", capabilityStatement.software.name);
+            make("software version", capabilityStatement.software.version);
+            make("software release date", capabilityStatement.software.releaseDate);
         }
 
         function make(name, value) {
