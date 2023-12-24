@@ -13,7 +13,7 @@ Copyright 2021 Google LLC
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-const PRECACHE = "firebrowser-v0.9.5";
+const PRECACHE = "firebrowser-v0.9.6";
 const RUNTIME = "runtime";
 
 // A list of local resources we always want to be cached.
@@ -26,9 +26,7 @@ const PRECACHE_URLS = [
   "./assets/icon_x512.png",
   "./assets/maskable_icon_x192.png",
   "./assets/maskable_icon_x512.png",
-  "./assets/material-symbols-sharp.woff2",
   "./assets/material.css",
-  "./assets/Roboto-Regular.ttf",
 ];
 
 // The install handler takes care of precaching the resources we always need.
@@ -68,7 +66,10 @@ self.addEventListener("activate", (event) => {
 // from the network before returning it to the page.
 self.addEventListener("fetch", (event) => {
   // Skip cross-origin requests, like those for Google Analytics.
-  if (event.request.url.startsWith(self.location.origin) || event.request.url.startsWith("https://hl7.org/fhir/")) {
+  if (event.request.url.startsWith(self.location.origin) ||
+    event.request.url.startsWith("https://hl7.org/fhir/") ||
+    (/fonts.(googleapis|gstatic).com/.test(event.request.url))
+  ) {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
         if (cachedResponse) {
