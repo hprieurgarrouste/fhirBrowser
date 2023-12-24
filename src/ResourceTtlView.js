@@ -16,10 +16,10 @@ class ResourceTtlView extends HTMLElement {
     }
 
     get resourceType() {
-        return this._resource.match(/rdf:type\s+fhir:(\w+)/)[1];
+        return this._resource.match(/rdf:type\s*fhir:(\w+)/)[1];
     }
     get resourceId() {
-        return this._resource.match(/fhir:Resource.id\s+\[\s+fhir:value\s+"([^"]+)"\s+\];/)[1];
+        return this._resource.match(/fhir:Resource.id\s*\[\s*fhir:value\s*"([^"]+)"\s*\]/)[1];
     }
     get source() {
         return this._resource;
