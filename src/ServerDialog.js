@@ -16,25 +16,21 @@ class ServerDialog extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-        this._editMode = false;
-        this._list = null;
-        this._form = null;
-    }
 
-    connectedCallback() {
+        this._editMode = false;
+
         this._list = this._shadow.querySelector('server-list');
+        this._list.addEventListener('serverchanged', this.serverListClick);
+
         this._form = this._shadow.querySelector("server-form");
+        this._form.onOk = this.serverFormOk;
+        this._form.onDelete = this.serverFormDelete;
 
         this._shadow.querySelector('app-dialog').onClose = (event) => {
             event.preventDefault();
             event.stopPropagation();
             this.appDialogClose();
         };
-
-        this._form.onOk = this.serverFormOk;
-        this._form.onDelete = this.serverFormDelete;
-
-        this._list.addEventListener('serverchanged', this.serverListClick);
 
         this._shadow.getElementById("setupAdd").onclick = this.setupAddClick;
 
@@ -44,7 +40,9 @@ class ServerDialog extends HTMLElement {
         this._shadow.getElementById("setupClose").onclick = this.appDialogClose;
 
         this._shadow.getElementById("setupToggle").onclick = () => { this.editMode = true };
+    }
 
+    connectedCallback() {
         this.editMode = false;
         this.loadConf();
     }

@@ -7,14 +7,11 @@ class ColorScheme extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' })
         this._shadow.innerHTML = template;
+        this._shadow.addEventListener('click', this.onClick);
     }
 
     connectedCallback() {
-        this._shadow.addEventListener('click', this.onClick);
         this.setColorScheme(PreferencesService.get("colorScheme", "auto"));
-    }
-    disconnectedCallback() {
-        this._shadow.removeEventListener('click', this.onClick);
     }
 
     onClick = (event) => {

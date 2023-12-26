@@ -7,25 +7,31 @@ class AppList extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-        this._list = null;
-        this._slot = null;
-        this._onFilter = null;
+        this._list = this._shadow.getElementById('list');
+        this._slot = this._shadow.querySelector('slot');
+        this._slot.addEventListener('slotchange', this.slotChange);
+        this._filter = this._shadow.querySelector('list-filter');
+        this._filter.onChange = this.filterChange;
     }
 
     connectedCallback() {
-        this._list = this._shadow.getElementById('list');
-        this._slot = this._shadow.querySelector('slot');
-        this._filter = this._shadow.querySelector('list-filter');
         this._filter.hidden = (this._slot.children.length <= 10);
-        this._slot.addEventListener('slotchange', () => {
-            this._filter.hidden = (('function' !== typeof this._onFilter) || this._slot.assignedNodes().length <= 10);
-        });
-        this._filter.onChange = ((value) => {
-            if (('function' == typeof this._onFilter)) {
-                if (value == '') this._list.scrollTop = 0;
-                this._onFilter(value);
-            }
-        });
+    }
+
+    _onFilter = (value) => { }
+    get onFilter() {
+        return this._onFilter;
+    }
+    set onFilter(filterFct) {
+        this._onFilter = filterFct;
+    }
+    filterChange = (value) => {
+        if (value == '') this._list.scrollTop = 0;
+        this._onFilter(value);
+    }
+
+    slotChange = () => {
+        this._filter.hidden = (('function' !== typeof this._onFilter) || this._slot.assignedNodes().length <= 10);
     }
 
     clear = () => {
@@ -34,12 +40,6 @@ class AppList extends HTMLElement {
         this._list.scrollTop = 0;
     }
 
-    get onFilter() {
-        return this._onFilter;
-    }
-    set onFilter(filterFct) {
-        this._onFilter = filterFct;
-    }
 
 
 };

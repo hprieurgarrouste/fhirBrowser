@@ -6,24 +6,20 @@ class AppSwitch extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' })
         this._shadow.innerHTML = template;
-        this._main = null;
+        this._shadow.addEventListener('click', this.clickHandler);
+        this._main = this._shadow.querySelector('main');
     }
 
     static get observedAttributes() { return ['data-checked']; }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        const main = this._shadow.querySelector('main');
         if ('data-checked' == name) {
             if (null === newValue) {
-                main.classList.remove('checked');
+                this._main.classList.remove('checked');
             } else {
-                main.classList.add('checked');
+                this._main.classList.add('checked');
             }
         }
-    }
-
-    connectedCallback() {
-        this._shadow.addEventListener('click', this.clickHandler);
     }
 
     clickHandler = (event) => {

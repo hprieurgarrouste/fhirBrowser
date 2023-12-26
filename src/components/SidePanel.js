@@ -9,28 +9,26 @@ class SidePanel extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-        this._onClose = function () {
-            this.classList.add('hidden');
-        }
+        this._title = this._shadow.getElementById("title");
+        this._closeButton = this._shadow.getElementById('close');
+        this._closeButton.onclick = (event) => {
+            this._onClose(event);
+        };
     }
 
     static get observedAttributes() { return ['data-title', 'data-closable']; }
 
     attributeChangedCallback(name, oldValue, newValue) {
         if ('data-title' == name) {
-            this._shadow.getElementById("title").innerText = newValue;
+            this._title.innerText = newValue;
         } else if ('data-closable' == name) {
-            const closable = 'true' === newValue;
-            this._shadow.getElementById('close').hidden = !closable;
+            this._closeButton.hidden = 'true' !== newValue;
         }
     }
 
-    connectedCallback() {
-        this._shadow.getElementById('close').addEventListener("click", (event) => {
-            this.onClose(event);
-        });
+    _onClose = (event) => {
+        this.classList.add('hidden');
     }
-
     get onClose() {
         return this._onClose;
     }

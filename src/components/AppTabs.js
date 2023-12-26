@@ -5,17 +5,14 @@ class AppTabs extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-        this._slot = null;
-        this._header = null;
-    }
-
-    connectedCallback() {
         this._shadow.onclick = (event) => {
             event.preventDefault();
             event.stopPropagation();
         }
+
         this._header = this._shadow.querySelector('header');
         this._header.onclick = this.headerClick;
+
         this._slot = this._shadow.querySelector('slot');
         this._slot.addEventListener('slotchange', this.slotChanged);
     }

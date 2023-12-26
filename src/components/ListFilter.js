@@ -5,24 +5,26 @@ class ListFilter extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-        this._onChange = () => { };
-    }
-    connectedCallback() {
-        const text = this._shadow.getElementById("text");
+        this._text = this._shadow.getElementById("text");
         this._shadow.querySelector("main").addEventListener('mousedown', (event) => {
-            text.focus();
+            this._text.focus();
         });
-        this._shadow.getElementById("clear").addEventListener('click', () => {
-            if (text.value) {
-                text.value = '';
-                this._onChange(text.value);
-            }
-        });
-        text.addEventListener("input", () => { this._onChange(text.value) });
+        this._shadow.getElementById("clear").onclick = this.clearClick;
+        this._text.addEventListener("input", () => { this._onChange(this._text.value) });
     }
+
+    clearClick = () => {
+        if (this._text.value) {
+            this._text.value = '';
+            this._onChange(this._text.value);
+        }
+    }
+
     clear() {
         this._shadow.getElementById("clear").click();
     }
+
+    _onChange = () => { };
     get onChange() {
         return this._onChange;
     }

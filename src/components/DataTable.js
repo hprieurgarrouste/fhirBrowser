@@ -5,10 +5,7 @@ class DataTable extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'open' });
         this._shadow.innerHTML = template;
-        this._onColumnReorder = () => { };
-    }
 
-    connectedCallback() {
         this._header = this._shadow.getElementById("header");
         this._header.ondragstart = this.onDragStart;
         this._header.ondragover = this.onDragOver;
@@ -21,6 +18,7 @@ class DataTable extends HTMLElement {
         this._body.onclick = this.bodyClick;
     }
 
+    _onColumnReorder = () => { };
     get onColumnReorder() {
         return this._onColumnReorder;
     }
@@ -29,11 +27,10 @@ class DataTable extends HTMLElement {
     }
 
     addColumn = (title) => {
-        const cellText = document.createTextNode(title);
         const cell = document.createElement("th");
         cell.dataset.id = title;
-        cell.appendChild(cellText);
         cell.setAttribute('draggable', 'true');
+        cell.appendChild(document.createTextNode(title));
 
         this._header.appendChild(cell);
     }

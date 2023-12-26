@@ -18,9 +18,6 @@ class BundleColumnsDialog extends HTMLElement {
         this._release = null;
         this._onValidate = () => { };
         this._list = null;
-    }
-
-    connectedCallback() {
         this._shadow.querySelector('app-dialog').onClose = this.appDialogClose;
 
         this._list = this._shadow.querySelector('app-list');

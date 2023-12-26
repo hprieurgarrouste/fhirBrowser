@@ -13,10 +13,6 @@ class ResourceTemplateEditor extends HTMLElement {
         this._shadow.innerHTML = template;
         this._resource = null;
         this._dragSrcEl = null;
-        this._template = null;
-    }
-
-    connectedCallback() {
         this._template = this._shadow.getElementById('form');
 
         const dragZone = this._shadow.querySelector('main');
@@ -30,8 +26,6 @@ class ResourceTemplateEditor extends HTMLElement {
         this._list = this._shadow.querySelector('app-list');
         this._list.onFilter = this.dataListFilter;
         this._shadow.querySelector('side-panel').onClose = this.dataPanelClose;
-
-        if (this._resource) this.render();
     }
 
     dataPanelClose = () => {
@@ -126,20 +120,16 @@ class ResourceTemplateEditor extends HTMLElement {
     set source(resource) {
         this._resource = resource;
         if (this._list) {
-            this.render();
-        }
-    }
-
-    render = () => {
-        this.load(this._resource.resourceType);
-        let templates = JSON.parse(localStorage.getItem('templates') || '{}');
-        const template = templates[this._resource.resourceType];
-        if (template) {
-            this.buildTemplate(template);
-            this.cleanEmpty();
-            this.setValues(this._resource);
-        } else {
-            this.clear();
+            this.load(this._resource.resourceType);
+            let templates = JSON.parse(localStorage.getItem('templates') || '{}');
+            const template = templates[this._resource.resourceType];
+            if (template) {
+                this.buildTemplate(template);
+                this.cleanEmpty();
+                this.setValues(this._resource);
+            } else {
+                this.clear();
+            }
         }
     }
 

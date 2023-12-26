@@ -26,6 +26,22 @@ class App extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
+
+        this._shadow.getElementById("navigation").onclick = () => {
+            this._shadow.querySelector("server-panel").classList.toggle("hidden");
+        };
+
+        this._shadow.getElementById('serverDialogToggle').onclick = () => {
+            this._shadow.querySelector('server-dialog').hidden = false;
+        };
+
+        this._shadow.querySelector("server-dialog").addEventListener('serverchanged', ({ detail }) => {
+            this.connect(detail.serverCode, detail.server);
+        });
+
+        this._shadow.getElementById('aboutDialogToggle').onclick = () => {
+            this._shadow.querySelector('about-dialog').hidden = false;
+        };
     }
 
     async fetchHash(hash) {
@@ -97,23 +113,6 @@ class App extends HTMLElement {
     connectedCallback() {
         window.addEventListener("hashchange", this.locationHandler);
         SnackbarsService.container = this._shadow;
-
-
-        this._shadow.getElementById("navigation").onclick = () => {
-            this._shadow.querySelector("server-panel").classList.toggle("hidden");
-        };
-
-        this._shadow.getElementById('serverDialogToggle').onclick = () => {
-            this._shadow.querySelector('server-dialog').hidden = false;
-        };
-
-        this._shadow.querySelector("server-dialog").addEventListener('serverchanged', ({ detail }) => {
-            this.connect(detail.serverCode, detail.server);
-        });
-
-        this._shadow.getElementById('aboutDialogToggle').onclick = () => {
-            this._shadow.querySelector('about-dialog').hidden = false;
-        };
 
         const preferedServer = PreferencesService.get("server");
         if (preferedServer) {

@@ -5,6 +5,7 @@ class RoundButton extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' })
         this._shadow.innerHTML = template;
+        this._shadow.addEventListener('click', this._onClick);
     }
 
     static get observedAttributes() { return ["data-icon", "disabled"]; }
@@ -20,13 +21,6 @@ class RoundButton extends HTMLElement {
                 elm.setAttribute("disabled", "");
             }
         }
-    }
-
-    connectedCallback() {
-        this._shadow.addEventListener('click', this._onClick);
-    }
-    disconnectedCallback() {
-        this._shadow.removeEventListener('click', this._onClick);
     }
 
     _onClick(event) {

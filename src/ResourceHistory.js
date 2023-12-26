@@ -9,9 +9,7 @@ class ResourceHistory extends HTMLElement {
         this._shadow.innerHTML = template;
         this._resourceType = null;
         this._resourceId = null;
-    }
 
-    connectedCallback() {
         this._shadow.getElementById('help').onclick = this.helpClick;
 
         this._shadow.getElementById('list').onclick = this.listClick;

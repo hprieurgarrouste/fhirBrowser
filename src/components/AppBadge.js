@@ -5,12 +5,11 @@ class AppBadge extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' })
         this._shadow.innerHTML = template;
-        this._content = null;
         this._value = null;
+        this._content = this._shadow.querySelector("main");
     }
 
     connectedCallback() {
-        this._content = this._shadow.querySelector("main");
         this.render();
     }
 

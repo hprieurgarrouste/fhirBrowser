@@ -5,19 +5,15 @@ class AppConfirm extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-    }
-
-    connectedCallback() {
-        this._shadow.querySelector("main").onclick = this._onClose;
+        this._shadow.querySelector("main").onclick = this.onClose;
         this._shadow.querySelector('.surface').onclick = (event) => {
             event.stopPropagation();
         };
         this._shadow.getElementById('btnOk').onclick = this.validateClick;
-        this._shadow.getElementById('btnCancel').onclick = this._onClose;
+        this._shadow.getElementById('btnCancel').onclick = this.onClose;
     }
 
-
-    _onClose = (event) => {
+    onClose = (event) => {
         this.hidden = true;
     }
 

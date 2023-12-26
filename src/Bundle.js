@@ -37,11 +37,8 @@ class Bundle extends HTMLElement {
         }
         this._columnsDialog = null;
         this._source = null;
-    }
 
-    connectedCallback() {
         this._shadow.getElementById('help').onclick = this.helpClick;
-
         this._shadow.querySelector("data-table-pagination").onclick = this.paginationClick;
 
         const dataTable = this._shadow.getElementById('table');
@@ -60,7 +57,6 @@ class Bundle extends HTMLElement {
         this._columnsDialog.onValidate = this.handleColumnSetup;
 
         this._shadow.getElementById('settingsDialogToggle').onclick = this.settingsDialogToggleClick;
-
     }
 
     onRowClick = ({ detail }) => {

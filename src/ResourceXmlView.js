@@ -10,33 +10,33 @@ class ResourceXmlView extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-        this._sort = false;
-        this._resource = null;
-    }
 
-    connectedCallback() {
-        this._shadow.getElementById("content").onclick = this.contentClick;
-        this._sort = PreferencesService.get('xmlView', { 'sorted': false }).sorted;
-        const sortToggle = this._shadow.querySelector('app-switch');
-        this._shadow.querySelector('app-switch').parentNode.onclick = this.sortToggleClick;
+        this._resource = null;
+
+        this._content = this._shadow.getElementById("content");
+        this._content.onclick = this.contentClick;
+
+        this._preferences = PreferencesService.get('xmlView', { 'sorted': false });
+
+        this._sort = this._preferences.sorted;
+        this._sortToggle = this._shadow.querySelector('app-switch');
         if (this._sort) {
-            sortToggle.setAttribute('data-checked', '');
+            this._sortToggle.setAttribute('data-checked', '');
         } else {
-            sortToggle.removeAttribute('data-checked');
+            this._sortToggle.removeAttribute('data-checked');
         }
+        this._sortToggle.parentNode.onclick = this.sortToggleClick;
     }
 
     sortToggleClick = ({ target }) => {
-        const sortSwitch = this._shadow.querySelector('app-switch');
         const ATBNAME = 'data-checked';
         if ("APP-SWITCH" !== target.nodeName) {
-            sortSwitch.hasAttribute(ATBNAME) ? sortSwitch.removeAttribute(ATBNAME) : sortSwitch.setAttribute(ATBNAME, '');
+            this._sortToggle.hasAttribute(ATBNAME) ? this._sortToggle.removeAttribute(ATBNAME) : this._sortToggle.setAttribute(ATBNAME, '');
         }
-        this._sort = sortSwitch.hasAttribute(ATBNAME);
+        this._sort = this._sortToggle.hasAttribute(ATBNAME);
         PreferencesService.set('xmlView', { 'sorted': this._sort });
         this.source = this._resource;
     }
-
 
     contentClick = ({ target, offsetX, offsetY, ctrlKey }) => {
         if (target.classList.contains("object")) {

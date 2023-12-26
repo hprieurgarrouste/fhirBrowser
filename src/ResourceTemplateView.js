@@ -7,18 +7,11 @@ class ResourceTemplateView extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-        this._form = null;
-    }
-
-    connectedCallback() {
         this._form = this._shadow.getElementById('form');
     }
 
     clear() {
         while (this._form.firstChild) this._form.removeChild(this._form.lastChild);
-        const p = document.createElement('p');
-        p.innerHTML = "There is no template yet for this type of resource.<br/>To create your own, click on the 'EDIT TEMPLATE' button."
-        this._form.appendChild(p);
     }
 
     buildTemplate = (template) => {
@@ -98,6 +91,9 @@ class ResourceTemplateView extends HTMLElement {
             this.setValues(resource);
         } else {
             this.clear();
+            const p = document.createElement('p');
+            p.innerHTML = "There is no template yet for this type of resource.<br/>To create your own, click on the 'EDIT TEMPLATE' button."
+            this._form.appendChild(p);
         }
     }
 

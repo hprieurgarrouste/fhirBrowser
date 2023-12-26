@@ -5,12 +5,6 @@ class AppDialog extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-        this._onClose = function () {
-            this.hidden = true;
-        }
-    }
-
-    connectedCallback() {
         this._shadow.querySelector("main").addEventListener("click", (event) => {
             this.onClose(event);
         });
@@ -19,6 +13,9 @@ class AppDialog extends HTMLElement {
         });
     }
 
+    _onClose = () => {
+        this.hidden = true;
+    }
     get onClose() {
         return this._onClose;
     }

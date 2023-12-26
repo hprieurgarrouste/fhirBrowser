@@ -13,17 +13,9 @@ class ResourceJsonView extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-        this._sort = false;
-        this._resource = null;
-        this._content = null;
-        this._sortToggle = null;
-        this._templateToggle = null;
-        this._templateView = null;
-        this._preferences = {};
-        this._templateEditButton = null;
-    }
 
-    connectedCallback() {
+        this._resource = null;
+
         this._content = this._shadow.getElementById("content");
         this._content.onclick = this.contentClick;
 
@@ -31,28 +23,32 @@ class ResourceJsonView extends HTMLElement {
 
         this._sort = this._preferences.sorted;
         this._sortToggle = this._shadow.getElementById('sort-toggle');
-        this._sortToggle.parentNode.onclick = this.sortToggleClick;
         if (this._sort) {
             this._sortToggle.setAttribute('data-checked', '');
         } else {
             this._sortToggle.removeAttribute('data-checked');
         }
+        this._sortToggle.parentNode.onclick = this.sortToggleClick;
+
+        this._template = this._preferences.template;
+        this._templateToggle = this._shadow.getElementById('use-template-toggle');
+        if (this._template) {
+            this._templateToggle.setAttribute('data-checked', '');
+        } else {
+            this._templateToggle.removeAttribute('data-checked');
+        }
+        this._templateToggle.parentNode.onclick = this.templateToggleClick;
+
+        this._templateView = this._shadow.querySelector('resource-template-view');
+
+        this._templateEditButton = this._shadow.getElementById('template-edit-button');
+        this._templateEditButton.onclick = this.showTemplateEditor;
 
         this._search = this._shadow.getElementById('search');
         this._search.addEventListener("keydown", this.searchKeyDown);
-        this._search.hidden = true;                                                //WIP not available yet
+    }
 
-        this._templateToggle = this._shadow.getElementById('use-template-toggle');
-        this._templateView = this._shadow.querySelector('resource-template-view');
-        this._templateEditButton = this._shadow.getElementById('template-edit-button');
-
-        this._templateToggle.parentNode.hidden = true;                             //WIP not available yet
-        this._template = false;                                                    //WIP not available yet
-        this._templateView.hidden = true;                                          //WIP not available yet
-        this._templateEditButton.hidden = true;                                    //WIP not available yet
-        /*this._templateToggle.parentNode.onclick = this.templateToggleClick;
-        this._templateEditButton.onclick = this.showTemplateEditor;
-        this._template = this._preferences.template;
+    connectedCallback() {
         if (this._template) {
             this._templateToggle.setAttribute('data-checked', '');
             this.showTemplate(true);
@@ -60,11 +56,6 @@ class ResourceJsonView extends HTMLElement {
             this._templateToggle.removeAttribute('data-checked');
             this.showTemplate(false);
         }
-
-        this._editor = document.createElement('resource-template-editor-dialog');
-        this._editor.hidden = true;
-        document.querySelector('fhir-browser').container.appendChild(this._editor);
-        */
     }
 
     searchKeyDown = (event) => {
@@ -89,11 +80,20 @@ class ResourceJsonView extends HTMLElement {
     }
 
     showTemplateEditor = () => {
+        this._editor = document.createElement('resource-template-editor-dialog');
         this._editor.source = this._resource;
-        this._editor.hidden = false;
+        document.querySelector('fhir-browser').container.appendChild(this._editor);
     }
 
     showTemplate = (bool) => {
+        //WIP not available yet
+        if (true) {
+            this._templateToggle.parentNode.hidden = true;
+            this._templateView.hidden = true;
+            this._templateEditButton.hidden = true;
+            this._search.hidden = true;
+            return;
+        }
         this._templateView.hidden = !bool;
         this._templateEditButton.hidden = !bool;
         this._content.hidden = bool;

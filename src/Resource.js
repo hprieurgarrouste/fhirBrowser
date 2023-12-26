@@ -23,9 +23,7 @@ class Resource extends HTMLElement {
         this._resourceType = null;
         this._resourceId = null;
         this._views = {};
-    }
 
-    connectedCallback() {
         this._shadow.getElementById("help").onclick = this.helpClick;
 
         this._shadow.getElementById('download').onclick = this.downloadClick;

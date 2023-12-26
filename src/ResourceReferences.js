@@ -12,16 +12,12 @@ class ResourceReferences extends HTMLElement {
         this._shadow.innerHTML = template;
         this._resourceType = null;
         this._resourceId = null;
-        this._list = null;
-    }
 
-    connectedCallback() {
         this._list = this._shadow.querySelector('app-list');
         this._list.onclick = this.appListClick;
         this._list.onFilter = this.appListFilter;
 
         this._shadow.querySelector('side-panel').onClose = this.sidePanelClose;
-
     }
 
     appListClick = (event) => {
