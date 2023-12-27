@@ -158,7 +158,7 @@ class ResourceXmlView extends HTMLElement {
         const url = URL.createObjectURL(file);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${this.resourceType}#${file.name}.json`;
+        link.download = `${this.resourceType}#${file.name}.xml`;
         this._shadow.appendChild(link);
         link.click();
         this._shadow.removeChild(link);
