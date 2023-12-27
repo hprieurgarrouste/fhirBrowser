@@ -2,11 +2,10 @@ import template from "./templates/ResourceJsonView.html";
 
 import "./components/AppSwitch"
 import "./ResourceTemplateView"
-import "./ResourceTemplateEditor"
-import "./ResourceTemplateEditorDialog"
 
 import { FhirService } from "./services/Fhir"
 import { PreferencesService } from "./services/Preferences"
+import { SnackbarsService } from "./services/Snackbars"
 
 class ResourceJsonView extends HTMLElement {
     constructor() {
@@ -23,39 +22,28 @@ class ResourceJsonView extends HTMLElement {
 
         this._sort = this._preferences.sorted;
         this._sortToggle = this._shadow.getElementById('sort-toggle');
-        if (this._sort) {
-            this._sortToggle.setAttribute('data-checked', '');
-        } else {
-            this._sortToggle.removeAttribute('data-checked');
-        }
-        this._sortToggle.parentNode.onclick = this.sortToggleClick;
+        this._sortToggle.onclick = this.sortToggleClick;
 
-        this._template = this._preferences.template;
-        this._templateToggle = this._shadow.getElementById('use-template-toggle');
-        if (this._template) {
-            this._templateToggle.setAttribute('data-checked', '');
+        this._templateToggle = this._shadow.getElementById('template-toggle');
+        if (true || window.matchMedia("(max-width: 480px)").matches) {
+            this._template = false;
+            this._templateToggle.hidden = true;
         } else {
-            this._templateToggle.removeAttribute('data-checked');
+            this._template = this._preferences.template;
+            this._templateToggle.onclick = this.templateToggleClick;
         }
-        this._templateToggle.parentNode.onclick = this.templateToggleClick;
-
         this._templateView = this._shadow.querySelector('resource-template-view');
 
-        this._templateEditButton = this._shadow.getElementById('template-edit-button');
-        this._templateEditButton.onclick = this.showTemplateEditor;
+        this._shadow.getElementById('download').onclick = this.downloadClick;
 
-        this._search = this._shadow.getElementById('search');
-        this._search.addEventListener("keydown", this.searchKeyDown);
+        this._shadow.getElementById('copy').onclick = this.copyClick;
+
+        this._shadow.getElementById('share').onclick = this.shareClick;
     }
 
     connectedCallback() {
-        if (this._template) {
-            this._templateToggle.setAttribute('data-checked', '');
-            this.showTemplate(true);
-        } else {
-            this._templateToggle.removeAttribute('data-checked');
-            this.showTemplate(false);
-        }
+        this.sortChange();
+        this.showTemplate();
     }
 
     searchKeyDown = (event) => {
@@ -79,51 +67,32 @@ class ResourceJsonView extends HTMLElement {
         node.parentNode.scrollIntoView();
     }
 
-    showTemplateEditor = () => {
-        this._editor = document.createElement('resource-template-editor-dialog');
-        this._editor.source = this._resource;
-        document.querySelector('fhir-browser').container.appendChild(this._editor);
-    }
 
-    showTemplate = (bool) => {
-        //WIP not available yet
-        if (true) {
-            this._templateToggle.parentNode.hidden = true;
-            this._templateView.hidden = true;
-            this._templateEditButton.hidden = true;
-            this._search.hidden = true;
-            return;
-        }
-        this._templateView.hidden = !bool;
-        this._templateEditButton.hidden = !bool;
-        this._content.hidden = bool;
-        this._search.hidden = bool;
-        this._sortToggle.parentNode.hidden = bool;
-    }
-
-    sortToggleClick = ({ target }) => {
-        const ATBNAME = 'data-checked';
-        if ("APP-SWITCH" !== target.nodeName) {
-            this._sortToggle.hasAttribute(ATBNAME) ? this._sortToggle.removeAttribute(ATBNAME) : this._sortToggle.setAttribute(ATBNAME, '');
-        }
-        this._sort = this._sortToggle.hasAttribute(ATBNAME);
+    sortToggleClick = () => {
+        this._sort = !this._sort;
         this._preferences.sorted = this._sort;
         PreferencesService.set('jsonView', this._preferences);
-        this.source = this._resource;
+        this.sortChange();
     }
 
-    templateToggleClick = ({ target }) => {
-        const ATBNAME = 'data-checked';
-        if ("APP-SWITCH" !== target.nodeName) {
-            this._templateToggle.hasAttribute(ATBNAME) ? this._templateToggle.removeAttribute(ATBNAME) : this._templateToggle.setAttribute(ATBNAME, '');
-        }
-        this._template = this._templateToggle.hasAttribute(ATBNAME);
-        this.showTemplate(this._template);
-        if (this._template) {
-            this._templateView.source = this._resource;
-        }
+    sortChange = () => {
+        this._sortToggle.style.color = this._sort ? 'var(--primary-color)' : 'unset';
+        if (this._resource) this.source = this._resource;
+    }
+
+    templateToggleClick = () => {
+        this._template = !this._template;
         this._preferences.template = this._template;
         PreferencesService.set('jsonView', this._preferences);
+
+        this.showTemplate();
+    }
+
+    showTemplate = () => {
+        this._templateToggle.style.color = this._template ? 'var(--primary-color)' : 'unset';
+        this._templateView.hidden = !this._template;
+        this._content.hidden = this._template;
+        this._sortToggle.style.visibility = this._template ? 'hidden' : 'visible';
     }
 
     contentClick = ({ target, offsetX, offsetY, ctrlKey }) => {
@@ -220,6 +189,40 @@ class ResourceJsonView extends HTMLElement {
         });
         return dl;
     }
+
+    downloadClick = () => {
+        const content = JSON.stringify(this._resource);
+        const file = new File([content], this.resourceId, {
+            'type': 'data:text/json;charset=utf-8'
+        });
+        const url = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${this.resourceType}#${file.name}.json`;
+        this._shadow.appendChild(link);
+        link.click();
+        this._shadow.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    };
+
+    copyClick = () => {
+        const content = JSON.stringify(this._resource);
+        navigator.clipboard.writeText(content).then(function () {
+            SnackbarsService.show("Copying to clipboard was successful");
+        }, function (err) {
+            SnackbarsService.error("Could not copy text");
+        });
+    };
+
+    shareClick = () => {
+        const content = JSON.stringify(this._resource);
+        const fileName = `${this.resourceType}.${this.resourceId}.txt`;
+        const file = new File([content], fileName, { type: 'text/plain' });
+        navigator.share({
+            "title": fileName,
+            "files": [file]
+        });
+    };
 
 };
 customElements.define('resource-json-view', ResourceJsonView);

@@ -16,6 +16,13 @@
         padding: 1em;
         white-space: pre;
         margin: 0;
+        box-shadow: inset 0 3px 4px var(--border-color);
+    }
+
+    footer {
+        border-top: 1px solid var(--border-color);
+        text-align: right;
+        padding: 0.5em;
     }
 
     @media (max-width:480px) {
@@ -26,4 +33,9 @@
 </style>
 <main>
     <pre id="content"></pre>
+    <footer>
+        <round-button id="share" title="Share" data-icon="share"></round-button>
+        <round-button id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
+        <round-button id="download" title="Download" data-icon="download"></round-button>
+    </footer>
 </main>

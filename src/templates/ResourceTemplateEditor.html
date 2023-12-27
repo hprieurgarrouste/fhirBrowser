@@ -6,18 +6,18 @@
         overflow: hidden;
     }
 
-    #form {
+    #template {
         flex: 1 1 auto;
         overflow: auto;
         padding: 1em;
     }
 
-    #form fieldset {
+    #template fieldset {
         border: 0;
         padding: 0;
     }
 
-    #form fieldset>input[type=text] {
+    #template fieldset>input[type=text] {
         border: 0 none;
         font-family: inherit;
         font-size: inherit;
@@ -25,7 +25,7 @@
         background-color: inherit;
     }
 
-    #form section {
+    #template section {
         display: flex;
         flex-flow: row wrap;
         align-content: flex-start;
@@ -35,10 +35,10 @@
         min-height: 50px;
     }
 
-    #form.drag.over,
-    #form.drag fieldset.over,
-    #form section.over,
-    #form text-field.over {
+    #template.drag.over,
+    #template.drag fieldset.over,
+    #template section.over,
+    #template text-field.over {
         border: 1px dashed black;
         background-color: var(--hover-color, rgb(0 0 0 / 4%));
     }
@@ -48,7 +48,7 @@
     }
 </style>
 <main>
-    <section id="form"></section>
+    <section id="template"></section>
     <side-panel data-title="Data" data-closable="false">
         <linear-progress slot="main"></linear-progress>
         <app-list slot="main"></app-list>

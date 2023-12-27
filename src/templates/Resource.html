@@ -27,10 +27,6 @@
         text-overflow: ellipsis;
     }
 
-    tab-bar {
-        border-bottom: 1px solid var(--border-color);
-    }
-
     #jsonView,
     #xmlView,
     #ttlView,
@@ -46,12 +42,6 @@
 
     #error {
         padding: 1em;
-    }
-
-    #tabs {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
     }
 
     resource-references,
@@ -75,9 +65,6 @@
             <app-bar id="header">
                 <round-button slot="left" id="help" title="Help" data-icon="help"></round-button>
                 <h3 slot="middle" id="title"></h3>
-                <round-button slot="right" id="share" title="Share" data-icon="share"></round-button>
-                <round-button slot="right" id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
-                <round-button slot="right" id="download" title="Download" data-icon="download"></round-button>
                 <round-button slot="right" id="referencesToggle" title="References"
                     data-icon="article_shortcut"></round-button>
                 <round-button slot="right" id="historyToggle" title="History" data-icon="history"></round-button>

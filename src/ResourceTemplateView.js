@@ -1,17 +1,23 @@
 import template from "./templates/ResourceTemplateView.html"
 
 import "./components/TextField"
+import "./ResourceTemplateEditor"
+import "./ResourceTemplateEditorDialog"
 
 class ResourceTemplateView extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-        this._form = this._shadow.getElementById('form');
+        this._template = this._shadow.getElementById('template');
+        this._resource = null;
+        this._templateEditorButton = this._shadow.querySelector('round-button[class~="fab"]');
+        this._templateEditorButton.onclick = this.showEditor;
+        this._emptyMsg = this._shadow.querySelector('p');
     }
 
     clear() {
-        while (this._form.firstChild) this._form.removeChild(this._form.lastChild);
+        while (this._template.firstChild) this._template.removeChild(this._template.lastChild);
     }
 
     buildTemplate = (template) => {
@@ -25,7 +31,7 @@ class ResourceTemplateView extends HTMLElement {
                 })
                 fieldset.appendChild(section);
             });
-            this._form.appendChild(fieldset);
+            this._template.appendChild(fieldset);
         });
     }
 
@@ -83,23 +89,32 @@ class ResourceTemplateView extends HTMLElement {
      * @param {object} resource
      */
     set source(resource) {
+        if (!resource) return;
         let templates = JSON.parse(localStorage.getItem('templates') || '{}');
         const template = templates[resource.resourceType];
+        this._emptyMsg.hidden = template;
         if (template) {
             this.buildTemplate(template);
             this.cleanEmpty();
             this.setValues(resource);
         } else {
             this.clear();
-            const p = document.createElement('p');
-            p.innerHTML = "There is no template yet for this type of resource.<br/>To create your own, click on the 'EDIT TEMPLATE' button."
-            this._form.appendChild(p);
         }
+        this._resource = resource;
     }
 
     cleanEmpty = () => {
-        Array.from(this._form.querySelectorAll('section:not(:has(text-field))')).forEach(e => e.remove());
-        Array.from(this._form.querySelectorAll('fieldset:not(:has(section))')).forEach(e => e.remove());
+        Array.from(this._template.querySelectorAll('section:not(:has(text-field))')).forEach(e => e.remove());
+        Array.from(this._template.querySelectorAll('fieldset:not(:has(section))')).forEach(e => e.remove());
+    }
+
+    showEditor = () => {
+        this._editor = document.createElement('resource-template-editor-dialog');
+        this._editor.source = this._resource;
+        this._editor.onClose = () => {
+            this.source = this._resource;
+        }
+        document.querySelector('fhir-browser').container.appendChild(this._editor);
     }
 
 };

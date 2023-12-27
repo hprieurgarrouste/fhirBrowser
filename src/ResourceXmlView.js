@@ -4,6 +4,7 @@ import "./components/AppSwitch"
 
 import { FhirService } from "./services/Fhir"
 import { PreferencesService } from "./services/Preferences"
+import { SnackbarsService } from "./services/Snackbars"
 
 class ResourceXmlView extends HTMLElement {
     constructor() {
@@ -19,23 +20,29 @@ class ResourceXmlView extends HTMLElement {
         this._preferences = PreferencesService.get('xmlView', { 'sorted': false });
 
         this._sort = this._preferences.sorted;
-        this._sortToggle = this._shadow.querySelector('app-switch');
-        if (this._sort) {
-            this._sortToggle.setAttribute('data-checked', '');
-        } else {
-            this._sortToggle.removeAttribute('data-checked');
-        }
-        this._sortToggle.parentNode.onclick = this.sortToggleClick;
+        this._sortToggle = this._shadow.getElementById('sort-toggle');
+        this._sortToggle.onclick = this.sortToggleClick;
+
+        this._shadow.getElementById('download').onclick = this.downloadClick;
+
+        this._shadow.getElementById('copy').onclick = this.copyClick;
+
+        this._shadow.getElementById('share').onclick = this.shareClick;
+
     }
 
-    sortToggleClick = ({ target }) => {
-        const ATBNAME = 'data-checked';
-        if ("APP-SWITCH" !== target.nodeName) {
-            this._sortToggle.hasAttribute(ATBNAME) ? this._sortToggle.removeAttribute(ATBNAME) : this._sortToggle.setAttribute(ATBNAME, '');
-        }
-        this._sort = this._sortToggle.hasAttribute(ATBNAME);
+    connectedCallback() {
+        this.sortChange();
+    }
+
+    sortToggleClick = () => {
+        this._sort = !this._sort;
         PreferencesService.set('xmlView', { 'sorted': this._sort });
-        this.source = this._resource;
+        this.sortChange();
+    }
+    sortChange = () => {
+        this._sortToggle.style.color = this._sort ? 'var(--primary-color)' : 'unset';
+        if (this._resource) this.source = this._resource;
     }
 
     contentClick = ({ target, offsetX, offsetY, ctrlKey }) => {
@@ -143,5 +150,38 @@ class ResourceXmlView extends HTMLElement {
         return dl;
     }
 
+    downloadClick = () => {
+        const content = new XMLSerializer().serializeToString(this._resource);
+        const file = new File([content], this.resourceId, {
+            'type': 'data:text/xml;charset=utf-8'
+        });
+        const url = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${this.resourceType}#${file.name}.json`;
+        this._shadow.appendChild(link);
+        link.click();
+        this._shadow.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    };
+
+    copyClick = () => {
+        const content = new XMLSerializer().serializeToString(this._resource);
+        navigator.clipboard.writeText(content).then(function () {
+            SnackbarsService.show("Copying to clipboard was successful");
+        }, function (err) {
+            SnackbarsService.error("Could not copy text");
+        });
+    };
+
+    shareClick = () => {
+        const content = new XMLSerializer().serializeToString(this._resource);
+        const fileName = `${this.resourceType}.${this.resourceId}.txt`;
+        const file = new File([content], fileName, { type: 'text/plain' });
+        navigator.share({
+            "title": fileName,
+            "files": [file]
+        });
+    };
 };
 customElements.define('resource-xml-view', ResourceXmlView);

@@ -13,6 +13,10 @@ class AppDialog extends HTMLElement {
         });
     }
 
+    connectedCallback() {
+        window.addEventListener("hashchange", (event) => { this.onClose(event) });
+    }
+
     _onClose = () => {
         this.hidden = true;
     }

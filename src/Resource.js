@@ -26,12 +26,6 @@ class Resource extends HTMLElement {
 
         this._shadow.getElementById("help").onclick = this.helpClick;
 
-        this._shadow.getElementById('download').onclick = this.downloadClick;
-
-        this._shadow.getElementById('copy').onclick = this.copyClick;
-
-        this._shadow.getElementById('share').onclick = this.shareClick;
-
         this._shadow.getElementById('referencesToggle').onclick = this.referenceToggleClick;
 
         this._shadow.getElementById('historyToggle').onclick = this.historyToggleClick;
@@ -76,75 +70,6 @@ class Resource extends HTMLElement {
     helpClick = () => {
         window.open(`${FhirService.helpUrl(this._resourceType.type)}#resource`, "FhirBrowserHelp");
     };
-
-    downloadClick = () => {
-        let content = this.getCurrentContent(), type, ext;
-        switch (content.type) {
-            case "ttl":
-                type = 'data:text/plain;charset=utf-8';
-                ext = 'txt';
-                break;
-            case "xml":
-                type = 'data:text/xml;charset=utf-8';
-                ext = 'xml';
-                break;
-            case "json":
-            default:
-                type = 'data:text/json;charset=utf-8';
-                ext = 'json';
-                break;
-        }
-        const file = new File([content.value], this._resourceId, {
-            'type': type
-        });
-        const url = URL.createObjectURL(file);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${this._resourceType.type}#${file.name}.${ext}`;
-        this._shadow.appendChild(link);
-        link.click();
-        this._shadow.removeChild(link);
-        window.URL.revokeObjectURL(url);
-    };
-
-    copyClick = () => {
-        let content = this.getCurrentContent().value;
-        navigator.clipboard.writeText(content).then(function () {
-            SnackbarsService.show("Copying to clipboard was successful");
-        }, function (err) {
-            SnackbarsService.error("Could not copy text");
-        });
-    };
-
-    shareClick = () => {
-        let content = this.getCurrentContent().value;
-        const fileName = `${this._resourceType.type}.${this._resourceId}.txt`;
-        const file = new File([content], fileName, { type: 'text/plain' });
-        navigator.share({
-            "title": fileName,
-            "files": [file]
-        });
-    };
-
-    getCurrentContent = () => {
-        const type = this._shadow.querySelector("app-tabs").value;
-        let value = this._views[type].source;
-        switch (type) {
-            case 'json':
-                value = JSON.stringify(value);
-                break;
-            case 'xml':
-                value = new XMLSerializer().serializeToString(value);
-                break;
-            default:
-                break;
-
-        }
-        return {
-            "type": type,
-            "value": value
-        };
-    }
 
     serverChanged = () => {
         const tabs = this._shadow.querySelector("app-tabs");

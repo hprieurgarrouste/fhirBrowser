@@ -13,7 +13,7 @@ class ResourceTemplateEditor extends HTMLElement {
         this._shadow.innerHTML = template;
         this._resource = null;
         this._dragSrcEl = null;
-        this._template = this._shadow.getElementById('form');
+        this._template = this._shadow.getElementById('template');
 
         const dragZone = this._shadow.querySelector('main');
         dragZone.ondragstart = this.onDragStart;
@@ -114,26 +114,64 @@ class ResourceTemplateEditor extends HTMLElement {
         return value;
     }
 
+
+    get source() {
+        return this._resource;
+    }
     /**
      * @param {object} resource
      */
     set source(resource) {
         this._resource = resource;
-        if (this._list) {
-            this.load(this._resource.resourceType);
-            let templates = JSON.parse(localStorage.getItem('templates') || '{}');
-            const template = templates[this._resource.resourceType];
-            if (template) {
-                this.buildTemplate(template);
-                this.cleanEmpty();
-                this.setValues(this._resource);
-            } else {
-                this.clear();
+        this.loadData(this._resource.resourceType);
+        this.setValues(this._resource);
+    }
+
+    set template(tpl) {
+        if (tpl) {
+            this.buildTemplate(tpl);
+            this.cleanEmpty();
+        } else {
+            this.clear();
+        }
+    }
+    get template() {
+        let ret = [];
+        Array.from(this._template.childNodes)
+            .filter(node => 'FIELDSET' == node.nodeName)
+            .forEach(fieldset => ret.push(parseFieldset(fieldset)));
+        return ret;
+
+        function parseFieldset(fieldset) {
+            let fs = {
+                'label': '',
+                'row': []
             }
+            Array.from(fieldset.childNodes).forEach(node => {
+                if ('INPUT' == node.nodeName) {
+                    fs.label = node.value;
+                } else if ('SECTION' == node.nodeName) {
+                    fs.row.push(parseSection(node));
+                }
+            });
+            return fs;
+        }
+        function parseSection(section) {
+            let ret = [];
+            Array.from(section.childNodes)
+                .filter(node => 'TEXT-FIELD' == node.nodeName)
+                .forEach(node => ret.push(parseField(node)))
+            return ret;
+        }
+        function parseField(textField) {
+            return {
+                'placeholder': textField.getAttribute('placeholder'),
+                'name': textField.id
+            };
         }
     }
 
-    load = (resourceType) => {
+    loadData = (resourceType) => {
         this._list.clear();
 
         this._shadow.querySelector('linear-progress').hidden = false;
@@ -200,25 +238,25 @@ class ResourceTemplateEditor extends HTMLElement {
     isDropAvailable = (src, target) => {
         return (src != target) &&
             (
-                (target.id == 'form') ||
-                (target.closest('#form') == null) ||
+                (target.id == 'template') ||
+                (target.closest('#template') == null) ||
                 ('FIELDSET' == src.tagName && (
-                    'form' == target.id ||
+                    'template' == target.id ||
                     'FIELDSET' == target.tagName
                 )) ||
                 ('SECTION' == src.tagName && (
-                    'form' == target.id ||
+                    'template' == target.id ||
                     'FIELDSET' == target.tagName ||
                     'SECTION' == target.tagName
                 )) ||
                 ('TEXT-FIELD' == src.tagName && (
-                    'form' == target.id ||
+                    'template' == target.id ||
                     'FIELDSET' == target.tagName ||
                     'SECTION' == target.tagName ||
                     'TEXT-FIELD' == target.tagName
                 )) ||
                 ('LIST-ROW' == src.tagName && (
-                    'form' == target.id ||
+                    'template' == target.id ||
                     'FIELDSET' == target.tagName ||
                     'SECTION' == target.tagName ||
                     'TEXT-FIELD' == target.tagName
@@ -255,7 +293,7 @@ class ResourceTemplateEditor extends HTMLElement {
         let target = event.target;
         let src = this._dragSrcEl;
         if (this.isDropAvailable(this._dragSrcEl, target)) {
-            if (target.closest('#form') == null) {
+            if (target.closest('#template') == null) {
                 this._dragSrcEl.remove();
             } else {
                 if (this._dragSrcEl.parentNode == target.parentNode) {
@@ -272,7 +310,7 @@ class ResourceTemplateEditor extends HTMLElement {
                     const id = this._dragSrcEl.dataset.id;
                     src = this.createField(id, id.split(".").pop());
                     src.setAttribute('value', this.calcValue(this._resource, id));
-                    if ('form' == target.id) {
+                    if ('template' == target.id) {
                         const section = this.createSection();
                         section.appendChild(src);
                         const fieldset = this.createFieldset();
@@ -288,13 +326,13 @@ class ResourceTemplateEditor extends HTMLElement {
                         target.parentNode.insertBefore(src, target);
                     }
                 } else if ('FIELDSET' == src.tagName) {
-                    if ('form' == target.id) {
+                    if ('template' == target.id) {
                         target.appendChild(src);
                     } else if ('FIELDSET' == target.tagName) {
                         target.parentNode.insertBefore(src, target);
                     }
                 } else if ('SECTION' == src.tagName) {
-                    if ('form' == target.id) {
+                    if ('template' == target.id) {
                         const fieldset = this.createFieldset();
                         fieldset.appendChild(src);
                         target.appendChild(fieldset);
@@ -304,7 +342,7 @@ class ResourceTemplateEditor extends HTMLElement {
                         target.parentNode.insertBefore(src, target);
                     }
                 } else if ('TEXT-FIELD' == src.tagName) {
-                    if ('form' == target.id) {
+                    if ('template' == target.id) {
                         const section = this.createSection();
                         section.appendChild(src);
                         const fieldset = this.createFieldset();
