@@ -44,8 +44,6 @@ class Bundle extends HTMLElement {
         dataTable.addEventListener('rowclick', this.onRowClick);
         dataTable.onColumnReorder = this.handleColumnChanged;
 
-        this._shadow.getElementById('searchToggle').onclick = this.searchToggleClick;
-
         this._shadow.getElementById('copy').onclick = this.copyClick;
 
         this._shadow.getElementById('download').onclick = this.downloadClick;
@@ -54,10 +52,26 @@ class Bundle extends HTMLElement {
         this._columnsDialog.onValidate = this.handleColumnSetup;
 
         this._shadow.getElementById('settingsDialogToggle').onclick = this.settingsDialogToggleClick;
+
+        this._searchToggle = this._shadow.getElementById('searchToggle');
+        this._searchToggle.onclick = this.searchToggleClick;
+        this._searchPanel = this._shadow.getElementById('search');
+    }
+
+    connectedCallback() {
+        new MutationObserver(this.searchHiddenObserver).observe(this._searchPanel, { attributes: true });
+    }
+
+    searchHiddenObserver = (mutationList) => {
+        mutationList.forEach(({ type, attributeName, target }) => {
+            if ('attributes' == type && 'class' == attributeName) {
+                this._searchToggle.hidden = !target.classList.contains('hidden');
+            }
+        })
     }
 
     searchToggleClick = () => {
-        this._shadow.getElementById('search')?.classList.toggle("hidden");
+        this._searchPanel.classList.toggle("hidden");
     }
 
     onRowClick = ({ detail }) => {
@@ -219,10 +233,10 @@ class Bundle extends HTMLElement {
             const pref = PreferencesService.get('columns', {});
             this._columns = pref[resourceType] || ['id', 'meta.lastUpdated'];
             this._shadow.getElementById('settingsDialogToggle').hidden = false;
-            this._shadow.getElementById('search').hidden = false;
+            this._searchPanel.hidden = false;
         } else {
             this._shadow.getElementById('settingsDialogToggle').hidden = true;
-            this._shadow.getElementById('search').hidden = true;
+            this._searchPanel.hidden = true;
             this._columns = ['resourceType', 'id'];
             if ('Bundle' == resourceType) {
                 title = `${response.type} ${title.toLowerCase()}`;

@@ -25,11 +25,6 @@ class ResourceTemplateEditor extends HTMLElement {
 
         this._list = this._shadow.querySelector('app-list');
         this._list.onFilter = this.dataListFilter;
-        this._shadow.querySelector('side-panel').onClose = this.dataPanelClose;
-    }
-
-    dataPanelClose = () => {
-        this._shadow.querySelector('side-panel').hidden = true;
     }
 
     dataListFilter = (value) => {

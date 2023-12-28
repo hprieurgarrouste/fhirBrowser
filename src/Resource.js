@@ -12,8 +12,6 @@ import "./ResourceTtlView"
 import "./ResourceXmlView"
 
 import { FhirService } from "./services/Fhir"
-import { SnackbarsService } from "./services/Snackbars"
-
 
 class Resource extends HTMLElement {
     constructor() {
@@ -26,13 +24,35 @@ class Resource extends HTMLElement {
 
         this._shadow.getElementById("help").onclick = this.helpClick;
 
-        this._shadow.getElementById('referencesToggle').onclick = this.referenceToggleClick;
+        this._referencesToggle = this._shadow.getElementById('referencesToggle');
+        this._referencesToggle.onclick = this.referenceToggleClick;
+        this._referencesPanel = this._shadow.querySelector('resource-references');
 
-        this._shadow.getElementById('historyToggle').onclick = this.historyToggleClick;
+        this._historyDisabled = null;
+        this._historyToggle = this._shadow.getElementById('historyToggle');
+        this._historyToggle.onclick = this.historyToggleClick;
+        this._historyPanel = this._shadow.querySelector('resource-history');
 
         this._shadow.querySelector("app-tabs").addEventListener('select', this.tabSelect);
 
         FhirService.addListener(this.serverChanged);
+    }
+
+    connectedCallback() {
+        new MutationObserver(this.panelHiddenObserver).observe(this._referencesPanel, { attributes: true });
+        new MutationObserver(this.panelHiddenObserver).observe(this._historyPanel, { attributes: true });
+    }
+
+    panelHiddenObserver = (mutationList) => {
+        mutationList.forEach(({ type, attributeName, target }) => {
+            if ('attributes' == type && 'hidden' == attributeName) {
+                if (target == this._historyPanel) {
+                    this._historyToggle.hidden = this._historyDisabled || !target.hidden
+                } else if (target == this._referencesPanel) {
+                    this._referencesToggle.hidden = !target.hidden
+                }
+            }
+        })
     }
 
     tabSelect = ({ detail }) => {
@@ -45,26 +65,22 @@ class Resource extends HTMLElement {
         } else {
             location.hash = `${location.hash}?_format=${format}`;
         }
-
-        const historyPanel = this._shadow.querySelector('resource-history');
-        if (historyPanel && !historyPanel.hidden) {
-            historyPanel.load(this._resourceType, this._resourceId);
-        }
     }
 
     referenceToggleClick = () => {
-        const panel = this._shadow.querySelector('resource-references');
-        if (panel.hidden) this._shadow.querySelector('resource-history').hidden = true;
-        panel.hidden = !panel.hidden;
+        if (this._referencesPanel.hidden) {
+            this._historyPanel.hidden = true;
+            this._referencesPanel.load(this._resourceType, this._resourceId);
+        }
+        this._referencesPanel.hidden = !this._referencesPanel.hidden;
     };
 
     historyToggleClick = () => {
-        const panel = this._shadow.querySelector('resource-history');
-        if (panel.hidden) {
-            this._shadow.querySelector('resource-references').hidden = true;
-            panel.load(this._resourceType, this._resourceId);
+        if (this._historyPanel.hidden) {
+            this._referencesPanel.hidden = true;
+            this._historyPanel.load(this._resourceType, this._resourceId);
         }
-        panel.hidden = !panel.hidden;
+        this._historyPanel.hidden = !this._historyPanel.hidden;
     };
 
     helpClick = () => {
@@ -133,23 +149,20 @@ class Resource extends HTMLElement {
         }
 
         if (window.matchMedia("(max-width: 480px)").matches) {
-            this._shadow.querySelector("resource-references").hidden = true;
-            this._shadow.querySelector("resource-history").hidden = true;
+            this._referencesPanel.hidden = true;
+            this._historyPanel.hidden = true;
         }
 
-        if (!this._resourceType.interaction.find(({ code }) => 'vread' == code)) {
-            this._shadow.getElementById('historyToggle').hidden = true;
-            this._shadow.querySelector('resource-history').hidden = true;
+        this._historyDisabled = this._resourceType.interaction.find(({ code }) => 'vread' == code) == undefined;
+        if (this._historyDisabled) {
+            this._historyPanel.hidden = true;
+            this._historyToggle.hidden = true;
         } else {
-            this._shadow.getElementById('historyToggle').hidden = false;
+            this._historyToggle.hidden = false;
         }
 
-        if (this._shadow.querySelector('resource-references').load(this._resourceType, this._resourceId)) {
-            this._shadow.getElementById('referencesToggle').hidden = false;
-        } else {
-            this._shadow.getElementById('referencesToggle').hidden = true;
-            this._shadow.querySelector('resource-references').hidden = true;
-        }
+        if (!this._historyPanel.hidden) this._historyPanel.load(this._resourceType, this._resourceId);
+        if (!this._referencesPanel.hidden) this._referencesPanel.load(this._resourceType, this._resourceId);
     }
 
 };

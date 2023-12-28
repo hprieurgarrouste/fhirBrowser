@@ -8,7 +8,6 @@
     }
 
     main {
-        border-bottom: 1px solid var(--border-color);
         padding: 0.5em;
         overflow: hidden auto;
         flex: 1 1 auto;
@@ -16,7 +15,8 @@
     }
 
     footer {
-        padding: 9px 16px;
+        border-top: 1px solid var(--border-color);
+        padding: 0.5em;
         text-align: center;
         overflow: hidden;
     }
@@ -38,6 +38,7 @@
 <side-panel data-title="Search">
     <round-button id="help" title="Help" data-icon="help" slot="appBarLeft"></round-button>
     <round-button id="clear" title="Clear" data-icon="clear_all" slot="appBarRight"></round-button>
+    <round-button id="close" title="Close" data-icon="close" slot="appBarRight"></round-button>
     <section slot="main">
         <main></main>
         <footer>

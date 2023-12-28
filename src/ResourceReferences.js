@@ -17,7 +17,7 @@ class ResourceReferences extends HTMLElement {
         this._list.onclick = this.appListClick;
         this._list.onFilter = this.appListFilter;
 
-        this._shadow.querySelector('side-panel').onClose = this.sidePanelClose;
+        this._shadow.getElementById('close').onclick = this.sidePanelClose;
     }
 
     appListClick = (event) => {

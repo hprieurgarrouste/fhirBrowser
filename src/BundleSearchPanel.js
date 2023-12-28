@@ -17,9 +17,8 @@ class BundleSearchPanel extends HTMLElement {
     connectedCallback() {
         window.addEventListener("hashchange", this.locationHandler);
 
-        this._shadow.querySelector('side-panel').onClose = this.sidePanelClose;
-
         this._shadow.getElementById("clear").addEventListener("click", this.clearClick);
+        this._shadow.getElementById("close").addEventListener("click", this.sidePanelClose);
 
         this._shadow.getElementById('help').addEventListener('click', this.helpClick);
 

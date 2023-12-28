@@ -14,7 +14,7 @@ class ResourceHistory extends HTMLElement {
 
         this._shadow.getElementById('list').onclick = this.listClick;
 
-        this._shadow.querySelector('side-panel').onClose = this.sidePanelClose;
+        this._shadow.getElementById('close').onclick = this.sidePanelClose;
     }
 
     listClick = (event) => {
