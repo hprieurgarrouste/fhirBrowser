@@ -13,7 +13,7 @@ class ResourceTemplateView extends HTMLElement {
         this._resource = null;
         this._templateEditorButton = this._shadow.querySelector('round-button[class~="fab"]');
         this._templateEditorButton.onclick = this.showEditor;
-        this._emptyMsg = this._shadow.querySelector('p');
+        this._emptyMsg = this._shadow.getElementById('emptyMsg');
     }
 
     clear() {

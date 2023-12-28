@@ -9,6 +9,7 @@ class ResourceTemplateEditorDialog extends HTMLElement {
         this._shadow.getElementById("cancel").onclick = this.dialogOnClose;
         this._shadow.getElementById("save").onclick = this.onSave;
         this._editor = this._shadow.querySelector('resource-template-editor');
+        this._dialog = this._shadow.querySelector('app-dialog');
     }
 
     _onClose = () => { }
@@ -41,6 +42,7 @@ class ResourceTemplateEditorDialog extends HTMLElement {
         const templates = JSON.parse(localStorage.getItem('templates') || '{}');
         this._editor.template = templates[resource.resourceType];
         this._editor.source = resource;
+        this._dialog.dataset.title = `${resource.resourceType} template`;
     }
 
 };

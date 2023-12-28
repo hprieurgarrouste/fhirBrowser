@@ -39,7 +39,7 @@
         min-height: 50px;
     }
 
-    p {
+    #emptyMsg {
         position: absolute;
         top: 50%;
         left: 50%;
@@ -48,7 +48,7 @@
         text-align: center;
     }
 
-    p>i {
+    #emptyMsg p>i {
         vertical-align: middle;
     }
 
@@ -64,9 +64,10 @@
 </style>
 <main>
     <section id="template"></section>
-    <p hidden>
-        There is no template yet for this type of resource.<br />
-        To design your own, click on the setup button <i class="material-symbols-sharp">tune</i>.
-    </p>
+    <section id="emptyMsg" hidden>
+        <p>There is no template yet for this resource type.</p>
+        <p>Click the configure button <i class="material-symbols-sharp">edit</i> to design your own<br />or use the view
+            switcher <i class="material-symbols-sharp">wysiwyg</i> to switch back to the json view.</p>
+    </section>
     <round-button class="fab" title="setup" data-icon="edit"></round-button>
 </main>
