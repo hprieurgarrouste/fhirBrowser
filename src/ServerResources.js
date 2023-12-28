@@ -77,7 +77,7 @@ class ServerResources extends HTMLElement {
             this._shadow.querySelector('app-list').querySelector("[selected]")?.removeAttribute("selected");
             row.setAttribute("selected", "");
             this._resourceType = row.dataset.type;
-            location.hash = `#/${row.dataset.type}?_summary=true&_format=json&_count=20`;
+            location.hash = `#/${row.dataset.type}?_summary=true&_format=json`;
         }
     }
 

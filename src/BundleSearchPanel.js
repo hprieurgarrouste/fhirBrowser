@@ -50,7 +50,7 @@ class BundleSearchPanel extends HTMLElement {
                 hash.push(`${value.name}=${encodeURIComponent(value.value)}`);
             }
         });
-        location.hash = `#/${this._resourceType.type}?${hash.length ? hash.join('&') + '&' : ''}_summary=true&_format=json&_count=20`;
+        location.hash = `#/${this._resourceType.type}?${hash.length ? hash.join('&') + '&' : ''}_summary=true&_format=json`;
     }
 
     helpClick = (event) => {
