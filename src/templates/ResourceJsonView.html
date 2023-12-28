@@ -2,7 +2,6 @@
     @import url(/assets/material.css);
 
     main {
-        --indent: 32px;
         display: flex;
         flex-direction: column;
         height: 100%;
@@ -16,6 +15,7 @@
     }
 
     #content {
+        --indent: 32px;
         color: var(--text-color-normal, black);
         font-family: monospace;
         overflow: auto;
@@ -23,81 +23,81 @@
         white-space: nowrap;
     }
 
-    dl {
+    #content dl {
         margin: 0;
         padding-left: var(--indent);
     }
 
-    dt {
+    #content dt {
         list-style-type: none;
     }
 
-    span {
+    #content span {
         color: var(--json-viewer-values-color, black);
         cursor: inherit;
     }
 
-    span.key {
+    #content span.key {
         color: var(--json-viewer-properties-color, black);
     }
 
-    span.key::before {
+    #content span.key::before {
         content: '"';
     }
 
-    span.key::after {
+    #content span.key::after {
         content: '": ';
     }
 
-    dt.array>span.value>dl>dt>span.key::before {
+    #content dt.array>span.value>dl>dt>span.key::before {
         content: '';
     }
 
-    dt.array>span.value>dl>dt>span.key::after {
+    #content dt.array>span.value>dl>dt>span.key::after {
         content: ': ';
     }
 
-    span.value a {
+    #content span.value a {
         color: inherit;
     }
 
-    span.value.string::before {
+    #content span.value.string::before {
         content: '"';
     }
 
-    span.value.string::after {
+    #content span.value.string::after {
         content: '"';
     }
 
-    dt.array>span.value::before {
+    #content dt.array>span.value::before {
         content: '[';
     }
 
-    dt.array>span.value::after {
+    #content dt.array>span.value::after {
         content: ']';
     }
 
-    dt.object>span.value::before {
+    #content dt.object>span.value::before {
         content: '{';
     }
 
-    dt.object>span.value::after {
+    #content dt.object>span.value::after {
         content: '}';
     }
 
-    dt,
-    dt.array>span.value::after,
-    dt.object>span.value::after {
+    #content dt,
+    #content dt.array>span.value::after,
+    #content dt.object>span.value::after {
         padding-left: var(--indent);
     }
 
-    dt.array,
-    dt.object {
+    #content dt.array,
+    #content dt.object {
         padding-left: 0;
     }
 
-    dt.array::before,
-    dt.object::before {
+    #content dt.array::before,
+    #content dt.object::before {
         cursor: pointer;
         content: 'expand_less ';
         font-family: 'Material Symbols Sharp';
@@ -107,49 +107,47 @@
         color: var(--text-color-disabled, black);
     }
 
-    dt:not(:last-child)::after {
+    #content dt:not(:last-child)::after {
         content: ",";
     }
 
-    dt.collapsed::before {
+    #content dt.collapsed::before {
         content: 'expand_more ';
     }
 
-    dt.collapsed>span dl {
+    #content dt.collapsed>span dl {
         display: none;
     }
 
-    dt.array.collapsed span.value::after {
+    #content dt.array.collapsed span.value::after {
         content: '...]';
         padding-left: 0;
     }
 
-    dt.object.collapsed span.value::after {
+    #content dt.object.collapsed span.value::after {
         content: '...}';
         padding-left: 0;
-    }
-
-    ::highlight(search-results),
-    ::selection {
-        background-color: #e5971a;
-        color: black;
     }
 
     footer {
         border-top: 1px solid var(--border-color);
         padding: 0.5em;
         display: flex;
-        flex-flow: row unwrap;
+        flex-flow: row nowrap;
     }
 
     footer>section:nth-child(2) {
         flex-grow: 1;
     }
 
-    #sort-toggle {
+    footer span {
         display: inline-block;
+    }
+
+    footer span:not(:last-child) {
         border-right: 1px solid var(--border-color);
         padding-right: 0.5em;
+        margin-right: 0.25em;
     }
 
     @media (max-width:480px) {
@@ -167,10 +165,14 @@
         </section>
         <section></section>
         <section>
-            <round-button id="sort-toggle" title="Sort" data-icon="sort_by_alpha"></round-button>
-            <round-button id="share" title="Share" data-icon="share"></round-button>
-            <round-button id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
-            <round-button id="download" title="Download" data-icon="download"></round-button>
+            <span>
+                <round-button id="sort-toggle" title="Sort" data-icon="sort_by_alpha"></round-button>
+            </span>
+            <span>
+                <round-button id="share" title="Share" data-icon="share"></round-button>
+                <round-button id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
+                <round-button id="download" title="Download" data-icon="download"></round-button>
+            </span>
         </section>
     </footer>
 </main>

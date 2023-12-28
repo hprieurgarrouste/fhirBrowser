@@ -2,13 +2,13 @@
     @import url(/assets/material.css);
 
     main {
-        --indent: 32px;
         display: flex;
         flex-direction: column;
         height: 100%;
     }
 
     #content {
+        --indent: 32px;
         color: var(--text-color-normal, black);
         flex: 1 1 auto;
         font-family: monospace;
@@ -20,58 +20,58 @@
         box-shadow: inset 0 3px 4px var(--border-color);
     }
 
-    dl {
+    #content dl {
         margin: 0;
         padding-left: var(--indent);
     }
 
-    #content>dl {
+    #content #content>dl {
         padding-left: 0;
     }
 
 
-    dt {
+    #content dt {
         list-style-type: none;
     }
 
-    span.key {
+    #content span.key {
         color: var(--xml-viewer-nodes-color, black);
     }
 
-    span.key::before {
+    #content span.key::before {
         content: '<';
     }
 
-    span.key::after {
+    #content span.key::after {
         content: '>';
     }
 
-    span.attributes {
+    #content span.attributes {
         color: var(--xml-viewer-attributes-color, black);
     }
 
-    span.values {
+    #content span.values {
         color: var(--xml-viewer-values-color, black);
     }
 
-    span.values a {
+    #content span.values a {
         color: inherit;
     }
 
-    span.key.end {
+    #content span.key.end {
         padding-left: var(--indent);
     }
 
-    dt,
-    dt.object>span.value::after {
+    #content dt,
+    #content dt.object>span.value::after {
         padding-left: var(--indent);
     }
 
-    dt.object {
+    #content dt.object {
         padding-left: 0;
     }
 
-    dt.object::before {
+    #content dt.object::before {
         cursor: pointer;
         content: 'expand_less ';
         font-family: 'Material Symbols Sharp';
@@ -81,20 +81,20 @@
         color: var(--text-color-disabled, black);
     }
 
-    dt.collapsed::before {
+    #content dt.collapsed::before {
         content: 'expand_more ';
     }
 
-    dt.collapsed>span dl {
+    #content dt.collapsed>span dl {
         display: none;
     }
 
-    dt.object.collapsed span.value::after {
+    #content dt.object.collapsed span.value::after {
         content: '...';
         padding-left: 0;
     }
 
-    dt.object.collapsed span.key.end {
+    #content dt.object.collapsed span.key.end {
         padding-left: 0;
     }
 
@@ -109,10 +109,14 @@
         flex-grow: 1;
     }
 
-    #sort-toggle {
+    footer span {
         display: inline-block;
+    }
+
+    footer span:not(:last-child) {
         border-right: 1px solid var(--border-color);
         padding-right: 0.5em;
+        margin-right: 0.25em;
     }
 
     @media (max-width:480px) {
@@ -127,10 +131,13 @@
         <section></section>
         <section></section>
         <section>
-            <round-button id="sort-toggle" title="Sort" data-icon="sort_by_alpha"></round-button>
-            <round-button id="share" title="Share" data-icon="share"></round-button>
-            <round-button id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
-            <round-button id="download" title="Download" data-icon="download"></round-button>
+            <span>
+                <round-button id="sort-toggle" title="Sort" data-icon="sort_by_alpha"></round-button>
+            </span>
+            <span><round-button id="share" title="Share" data-icon="share"></round-button>
+                <round-button id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
+                <round-button id="download" title="Download" data-icon="download"></round-button>
+            </span>
         </section>
     </footer>
 </main>

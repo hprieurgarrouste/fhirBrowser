@@ -25,7 +25,7 @@ class ResourceJsonView extends HTMLElement {
         this._sortToggle.onclick = this.sortToggleClick;
 
         this._templateToggle = this._shadow.getElementById('template-toggle');
-        if (true || window.matchMedia("(max-width: 480px)").matches) {
+        if (window.matchMedia("(max-width: 480px)").matches) {
             this._template = false;
             this._templateToggle.hidden = true;
         } else {

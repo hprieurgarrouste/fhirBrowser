@@ -2,7 +2,6 @@ import template from "./templates/Bundle.html";
 
 import "./components/AppBar"
 import "./components/DataTable"
-import "./components/DataTablePagination"
 import "./components/LinearProgress"
 
 import "./BundleSearchPanel"
@@ -18,12 +17,8 @@ class Bundle extends HTMLElement {
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
         this._resourceType = null;
-        this._skip = 0;
-        this._pageSize = 20;
-        this._count = null;
         this._columns = null;
         this._filters = [];
-        this._page = null;
         this._dateOptions = {
             year: "numeric",
             month: "2-digit",
@@ -39,15 +34,17 @@ class Bundle extends HTMLElement {
         this._source = null;
 
         this._shadow.getElementById('help').onclick = this.helpClick;
-        this._shadow.querySelector("data-table-pagination").onclick = this.paginationClick;
+
+        this._shadow.getElementById('paginationFirst').onclick = this.paginationClick;
+        this._shadow.getElementById('paginationPrevious').onclick = this.paginationClick;
+        this._shadow.getElementById('paginationNext').onclick = this.paginationClick;
+        this._shadow.getElementById('paginationLast').onclick = this.paginationClick;
 
         const dataTable = this._shadow.getElementById('table');
         dataTable.addEventListener('rowclick', this.onRowClick);
         dataTable.onColumnReorder = this.handleColumnChanged;
 
-        this._shadow.getElementById('searchToggle').addEventListener('click', () => {
-            this._shadow.getElementById('search')?.classList.toggle("hidden");
-        });
+        this._shadow.getElementById('searchToggle').onclick = this.searchToggleClick;
 
         this._shadow.getElementById('copy').onclick = this.copyClick;
 
@@ -57,6 +54,10 @@ class Bundle extends HTMLElement {
         this._columnsDialog.onValidate = this.handleColumnSetup;
 
         this._shadow.getElementById('settingsDialogToggle').onclick = this.settingsDialogToggleClick;
+    }
+
+    searchToggleClick = () => {
+        this._shadow.getElementById('search')?.classList.toggle("hidden");
     }
 
     onRowClick = ({ detail }) => {
@@ -104,7 +105,7 @@ class Bundle extends HTMLElement {
     }
 
     copyClick = () => {
-        navigator.clipboard.writeText(JSON.stringify(this._page)).then(function () {
+        navigator.clipboard.writeText(JSON.stringify(this._source)).then(function () {
             SnackbarsService.show("Copying to clipboard was successful");
         }, function (err) {
             console.error('Async: Could not copy text: ', err);
@@ -112,8 +113,8 @@ class Bundle extends HTMLElement {
     }
 
     downloadClick = () => {
-        const fileName = `${this._resourceType.type}-${this._skip}`;
-        const file = new File([JSON.stringify(this._page)], fileName, {
+        const fileName = this._resourceType.type;
+        const file = new File([JSON.stringify(this._source)], fileName, {
             type: 'data:text/json;charset=utf-8',
         });
         const url = URL.createObjectURL(file);

@@ -21,8 +21,23 @@
 
     footer {
         border-top: 1px solid var(--border-color);
-        text-align: right;
         padding: 0.5em;
+        display: flex;
+        flex-flow: row nowrap;
+    }
+
+    footer>section:nth-child(2) {
+        flex-grow: 1;
+    }
+
+    footer span {
+        display: inline-block;
+    }
+
+    footer span:not(:last-child) {
+        border-right: 1px solid var(--border-color);
+        padding-right: 0.5em;
+        margin-right: 0.25em;
     }
 
     @media (max-width:480px) {
@@ -34,8 +49,14 @@
 <main>
     <pre id="content"></pre>
     <footer>
-        <round-button id="share" title="Share" data-icon="share"></round-button>
-        <round-button id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
-        <round-button id="download" title="Download" data-icon="download"></round-button>
+        <section></section>
+        <section></section>
+        <section>
+            <span>
+                <round-button id="share" title="Share" data-icon="share"></round-button>
+                <round-button id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
+                <round-button id="download" title="Download" data-icon="download"></round-button>
+            </span>
+        </section>
     </footer>
 </main>
