@@ -35,6 +35,7 @@ class Bundle extends HTMLElement {
 
         this._shadow.getElementById('help').onclick = this.helpClick;
 
+        this._total = this._shadow.getElementById('total');
         this._shadow.getElementById('paginationFirst').onclick = this.paginationClick;
         this._shadow.getElementById('paginationPrevious').onclick = this.paginationClick;
         this._shadow.getElementById('paginationNext').onclick = this.paginationClick;
@@ -155,6 +156,11 @@ class Bundle extends HTMLElement {
     }
 
     parsePage(data) {
+        this._total.hidden = true;
+        if (data.total) {
+            this._total.hidden = false;
+            this._total.innerHTML = `<b>Total:&nbsp;</b>${data.total}`;
+        }
         if (data.entry) {
             const dataTable = this._shadow.getElementById('table');
             data.entry

@@ -55,12 +55,22 @@
         flex-flow: row nowrap;
     }
 
+    footer>section {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
     footer>section:nth-child(2) {
         flex-grow: 1;
     }
 
-    footer span {
+    footer span>* {
         display: inline-block;
+    }
+
+    #total {
+        line-height: 40px;
     }
 
     footer span:not(:last-child) {
@@ -100,6 +110,7 @@
             <section></section>
             <section></section>
             <section>
+                <span id="total"></span>
                 <span>
                     <round-button id="paginationFirst" title="first" data-icon="first_page" disabled></round-button>
                     <round-button id="paginationPrevious" title="previous" data-icon="chevron_left"
