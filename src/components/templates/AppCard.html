@@ -1,0 +1,77 @@
+<style>
+    @import url(/assets/material.css);
+
+    .surface {
+        background-color: var(--background-color, white);
+        border-radius: 4px;
+        box-shadow: 1px 1px 5px 1px var(--border-color);
+    }
+
+    .overlay {
+        background-color: rgba(255, 255, 255, 4%);
+        color: var(--text-color-normal, white);
+        font-family: var(--font-family);
+        height: 100%;
+    }
+
+    main {
+        padding: 1em;
+    }
+
+    header {
+        background-color: inherit;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    header>i:not(:empty) {
+        padding-right: 0.5em;
+    }
+
+    header .text {
+        flex: 1 1 auto;
+        overflow: hidden;
+    }
+
+    #primary {
+        display: block;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        color: var(--text-color-normal, black);
+        text-transform: lowercase;
+        font-weight: bold;
+    }
+
+    #primary:first-letter {
+        text-transform: uppercase;
+    }
+
+    #secondary {
+        display: block;
+        font-size: smaller;
+        color: var(--text-color-disabled);
+        overflow-wrap: break-word;
+    }
+</style>
+<div class="surface">
+    <div class="overlay">
+        <main>
+            <header>
+                <i class="material-symbols-sharp"></i>
+                <span class="text">
+                    <span id="primary"></span>
+                    <span id="secondary"></span>
+                </span>
+                <section>
+                    <slot name="media"></slot>
+                </section>
+            </header>
+            <list-item></list-item>
+            <section>
+                <slot></slot>
+            </section>
+        </main>
+    </div>
+</div>
