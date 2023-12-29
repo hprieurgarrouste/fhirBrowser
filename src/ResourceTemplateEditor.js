@@ -106,7 +106,7 @@ class ResourceTemplateEditor extends HTMLElement {
             }
             return true;
         })
-        return value;
+        return value || '';
     }
 
 
@@ -174,6 +174,7 @@ class ResourceTemplateEditor extends HTMLElement {
             elements.sort((e1, e2) => e1.path.localeCompare(e2.path));
             elements.forEach(element => {
                 const item = document.createElement('list-item');
+                item.setAttribute("data-icon", 'drag_indicator');
                 item.setAttribute("data-primary", element.path);
                 item.setAttribute("data-secondary", element.short);
                 const row = document.createElement('list-row');

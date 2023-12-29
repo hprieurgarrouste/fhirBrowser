@@ -82,7 +82,7 @@ class ResourceTemplateView extends HTMLElement {
             }
             return true;
         })
-        return value;
+        return value || '';
     }
 
     /**

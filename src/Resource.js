@@ -153,12 +153,12 @@ class Resource extends HTMLElement {
             this._historyPanel.hidden = true;
         }
 
-        this._historyDisabled = this._resourceType.interaction.find(({ code }) => 'vread' == code) == undefined;
+        this._historyDisabled = this._resourceType?.interaction.find(({ code }) => 'vread' == code) == undefined;
         if (this._historyDisabled) {
             this._historyPanel.hidden = true;
             this._historyToggle.hidden = true;
         } else {
-            this._historyToggle.hidden = false;
+            this._historyToggle.hidden = !this._historyPanel.hidden;
         }
 
         if (!this._historyPanel.hidden) this._historyPanel.load(this._resourceType, this._resourceId);
