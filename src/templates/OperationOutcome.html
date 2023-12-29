@@ -1,0 +1,74 @@
+<style>
+    @import url(/assets/material.css);
+
+    #wrapper {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    main {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        flex: auto;
+        width: 0;
+    }
+
+    #title {
+        margin: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    main>section {
+        padding: 1em;
+        flex: 1 1 auto;
+        height: 0;
+        overflow: auto;
+    }
+
+    #issue {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1em;
+    }
+
+    #issue app-card {
+        max-width: 40%;
+    }
+
+    #text {
+        font-size: smaller;
+        font-family: monospace;
+    }
+
+    #text table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    #text table,
+    #text td,
+    #text th {
+        border: 1px solid var(--border-color);
+    }
+</style>
+<div id="wrapper">
+    <main>
+        <header>
+            <app-bar>
+                <round-button id="help" title="Help" data-icon="help" slot="left"></round-button>
+                <h3 slot="middle" id="title">OperationOutcome</h3>
+            </app-bar>
+        </header>
+        <section>
+            <h4>Issue</h4>
+            <section id="issue"></section>
+            <h4>Text</h4>
+            <section id="text"></section>
+        </section>
+    </main>
+</div>

@@ -10,6 +10,7 @@ import "./Bundle"
 import "./ServerPanel"
 import "./Resource"
 import "./ServerDialog"
+import "./OperationOutcome"
 
 import { FhirService } from "./services/Fhir"
 import { PreferencesService } from "./services/Preferences"
@@ -42,6 +43,10 @@ class App extends HTMLElement {
         this._shadow.getElementById('aboutDialogToggle').onclick = () => {
             this._shadow.querySelector('about-dialog').hidden = false;
         };
+
+        this._bundleView = this._shadow.querySelector("fhir-bundle");
+        this._resourceView = this._shadow.querySelector("fhir-resource");
+        this._operationOutcomeView = this._shadow.querySelector("fhir-operation-outcome");
     }
 
     async fetchHash(hash) {
@@ -55,7 +60,8 @@ class App extends HTMLElement {
                 "headers": FhirService.server.headers
             });
             if (!response.ok) {
-                throw new Error(`${response.status} ${response.statusText}`);
+                //throw new Error(`${response.status} ${response.statusText}`);
+                SnackbarsService.error(`${response.status} ${response.statusText}`);
             }
             const bdy = this._shadow.getElementById("bdy");
             bdy.style.visibility = "visible";
@@ -74,13 +80,21 @@ class App extends HTMLElement {
                 if (match) sourceType = match[1];
             }
             if (sourceType) {
-                if ('Bundle' == sourceType) {
-                    const bundle = this._shadow.getElementById("bundle");
-                    bundle.hidden = false;
-                    bundle.source = source;
+                if ('OperationOutcome' == sourceType) {
+                    this._bundleView.hidden = true;
+                    this._resourceView.hidden = true;
+                    this._operationOutcomeView.hidden = false;
+                    this._operationOutcomeView.source = source;
+                } else if ('Bundle' == sourceType) {
+                    this._bundleView.hidden = false;
+                    this._bundleView.source = source;
+                    this._resourceView.hidden = true;
+                    this._operationOutcomeView.hidden = true;
                 } else {
-                    this._shadow.getElementById("bundle").hidden = true;
-                    this._shadow.getElementById("resource").source = source;
+                    this._bundleView.hidden = true;
+                    this._resourceView.hidden = false;
+                    this._resourceView.source = source;
+                    this._operationOutcomeView.hidden = true;
                 }
             } else {
                 throw new Error('Unknown response format');
