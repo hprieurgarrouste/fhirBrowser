@@ -50,35 +50,45 @@ class ServerResources extends HTMLElement {
                 const item = document.createElement('list-item');
                 item.setAttribute("data-primary", resource.type);
                 item.setAttribute("data-icon", FhirService.ResourceIcon(resource.type));
-                const count = makeTrailling(resource);
-                if (count) item.appendChild(count);
                 row.appendChild(item);
                 list.appendChild(row);
             });
         this.locationHandler();
 
-        function makeTrailling(resource) {
-            const count = resource.extension
-                ?.find(x => 'http://hl7api.sourceforge.net/hapi-fhir/res/extdefs.html#resourceCount' == x.url)
-                ?.valueDecimal;
-            if (count) {
-                const badge = document.createElement('app-badge');
-                badge.slot = 'trailling';
-                badge.value = count;
-                return badge;
-            }
-            return null;
-        }
+    }
+
+    makeBadge = (value) => {
+        const badge = document.createElement('app-badge');
+        badge.slot = 'trailling';
+        badge.value = value;
+        return badge;
     }
 
     appListClick = ({ target }) => {
         const row = target.closest("list-row");
         if (row) {
+            this._resourceType = row.dataset.type;
+
+            const item = row.querySelector('list-item');
+            if (!item.querySelector('app-badge[slot="trailling"]')) {
+                this.getCount(this._resourceType).then(({ total }) => item.appendChild(this.makeBadge(total == undefined ? '?' : total)));
+            }
+
             this._shadow.querySelector('app-list').querySelector("[selected]")?.removeAttribute("selected");
             row.setAttribute("selected", "");
-            this._resourceType = row.dataset.type;
+
             location.hash = `#/${row.dataset.type}?_summary=true&_format=json`;
         }
+    }
+
+    getCount = async (type) => {
+        const url = new URL(`${FhirService.server.url}/${type}`);
+        url.searchParams.set("_summary", "count");
+        url.searchParams.set("_format", "json");
+        const response = await fetch(url, {
+            "headers": FhirService.server.headers
+        });
+        return response.json();
     }
 
     appListFilter = (value) => {
