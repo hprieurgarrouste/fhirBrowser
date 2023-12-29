@@ -1,22 +1,23 @@
 <style>
     @import url(/assets/material.css);
 
-    #list {
+    main {
         display: flex;
         flex-direction: column;
-        flex-wrap: nowrap;
-
-        background: linear-gradient(90deg, var(--background-color) calc(100% - 2px), var(--text-color-normal) 0);
-        background-size: 19px;
-        background-repeat: no-repeat;
+        height: 100%;
     }
 
-    #list>* {
-        cursor: pointer;
+    app-list {
+        flex: 1 1 auto;
+        height: 0;
+
     }
 </style>
 <side-panel data-title="History">
     <round-button id="help" title="Help" data-icon="help" slot="appBarLeft"></round-button>
     <round-button id="close" title="Close" data-icon="close" slot="appBarRight"></round-button>
-    <section id="list" slot="main"></section>
+    <main slot="main">
+        <linear-progress></linear-progress>
+        <app-list></app-list>
+    </main>
 </side-panel>
