@@ -15,8 +15,8 @@ class AppBadge extends HTMLElement {
 
     render = () => {
         if (!this._content) return;
-        if (!this._value || this._value.length == 0) {
-            this._content.innerText = '';
+        if (this._value == null || this._value == undefined || this._value.length == 0) {
+            this._content.innerText = '?';
             this.title = this._value;
             return;
         }
