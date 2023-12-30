@@ -5,9 +5,10 @@ import { PreferencesService } from "../services/Preferences"
 class ColorScheme extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' })
-        this._shadow.innerHTML = template;
-        this._shadow.addEventListener('click', this.onClick);
+        const shadow = this.attachShadow({ mode: 'closed' })
+        shadow.innerHTML = template;
+        shadow.addEventListener('click', this.onClick);
+        this._themeButton = shadow.querySelector("round-button");
     }
 
     connectedCallback() {
@@ -45,9 +46,8 @@ class ColorScheme extends HTMLElement {
                 colorSchemeIcon = "brightness_auto";
                 break;
         }
-        const themeButton = this._shadow.querySelector("round-button");
-        themeButton.setAttribute("data-icon", colorSchemeIcon);
-        themeButton.title = `Theme ${colorScheme}`;
+        this._themeButton.setAttribute("data-icon", colorSchemeIcon);
+        this._themeButton.title = `Theme ${colorScheme}`;
         document.body.setAttribute("color-scheme", scheme);
     }
 

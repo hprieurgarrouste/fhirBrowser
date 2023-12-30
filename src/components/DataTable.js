@@ -3,10 +3,10 @@ import template from "./templates/DataTable.html";
 class DataTable extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'open' });
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'open' });
+        shadow.innerHTML = template;
 
-        this._header = this._shadow.getElementById("header");
+        this._header = shadow.getElementById("header");
         this._header.ondragstart = this.onDragStart;
         this._header.ondragover = this.onDragOver;
         this._header.ondragenter = this.onDragEnter;
@@ -14,7 +14,7 @@ class DataTable extends HTMLElement {
         this._header.ondragend = this.onDragEnd;
         this._header.ondrop = this.onDragDrop;
 
-        this._body = this._shadow.getElementById("body");
+        this._body = shadow.getElementById("body");
         this._body.onclick = this.bodyClick;
     }
 

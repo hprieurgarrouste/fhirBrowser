@@ -5,12 +5,12 @@ import "./ListFilter";
 class AppList extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._list = this._shadow.getElementById('list');
-        this._slot = this._shadow.querySelector('slot');
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+        this._list = shadow.getElementById('list');
+        this._slot = shadow.querySelector('slot');
         this._slot.addEventListener('slotchange', this.slotChange);
-        this._filter = this._shadow.querySelector('list-filter');
+        this._filter = shadow.querySelector('list-filter');
         this._filter.onChange = this.filterChange;
     }
 

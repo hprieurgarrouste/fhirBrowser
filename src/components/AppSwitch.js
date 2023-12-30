@@ -4,10 +4,10 @@ class AppSwitch extends HTMLElement {
 
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' })
-        this._shadow.innerHTML = template;
-        this._shadow.addEventListener('click', this.clickHandler);
-        this._main = this._shadow.querySelector('main');
+        const shadow = this.attachShadow({ mode: 'closed' })
+        shadow.innerHTML = template;
+        shadow.addEventListener('click', this.clickHandler);
+        this._main = shadow.querySelector('main');
     }
 
     static get observedAttributes() { return ['data-checked']; }

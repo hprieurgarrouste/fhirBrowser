@@ -3,10 +3,10 @@ import template from "./templates/AppBadge.html";
 class AppBadge extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' })
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' })
+        shadow.innerHTML = template;
+        this._content = shadow.querySelector("main");
         this._value = null;
-        this._content = this._shadow.querySelector("main");
     }
 
     connectedCallback() {

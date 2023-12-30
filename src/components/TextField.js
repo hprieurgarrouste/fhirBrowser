@@ -3,62 +3,56 @@ import template from "./templates/TextField.html";
 class TextField extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._label = '';
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+        this._label = shadow.querySelector('label');
+        this._labelInnerText = '';
+        this._input = shadow.querySelector('input[type="text"]');
+        this._helper = shadow.getElementById('helper');
     }
 
-    static get observedAttributes() { return ["placeholder", "readonly", "required", "value", "helper"]; }
+    static get observedAttributes() { return ['placeholder', 'readonly', 'required', 'value', 'helper']; }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        const text = this._shadow.querySelector('input[type="text"]');
         switch (name) {
-            case "placeholder":
-                this._label = newValue;
-                text.setAttribute('placeholder', newValue);
-                this._shadow.querySelector("label").innerText = newValue;
+            case 'placeholder':
+                this._labelInnerText = newValue;
+                this._input.setAttribute('placeholder', newValue);
+                this._label.innerText = newValue;
                 break;
-            case "readonly":
+            case 'readonly':
+            case 'required':
                 if (newValue == null) {
-                    text.removeAttribute('readonly');
+                    this._input.removeAttribute(name);
                 } else {
-                    text.setAttribute('readonly', '');
+                    this._input.setAttribute(name, '');
                 }
                 break;
-            case "required":
-                if (newValue == null) {
-                    text.removeAttribute('required');
-                } else {
-                    text.setAttribute('required', '');
-                }
+            case 'value':
+                this._input.setAttribute('value', newValue);
                 break;
-            case "value":
-                text.setAttribute('value', newValue);
-                break;
-            case "helper":
-                this._shadow.getElementById('helper', newValue);
+            case 'helper':
+                this._helper.innerText = newValue;
                 break;
         }
         //css input:required::placeholder::after dont work :(
-        if (text.hasAttribute('required')) {
-            text.setAttribute('placeholder', `${this._label}*`);
+        if (this._input.hasAttribute('required')) {
+            this._input.setAttribute('placeholder', `${this._labelInnerText}*`);
         }
     }
 
     checkValidity = function () {
-        return this._shadow.querySelector('input[type="text"]').checkValidity();
+        return this._input.checkValidity();
     }
     focus = function () {
-        this._shadow.querySelector('input[type="text"]').focus();
+        this._input.focus();
     }
 
     get value() {
-        const text = this._shadow.querySelector('input[type="text"]');
-        return text.value;
+        return this._input.value;
     }
     set value(newValue) {
-        const text = this._shadow.querySelector('input[type="text"]');
-        text.value = newValue;
+        this._input.value = newValue;
     }
 };
 window.customElements.define('text-field', TextField);

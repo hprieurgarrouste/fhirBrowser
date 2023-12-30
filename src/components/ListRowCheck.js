@@ -3,25 +3,25 @@ import template from "./templates/ListRowCheck.html";
 class ListRowCheck extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._shadow.querySelector('main').onclick = this.onclick;
-        this._checkbox = this._shadow.querySelector("input[type=checkbox]");
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+        shadow.querySelector('main').onclick = this.onclick;
+        this._checkbox = shadow.querySelector('input[type=checkbox]');
     }
 
-    static get observedAttributes() { return ["selected"]; }
+    static get observedAttributes() { return ['selected']; }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        if ("selected" === name) {
+        if ('selected' === name) {
             this._checkbox.checked = (newValue !== null);
         }
     }
 
     onclick = (event) => {
-        if (this.getAttribute("selected") !== null) {
-            this.removeAttribute("selected");
+        if (this.getAttribute('selected') !== null) {
+            this.removeAttribute('selected');
         } else {
-            this.setAttribute("selected", "");
+            this.setAttribute('selected', '');
         }
     }
 };

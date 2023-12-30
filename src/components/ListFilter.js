@@ -3,14 +3,19 @@ import template from "./templates/ListFilter.html";
 class ListFilter extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._text = this._shadow.getElementById("text");
-        this._shadow.querySelector("main").addEventListener('mousedown', (event) => {
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+
+        this._text = shadow.getElementById("text");
+        this._text.addEventListener("input", () => {
+            this._onChange(this._text.value)
+        });
+
+        shadow.querySelector("main").addEventListener('mousedown', (event) => {
             this._text.focus();
         });
-        this._shadow.getElementById("clear").onclick = this.clearClick;
-        this._text.addEventListener("input", () => { this._onChange(this._text.value) });
+
+        shadow.getElementById("clear").onclick = this.clearClick;
     }
 
     clearClick = () => {
@@ -21,7 +26,7 @@ class ListFilter extends HTMLElement {
     }
 
     clear() {
-        this._shadow.getElementById("clear").click();
+        this.clearClick();
     }
 
     _onChange = () => { };

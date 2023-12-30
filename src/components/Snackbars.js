@@ -4,12 +4,13 @@ import template from "./templates/Snackbars.html";
 class Snackbars extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+        this._main = shadow.querySelector('main');
     }
 
     set type(type = 'info') {
-        this._shadow.querySelector('main').classList.add(type);
+        this._main.classList.add(type);
     }
 };
 customElements.define('snack-bars', Snackbars);

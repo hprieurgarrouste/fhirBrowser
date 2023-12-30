@@ -3,18 +3,19 @@ import template from "./templates/AppDialog.html"
 class AppDialog extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._shadow.querySelector("main").addEventListener("click", (event) => {
-            this.onClose(event);
-        });
-        this._shadow.querySelector('.surface').addEventListener("click", (event) => {
-            event.stopPropagation();
-        });
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+
+        shadow.querySelector('main').addEventListener('click', (event) => this.onClose(event));
+
+        this._surface = shadow.querySelector('.surface');
+        this._surface.addEventListener('click', (event) => event.stopPropagation());
+
+        this._title = shadow.getElementById('title');
     }
 
     connectedCallback() {
-        window.addEventListener("hashchange", (event) => { this.onClose(event) });
+        window.addEventListener('hashchange', (event) => this.onClose(event));
     }
 
     _onClose = () => {
@@ -27,15 +28,15 @@ class AppDialog extends HTMLElement {
         this._onClose = closeFct;
     }
 
-    static get observedAttributes() { return ["data-title", "centered", "fullscreen"]; }
+    static get observedAttributes() { return ['data-title', 'centered', 'fullscreen']; }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        if ("centered" == name) {
-            this._shadow.querySelector(".surface").classList.add("centered");
-        } else if ("fullscreen" == name) {
-            this._shadow.querySelector(".surface").classList.add("fullscreen");
-        } else if ("data-title" === name) {
-            this._shadow.getElementById("title").innerText = newValue;
+        if ('centered' == name) {
+            this._surface.classList.add('centered');
+        } else if ('fullscreen' == name) {
+            this._surface.classList.add('fullscreen');
+        } else if ('data-title' === name) {
+            this._title.innerText = newValue;
         }
     }
 };

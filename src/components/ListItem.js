@@ -3,11 +3,11 @@ import template from "./templates/ListItem.html";
 class ListItem extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._icon = this._shadow.getElementById("icon");
-        this._primary = this._shadow.getElementById("primary");
-        this._secondary = this._shadow.getElementById("secondary");
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+        this._icon = shadow.getElementById("icon");
+        this._primary = shadow.getElementById("primary");
+        this._secondary = shadow.getElementById("secondary");
     }
 
     static get observedAttributes() { return ["data-primary", "data-secondary", "data-icon"]; }

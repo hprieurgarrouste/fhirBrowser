@@ -3,15 +3,12 @@ import template from "./templates/AppCard.html";
 class AppCard extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
 
-        this._main = this._shadow.querySelector('main');
-        this._headerIcon = this._shadow.querySelector('header>i');
-        this._headerPrimary = this._shadow.getElementById('primary');
-        this._headerSecondary = this._shadow.getElementById('secondary');
-        this._mediaSlot = this._shadow.querySelector('slot[name="media"');
-        this._contentSlot = this._shadow.querySelector('slot:not([name])');
+        this._headerIcon = shadow.querySelector('header>i');
+        this._headerPrimary = shadow.getElementById('primary');
+        this._headerSecondary = shadow.getElementById('secondary');
     }
 
     static get observedAttributes() { return ["data-primary", "data-secondary", "data-icon"]; }

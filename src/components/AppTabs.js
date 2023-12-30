@@ -3,17 +3,17 @@ import template from "./templates/AppTabs.html";
 class AppTabs extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._shadow.onclick = (event) => {
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+        shadow.onclick = (event) => {
             event.preventDefault();
             event.stopPropagation();
         }
 
-        this._header = this._shadow.querySelector('header');
+        this._header = shadow.querySelector('header');
         this._header.onclick = this.headerClick;
 
-        this._slot = this._shadow.querySelector('slot');
+        this._slot = shadow.querySelector('slot');
         this._slot.addEventListener('slotchange', this.slotChanged);
     }
 

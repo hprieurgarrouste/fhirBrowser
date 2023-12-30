@@ -7,9 +7,9 @@ import "./AppBar";
 class SidePanel extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._title = this._shadow.getElementById("title");
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+        this._title = shadow.getElementById('title');
     }
 
     static get observedAttributes() { return ['data-title']; }

@@ -3,19 +3,19 @@ import template from "./templates/ListRow.html";
 class ListRow extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+        this._main = shadow.querySelector('main');
     }
 
     static get observedAttributes() { return ["selected"]; }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        if ("selected" === name) {
-            const elm = this._shadow.querySelector("main");
+        if ('selected' === name) {
             if (null === newValue) {
-                elm.removeAttribute("selected");
+                this._main.removeAttribute('selected');
             } else {
-                elm.setAttribute("selected", "");
+                this._main.setAttribute('selected', '');
             }
         }
     }
