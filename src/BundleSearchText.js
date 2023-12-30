@@ -3,22 +3,24 @@ import template from "./templates/BundleSearchText.html";
 class BundleSearchText extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' })
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' })
+        shadow.innerHTML = template;
+        this._input = shadow.querySelector('input');
     }
 
-    connectedCallback() {
-        let placeholder = this.getAttribute("placeholder");
-        if (placeholder) {
-            this._shadow.querySelector("input").setAttribute("placeholder", placeholder);
+    static get observedAttributes() { return ['placeholder']; }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        if ('placeholder' == name) {
+            this._input.setAttribute('placeholder', newValue);
         }
     }
 
     get value() {
-        return this._shadow.querySelector("input").value;
+        return this._input.value;
     }
     set value(newValue) {
-        this._shadow.querySelector("input").value = newValue;
+        this._input.value = newValue;
     }
 
 };

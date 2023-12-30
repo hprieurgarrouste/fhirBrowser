@@ -8,16 +8,16 @@ import { FhirService } from "./services/Fhir"
 class ResourceReferences extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._resourceType = null;
-        this._resourceId = null;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
 
-        this._list = this._shadow.querySelector('app-list');
+        this._list = shadow.querySelector('app-list');
         this._list.onclick = this.appListClick;
         this._list.onFilter = this.appListFilter;
 
-        this._shadow.getElementById('close').onclick = this.sidePanelClose;
+        shadow.getElementById('close').onclick = this.sidePanelClose;
+
+        this._resourceId = null;
     }
 
     appListClick = (event) => {
@@ -43,7 +43,6 @@ class ResourceReferences extends HTMLElement {
     }
 
     load(resourceType, resourceId) {
-        this._resourceType = resourceType;
         this._resourceId = resourceId;
 
         this._list.clear();
@@ -52,13 +51,13 @@ class ResourceReferences extends HTMLElement {
         if (references) {
             Object.entries(references).forEach(([key, value]) => {
                 value.forEach(v => {
-                    const row = document.createElement('list-row');
-                    row.setAttribute("data-target", key);
-                    row.setAttribute("data-search", v.name);
                     const item = document.createElement('list-item');
                     item.setAttribute("data-icon", FhirService.ResourceIcon(key));
                     item.setAttribute("data-primary", `${key}.${v.name}`);
                     item.setAttribute("data-secondary", v.documentation.length > 100 ? `${v.documentation.substring(0, 100)}...` : v.documentation);
+                    const row = document.createElement('list-row');
+                    row.setAttribute("data-target", key);
+                    row.setAttribute("data-search", v.name);
                     row.appendChild(item);
                     this._list.appendChild(row);
                 })

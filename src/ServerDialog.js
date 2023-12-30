@@ -14,32 +14,33 @@ import { SnackbarsService } from "./services/Snackbars"
 class ServerDialog extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
 
         this._editMode = false;
 
-        this._list = this._shadow.querySelector('server-list');
+        this._list = shadow.querySelector('server-list');
         this._list.addEventListener('serverchanged', this.serverListClick);
 
-        this._form = this._shadow.querySelector("server-form");
+        this._form = shadow.querySelector("server-form");
         this._form.onOk = this.serverFormOk;
         this._form.onDelete = this.serverFormDelete;
 
-        this._shadow.querySelector('app-dialog').onClose = (event) => {
+        this._appDialog = shadow.querySelector('app-dialog');
+        this._appDialog.onClose = (event) => {
             event.preventDefault();
             event.stopPropagation();
             this.appDialogClose();
         };
 
-        this._shadow.getElementById("setupAdd").onclick = this.setupAddClick;
+        shadow.getElementById("setupAdd").onclick = this.setupAddClick;
 
-        this._shadow.getElementById("setupCancel").onclick = this.setupCancel;
+        shadow.getElementById("setupCancel").onclick = this.setupCancel;
 
-        this._shadow.getElementById("setupOk").onclick = this.setupOk;
-        this._shadow.getElementById("setupClose").onclick = this.appDialogClose;
+        shadow.getElementById("setupOk").onclick = this.setupOk;
+        shadow.getElementById("setupClose").onclick = this.appDialogClose;
 
-        this._shadow.getElementById("setupToggle").onclick = () => { this.editMode = true };
+        shadow.getElementById("setupToggle").onclick = () => { this.editMode = true };
     }
 
     connectedCallback() {
@@ -148,11 +149,10 @@ class ServerDialog extends HTMLElement {
      */
     set editMode(edit) {
         this._editMode = edit;
-        const dlg = this._shadow.querySelector('app-dialog');
         if (edit) {
-            dlg.classList.add("edit");
+            this._appDialog.classList.add("edit");
         } else {
-            dlg.classList.remove("edit");
+            this._appDialog.classList.remove("edit");
         }
     }
 };

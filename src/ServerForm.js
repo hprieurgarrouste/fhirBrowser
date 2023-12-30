@@ -7,32 +7,54 @@ import "./components/TextField"
 class ServerForm extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+
+        this._appDialog = shadow.querySelector('app-dialog');
+        this._appDialog.onClose = this.appDialogClose;
+        this._content = shadow.getElementById('content');
+
+        shadow.querySelectorAll('input[name="authMethod"]').forEach((input) => { input.addEventListener("change", this.authMethodChange) });
+
+        shadow.querySelector('main').onkeydown = this.mainKeyDown;
+
+        this._key = shadow.getElementById('key');
+        this._url = shadow.getElementById('url');
+
+        this._authNo = shadow.getElementById("authNo");
+        this._authApi = shadow.getElementById("authApi");
+        this._authBasic = shadow.getElementById("authBasic");
+        this._authOauth = shadow.getElementById("authOauth");
+
+        this._apiSection = shadow.getElementById("apiSection");
+        this._apiKey = shadow.getElementById('apiKey');
+        this._apiValue = shadow.getElementById('apiValue');
+
+        this._basicSection = shadow.getElementById('basicSection');
+        this._basicUsername = shadow.getElementById('basicUsername');
+        this._basicPassword = shadow.getElementById('basicPassword');
+
+        this._oauthSection = shadow.getElementById('oauthSection');
+        this._oauthTokenurl = shadow.getElementById('oauthTokenurl');
+        this._oauthClientid = shadow.getElementById('oauthClientid');
+        this._oauthClientsecret = shadow.getElementById('oauthClientsecret');
+        this._oauthGranttype = shadow.getElementById('oauthGranttype');
+
+        this._appConfirm = shadow.querySelector('app-confirm');
+        this._appConfirm.onValidate = this.deleteConfirm;
+
+        shadow.getElementById('formOk').onclick = this.formOkClick;
+        shadow.getElementById('formCancel').onclick = this.formCancelClick;
+        this._formDelete = shadow.getElementById('formDelete');
+        this._formDelete.onclick = this.formDeleteClick;
     }
 
     static get observedAttributes() { return ["data-title"]; }
 
     attributeChangedCallback(name, oldValue, newValue) {
         if ("data-title" == name) {
-            this._shadow.querySelector("app-dialog").setAttribute("data-title", newValue);
+            this._appDialog.setAttribute("data-title", newValue);
         }
-    }
-
-    connectedCallback() {
-        this._shadow.querySelector('app-dialog').onClose = this.appDialogClose;
-
-        this._shadow.querySelectorAll("input[name='authMethod']").forEach((input) => { input.addEventListener("change", this.authMethodChange) });
-
-        this._shadow.getElementById("formCancel").onclick = this.formCancelClick;
-
-        this._shadow.getElementById("formDelete").onclick = this.formDeleteClick;
-
-        this._shadow.getElementById("formOk").onclick = this.formOkClick;
-
-        this._shadow.querySelector("main").onkeydown = this.mainKeyDown;
-
-        this._shadow.querySelector("app-confirm").onValidate = this.deleteConfirm;
     }
 
     appDialogClose = (event) => {
@@ -52,7 +74,7 @@ class ServerForm extends HTMLElement {
     }
 
     formDeleteClick = () => {
-        this._shadow.querySelector('app-confirm').hidden = false;
+        this._appConfirm.hidden = false;
     }
 
     deleteConfirm = (event) => {
@@ -61,16 +83,16 @@ class ServerForm extends HTMLElement {
     }
 
     mainKeyDown = (event) => {
-        if (('Enter' === event.code || 'NumpadEnter' === event.code) && this.checkValidity()) {
+        if (['Enter', 'NumpadEnter'].includes(event.code) && this.checkValidity()) {
             if (this.onOk(event)) this.hidden = true;
         }
     }
 
     authMethodChange = () => {
-        const value = this._shadow.querySelector("input[name='authMethod']:checked").value;
-        this._shadow.getElementById("apiSection").hidden = ("API Key" !== value);
-        this._shadow.getElementById("basicSection").hidden = ("Basic" !== value);
-        this._shadow.getElementById("oauthSection").hidden = ("OAuth 2" !== value);
+        const value = this._content.querySelector("input[name='authMethod']:checked").value;
+        this._apiSection.hidden = ("API Key" !== value);
+        this._basicSection.hidden = ("Basic" !== value);
+        this._oauthSection.hidden = ("OAuth 2" !== value);
     }
 
     _onOk = (event) => {
@@ -104,42 +126,24 @@ class ServerForm extends HTMLElement {
     }
 
     checkValidity = function () {
-        let self = this;
-        if (check("key") && check("url")) {
-            const method = this._shadow.querySelector("input[name='authMethod']:checked").value;
+        if (check(this._key) && check(this._url)) {
+            const method = this._content.querySelector("input[name='authMethod']:checked");
             switch (method) {
-                case "No Auth":
+                case this._authNo:
                     return true;
-                case "API Key":
-                    return checkApi();
-                case "Basic":
-                    return checkBasic();
-                case "OAuth 2":
-                    return checkOAuth2();
+                case this._authApi:
+                    return check(this._apiKey) && check(this._apiValue);
+                case this._authBasic:
+                    return check(this._basicUsername) && check(this._basicPassword);
+                case this._authOauth:
+                    return check(this._oauthTokenurl) && check(this._oauthClientid) && check(this._oauthClientsecret) && check(this._oauthGranttype);
                 default:
                     break;
             }
         }
         return false;
 
-        function checkBasic() {
-            return check("basicUsername")
-                && check("basicPassword");
-        }
-
-        function checkApi() {
-            return check("apiKey")
-                && check("apiValue");
-        }
-        function checkOAuth2() {
-            return check("oauthTokenurl")
-                && check("oauthClientid")
-                && check("oauthClientsecret")
-                && check("oauthGranttype");
-        }
-
-        function check(name) {
-            let field = self._shadow.getElementById(name);
+        function check(field) {
             if (!field.checkValidity()) {
                 field.focus(true);
                 return false;
@@ -150,32 +154,32 @@ class ServerForm extends HTMLElement {
     }
 
     get value() {
-        const method = this._shadow.querySelector("input[name='authMethod']:checked").value;
+        const method = this._content.querySelector("input[name='authMethod']:checked");
         let server = {
-            serverCode: this._shadow.getElementById("key").value,
-            url: this._shadow.getElementById("url").value,
+            serverCode: this._key.value,
+            url: this._url.value,
             auth: {
                 method: "noauth",
                 setup: {}
             }
         };
         switch (method) {
-            case "API Key":
+            case this._authApi:
                 server.auth.method = "apikey";
-                server.auth.setup.key = this._shadow.getElementById("apiKey").value;
-                server.auth.setup.value = this._shadow.getElementById("apiValue").value;
+                server.auth.setup.key = this._apiKey.value;
+                server.auth.setup.value = this._apiValue.value;
                 break;
-            case "Basic":
+            case this._authBasic:
                 server.auth.method = "basic";
-                server.auth.setup.username = this._shadow.getElementById("basicUsername").value;
-                server.auth.setup.password = this._shadow.getElementById("basicPassword").value;
+                server.auth.setup.username = this._basicUsername.value;
+                server.auth.setup.password = this._basicPassword.value;
                 break;
-            case "OAuth 2":
+            case this._authOauth:
                 server.auth.method = "oauth2";
-                server.auth.setup.access_token_url = this._shadow.getElementById("oauthTokenurl").value;
-                server.auth.setup.client_id = this._shadow.getElementById("oauthClientid").value;
-                server.auth.setup.client_secret = this._shadow.getElementById("oauthClientsecret").value;
-                server.auth.setup.grant_type = this._shadow.getElementById("oauthGranttype").value;
+                server.auth.setup.access_token_url = this._oauthTokenurl.value;
+                server.auth.setup.client_id = this._oauthClientid.value;
+                server.auth.setup.client_secret = this._oauthClientsecret.value;
+                server.auth.setup.grant_type = this._oauthGranttype.value;
                 break;
             default:
                 break;
@@ -185,46 +189,45 @@ class ServerForm extends HTMLElement {
 
     set value({ serverCode, server }) {
         if (serverCode) {
-            this._shadow.querySelector("app-dialog").setAttribute("data-title", serverCode);
-            this._shadow.getElementById("formDelete").hidden = false;
+            this._appDialog.setAttribute("data-title", serverCode);
+            this._formDelete.hidden = false;
         } else {
-            this._shadow.querySelector("app-dialog").setAttribute("data-title", "New");
-            this._shadow.getElementById("formDelete").hidden = true;
+            this._appDialog.setAttribute("data-title", "New");
+            this._formDelete.hidden = true;
         }
         this.clear();
-        this._shadow.getElementById("key").value = serverCode;
-        this._shadow.getElementById("url").value = server.url;
+        this._key.value = serverCode;
+        this._url.value = server.url;
         switch (server?.auth?.method) {
             case "apikey":
-                this._shadow.getElementById("API Key").checked = true;
-                this._shadow.getElementById("apiKey").value = server.auth.setup.key;
-                this._shadow.getElementById("apiValue").value = server.auth.setup.value;
+                this._authApi.checked = true;
+                this._apiKey.value = server.auth.setup.key;
+                this._apiValue.value = server.auth.setup.value;
                 break;
             case "basic":
-                this._shadow.getElementById("Basic").checked = true;
-                this._shadow.getElementById("basicUsername").value = server.auth.setup.username;
-                this._shadow.getElementById("basicPassword").value = server.auth.setup.password;
+                this._authBasic.checked = true;
+                this._basicUsername.value = server.auth.setup.username;
+                this._basicPassword.value = server.auth.setup.password;
                 break;
             case "oauth2":
-                this._shadow.getElementById("OAuth 2").checked = true;
-                this._shadow.getElementById("oauthTokenurl").value = server.auth.setup.access_token_url;
-                this._shadow.getElementById("oauthClientid").value = server.auth.setup.client_id;
-                this._shadow.getElementById("oauthClientsecret").value = server.auth.setup.client_secret;
-                this._shadow.getElementById("oauthGranttype").value = server.auth.setup.grant_type;
+                this._authOauth.checked = true;
+                this._oauthTokenurl.value = server.auth.setup.access_token_url;
+                this._oauthClientid.value = server.auth.setup.client_id;
+                this._oauthClientsecret.value = server.auth.setup.client_secret;
+                this._oauthGranttype.value = server.auth.setup.grant_type;
                 break;
             default:
-                this._shadow.getElementById("No Auth").checked = true;
+                this._authNo.checked = true;
                 break;
         }
         this.authMethodChange();
     }
 
     clear() {
-        const content = this._shadow.getElementById("content");
-        const fields = content.querySelectorAll("text-field");
+        const fields = this._content.querySelectorAll("text-field");
         fields.forEach(field => field.value = '');
         // only grant type allowed
-        this._shadow.getElementById("oauthGranttype").value = "client_credentials";
+        this._oauthGranttype.value = "client_credentials";
     }
 
 };

@@ -25,34 +25,47 @@ if ('serviceWorker' in navigator) {
 class App extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
 
-        this._shadow.getElementById("navigation").onclick = () => {
-            this._shadow.querySelector("server-panel").classList.toggle("hidden");
-        };
+        SnackbarsService.container = shadow;
+        this._shadow = shadow;
 
-        this._shadow.getElementById('serverDialogToggle').onclick = () => {
-            this._shadow.querySelector('server-dialog').hidden = false;
-        };
+        this._serverPanel = shadow.querySelector('server-panel');
+        this._body = shadow.getElementById("bdy");
 
-        this._shadow.querySelector("server-dialog").addEventListener('serverchanged', ({ detail }) => {
-            this.connect(detail.serverCode, detail.server);
-        });
+        this._navigationToggle = shadow.getElementById('navigation');
+        this._navigationToggle.onclick = () => this._serverPanel.classList.toggle('hidden');
 
-        this._shadow.getElementById('aboutDialogToggle').onclick = () => {
-            this._shadow.querySelector('about-dialog').hidden = false;
-        };
+        this._waiting = shadow.getElementById('waiting');
 
-        this._bundleView = this._shadow.querySelector("fhir-bundle");
-        this._resourceView = this._shadow.querySelector("fhir-resource");
-        this._operationOutcomeView = this._shadow.querySelector("fhir-operation-outcome");
+        this._serverDialog = shadow.querySelector('server-dialog');
+        this._serverDialog.addEventListener('serverchanged', ({ detail }) => this.connect(detail.serverCode, detail.server));
+
+        shadow.getElementById('serverDialogToggle').onclick = () => this._serverDialog.hidden = false;
+
+
+        shadow.getElementById('aboutDialogToggle').onclick = this.aboutDialogToggleClick;
+
+        this._bundleView = shadow.querySelector("fhir-bundle");
+        this._resourceView = shadow.querySelector("fhir-resource");
+        this._operationOutcomeView = shadow.querySelector("fhir-operation-outcome");
     }
 
-    async fetchHash(hash) {
+    aboutDialogToggleClick = () => {
+        let aboutDialog = this._shadow.querySelector('about-dialog');
+        if (aboutDialog) {
+            aboutDialog.hidden = false;
+        } else {
+            aboutDialog = document.createElement('about-dialog');
+            this._shadow.appendChild(aboutDialog);
+        }
+    }
+
+    fetchHash = async (hash) => {
         const url = new URL(`${FhirService.server.url}${hash}`);
         const timeoutId = setTimeout(() => {
-            this._shadow.getElementById('waiting').style.visibility = 'visible';
+            this._waiting.style.visibility = 'visible';
         }, 500);
 
         try {
@@ -63,8 +76,7 @@ class App extends HTMLElement {
                 //throw new Error(`${response.status} ${response.statusText}`);
                 SnackbarsService.error(`${response.status} ${response.statusText}`);
             }
-            const bdy = this._shadow.getElementById("bdy");
-            bdy.style.visibility = "visible";
+            this._body.style.visibility = "visible";
             const contentType = response.headers.get("Content-Type");
             let sourceType;
             let source;
@@ -103,7 +115,7 @@ class App extends HTMLElement {
             SnackbarsService.show(error, undefined, undefined, 'error');
         } finally {
             clearTimeout(timeoutId);
-            this._shadow.getElementById('waiting').style.visibility = 'hidden'
+            this._waiting.style.visibility = 'hidden'
         }
     }
 
@@ -112,11 +124,11 @@ class App extends HTMLElement {
         if (hash.length) {
             this.fetchHash(hash);
             if (window.matchMedia("(max-width: 480px)").matches) {
-                this._shadow.querySelector("server-panel").classList.add("hidden");
+                this._serverPanel.classList.add("hidden");
             }
         } else {
-            this._shadow.getElementById("bdy").style.visibility = "hidden";
-            this._shadow.querySelector("server-panel").classList.remove("hidden");
+            this._body.style.visibility = "hidden";
+            this._serverPanel.classList.remove("hidden");
         }
     }
 
@@ -126,7 +138,6 @@ class App extends HTMLElement {
 
     connectedCallback() {
         window.addEventListener("hashchange", this.locationHandler);
-        SnackbarsService.container = this._shadow;
 
         const preferedServer = PreferencesService.get("server");
         if (preferedServer) {
@@ -134,18 +145,17 @@ class App extends HTMLElement {
                 this.connect(preferedServer, server);
             });
         } else {
-            this._shadow.querySelector('server-dialog').hidden = false;
+            this._serverDialog.hidden = false;
         }
     }
 
     connect(serverCode, server) {
-        const waiting = this._shadow.getElementById('waiting');
-        waiting.style.visibility = 'visible';
+        this._waiting.style.visibility = 'visible';
         FhirService.connect(serverCode, server).then(() => {
             SnackbarsService.show(`Connected to "${serverCode}" server.`);
             PreferencesService.set("server", serverCode);
-            this._shadow.getElementById("navigation").hidden = false;
-            this._shadow.querySelector('server-dialog').value = serverCode;
+            this._navigationToggle.hidden = false;
+            this._serverDialog.value = serverCode;
             if (location.hash) {
                 location.hash = '';
             } else {
@@ -155,7 +165,7 @@ class App extends HTMLElement {
             SnackbarsService.error(`An error occurred while connecting to the server "${serverCode}"`);
             console.log(error);
         }).finally(() => {
-            waiting.style.visibility = 'hidden';
+            this._waiting.style.visibility = 'hidden';
         });
     }
 

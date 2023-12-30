@@ -9,15 +9,15 @@ import { FhirService } from "./services/Fhir"
 class OperationOutcome extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
         this._resource = null;
 
-        this._shadow.getElementById('help').onclick = this.helpClick;
-        this._main = this._shadow.querySelector('main');
+        shadow.getElementById('help').onclick = this.helpClick;
+        this._main = shadow.querySelector('main');
         this._content = this._main.querySelector('main>section');
-        this._issue = this._shadow.getElementById('issue');
-        this._text = this._shadow.getElementById('text');
+        this._issue = shadow.getElementById('issue');
+        this._text = shadow.getElementById('text');
     }
 
     helpClick = () => {

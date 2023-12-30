@@ -5,19 +5,20 @@ import { FhirService } from "./services/Fhir"
 class ResourceHistory extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._resourceType = null;
-        this._resourceId = null;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
 
-        this._shadow.getElementById('help').onclick = this.helpClick;
+        shadow.getElementById('help').onclick = this.helpClick;
 
-        this._list = this._shadow.querySelector('app-list');
+        this._list = shadow.querySelector('app-list');
         this._list.onclick = this.appListClick;
 
-        this._progress = this._shadow.querySelector('linear-progress');
+        this._progress = shadow.querySelector('linear-progress');
 
-        this._shadow.getElementById('close').onclick = this.sidePanelClose;
+        shadow.getElementById('close').onclick = this.sidePanelClose;
+
+        this._resourceType = null;
+        this._resourceId = null;
     }
 
     appListClick = (event) => {
@@ -26,7 +27,7 @@ class ResourceHistory extends HTMLElement {
         const item = event.target.closest("list-row");
         if (item) {
             if (item.hasAttribute('selected')) return;
-            this._shadow.querySelector("list-row[selected]")?.removeAttribute("selected");
+            this._list.querySelector("list-row[selected]")?.removeAttribute("selected");
             item.setAttribute("selected", "")
             location.hash = `#/${this._resourceType}/${this._resourceId}/_history/${item.dataset.versionid}`;
         } else {

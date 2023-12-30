@@ -10,21 +10,21 @@ import { SnackbarsService } from "./services/Snackbars"
 class ResourceJsonView extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
 
         this._resource = null;
 
-        this._content = this._shadow.getElementById("content");
+        this._content = shadow.getElementById("content");
         this._content.onclick = this.contentClick;
 
         this._preferences = PreferencesService.get('jsonView', { 'sorted': false, 'template': false });
 
         this._sort = this._preferences.sorted;
-        this._sortToggle = this._shadow.getElementById('sort-toggle');
+        this._sortToggle = shadow.getElementById('sort-toggle');
         this._sortToggle.onclick = this.sortToggleClick;
 
-        this._templateToggle = this._shadow.getElementById('template-toggle');
+        this._templateToggle = shadow.getElementById('template-toggle');
         if (true || window.matchMedia("(max-width: 480px)").matches) { //WIP not available yet
             this._template = false;
             this._templateToggle.hidden = true;
@@ -32,41 +32,17 @@ class ResourceJsonView extends HTMLElement {
             this._template = this._preferences.template;
             this._templateToggle.onclick = this.templateToggleClick;
         }
-        this._templateView = this._shadow.querySelector('resource-template-view');
+        this._templateView = shadow.querySelector('resource-template-view');
 
-        this._shadow.getElementById('download').onclick = this.downloadClick;
-
-        this._shadow.getElementById('copy').onclick = this.copyClick;
-
-        this._shadow.getElementById('share').onclick = this.shareClick;
+        shadow.getElementById('download').onclick = this.downloadClick;
+        shadow.getElementById('copy').onclick = this.copyClick;
+        shadow.getElementById('share').onclick = this.shareClick;
     }
 
     connectedCallback() {
         this.sortChange();
         this.showTemplate();
     }
-
-    searchKeyDown = (event) => {
-        if ('Enter' === event.code || 'NumpadEnter' === event.code) {
-            this.search();
-        }
-    }
-
-    search = () => {
-        const search = this._search.value.trim().toLowerCase();
-        if (!search) return;
-
-        const allNodes = document.evaluate(`.//span[contains(text(), '${search}')]/text()`, this._content, null, XPathResult.ANY_TYPE, null);
-        const node = allNodes.iterateNext();
-        const startPos = node.textContent.indexOf(search);
-        const range = new Range();
-        range.setStart(node, startPos);
-        range.setEnd(node, startPos + search.length);
-        getSelection().removeAllRanges();
-        getSelection().addRange(range);
-        node.parentNode.scrollIntoView();
-    }
-
 
     sortToggleClick = () => {
         this._sort = !this._sort;
@@ -199,9 +175,8 @@ class ResourceJsonView extends HTMLElement {
         const link = document.createElement('a');
         link.href = url;
         link.download = `${this.resourceType}#${file.name}.json`;
-        this._shadow.appendChild(link);
         link.click();
-        this._shadow.removeChild(link);
+        link.remove();
         window.URL.revokeObjectURL(url);
     };
 

@@ -9,28 +9,30 @@ import { FhirService } from "./services/Fhir"
 class BundleSearchPanel extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+
+        shadow.getElementById('close').onclick = this.sidePanelClose;
+
+        shadow.getElementById("clear").onclick = this.clearClick;
+
+        shadow.getElementById('help').onclick = this.helpClick;
+
+        shadow.getElementById('apply').onclick = this.applyClick;
+
+        this._main = shadow.querySelector('main');
+        this._main.addEventListener('keydown', this.mainKeyDown);
+
         this._resourceType = null;
     }
 
     connectedCallback() {
         window.addEventListener("hashchange", this.locationHandler);
-
-        this._shadow.getElementById("clear").addEventListener("click", this.clearClick);
-        this._shadow.getElementById("close").addEventListener("click", this.sidePanelClose);
-
-        this._shadow.getElementById('help').addEventListener('click', this.helpClick);
-
-        this._shadow.getElementById("apply").addEventListener("click", this.applyClick);
-
-        this._shadow.querySelector("main").addEventListener("keydown", this.mainKeyDown);
-
         this.locationHandler();
     }
 
     mainKeyDown = (event) => {
-        if ('Enter' === event.code || 'NumpadEnter' === event.code) {
+        if (['Enter', 'NumpadEnter'].includes(event.code)) {
             this.applyClick(event);
         }
     }
@@ -43,7 +45,7 @@ class BundleSearchPanel extends HTMLElement {
             this.classList.add("hidden");
         }
         const hash = [];
-        const fields = this._shadow.querySelector("main").querySelectorAll("bundle-search-item");
+        const fields = this._main.querySelectorAll("bundle-search-item");
         fields.forEach(({ value }) => {
             if (value) {
                 hash.push(`${value.name}=${encodeURIComponent(value.value)}`);
@@ -87,11 +89,10 @@ class BundleSearchPanel extends HTMLElement {
             }
             this.clear();
 
-            const content = this._shadow.querySelector("main");
             const searchParams = new URLSearchParams(hash.replace(/^[^?]+\?/, ''));
             Array.from(searchParams).forEach(([name, value]) => {
                 const fieldName = name.split(':')[0];
-                const field = content.querySelector(`bundle-search-item[data-name="${fieldName}"`);
+                const field = this._main.querySelector(`bundle-search-item[data-name="${fieldName}"`);
                 if (field) field.value = {
                     'name': name,
                     'value': value
@@ -107,8 +108,7 @@ class BundleSearchPanel extends HTMLElement {
     }
 
     clear() {
-        const content = this._shadow.querySelector("main");
-        const fields = content.querySelectorAll("bundle-search-item");
+        const fields = this._main.querySelectorAll("bundle-search-item");
         fields.forEach(field => field.clear());
     }
 
@@ -116,16 +116,15 @@ class BundleSearchPanel extends HTMLElement {
      * @param {any} resourceType
      */
     set metadata(resourceType) {
-        const content = this._shadow.querySelector("main");
-        content.scrollTop = 0;
-        while (content.firstChild) content.removeChild(content.lastChild);
+        this._main.scrollTop = 0;
+        while (this._main.firstChild) this._main.removeChild(this._main.lastChild);
         resourceType?.searchParam
             .sort((s1, s2) => s1.name.localeCompare(s2.name))
             .forEach(search => {
                 const item = document.createElement("bundle-search-item");
                 if (item.init(search)) {
                     item.setAttribute('data-name', search.name);
-                    content.appendChild(item);
+                    this._main.appendChild(item);
                 }
             });
 

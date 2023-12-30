@@ -5,21 +5,24 @@ import { SnackbarsService } from "./services/Snackbars"
 class ResourceTtlView extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+
+        this._content = shadow.getElementById('content');
+
+        shadow.getElementById('download').onclick = this.downloadClick;
+
+        shadow.getElementById('copy').onclick = this.copyClick;
+
+        shadow.getElementById('share').onclick = this.shareClick;
+
         this._resource = null;
-
-        this._shadow.getElementById('download').onclick = this.downloadClick;
-
-        this._shadow.getElementById('copy').onclick = this.copyClick;
-
-        this._shadow.getElementById('share').onclick = this.shareClick;
     }
+
     clear = () => {
-        const content = this._shadow.getElementById("content");
-        content.scrollTo(0, 0);
-        content.innerHTML = "Loading...";
-        content.style.cursor = "wait";
+        this._content.scrollTo(0, 0);
+        this._content.innerHTML = "Loading...";
+        this._content.style.cursor = "wait";
         this._resource = null;
     }
 
@@ -36,10 +39,9 @@ class ResourceTtlView extends HTMLElement {
      * @param {object} resource
      */
     set source(resource) {
-        const content = this._shadow.getElementById("content");
-        content.scrollTo(0, 0);
-        content.innerText = resource;
-        content.style.cursor = "default";
+        this._content.scrollTo(0, 0);
+        this._content.innerText = resource;
+        this._content.style.cursor = "default";
         this._resource = resource;
     }
 
@@ -52,9 +54,8 @@ class ResourceTtlView extends HTMLElement {
         const link = document.createElement('a');
         link.href = url;
         link.download = `${this.resourceType}#${file.name}.txt`;
-        this._shadow.appendChild(link);
         link.click();
-        this._shadow.removeChild(link);
+        link.remove();
         window.URL.revokeObjectURL(url);
     };
 

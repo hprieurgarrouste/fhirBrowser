@@ -9,25 +9,25 @@ import { SnackbarsService } from "./services/Snackbars"
 class ResourceXmlView extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
 
         this._resource = null;
 
-        this._content = this._shadow.getElementById("content");
+        this._content = shadow.getElementById('content');
         this._content.onclick = this.contentClick;
 
         this._preferences = PreferencesService.get('xmlView', { 'sorted': false });
 
         this._sort = this._preferences.sorted;
-        this._sortToggle = this._shadow.getElementById('sort-toggle');
+        this._sortToggle = shadow.getElementById('sort-toggle');
         this._sortToggle.onclick = this.sortToggleClick;
 
-        this._shadow.getElementById('download').onclick = this.downloadClick;
+        shadow.getElementById('download').onclick = this.downloadClick;
 
-        this._shadow.getElementById('copy').onclick = this.copyClick;
+        shadow.getElementById('copy').onclick = this.copyClick;
 
-        this._shadow.getElementById('share').onclick = this.shareClick;
+        shadow.getElementById('share').onclick = this.shareClick;
 
     }
 
@@ -67,10 +67,9 @@ class ResourceXmlView extends HTMLElement {
     };
 
     clear = () => {
-        const content = this._shadow.getElementById("content");
-        content.scrollTo(0, 0);
-        content.innerHTML = "Loading...";
-        content.style.cursor = "wait";
+        this._content.scrollTo(0, 0);
+        this._content.innerHTML = "Loading...";
+        this._content.style.cursor = "wait";
         this._resource = null;
     }
 
@@ -87,10 +86,9 @@ class ResourceXmlView extends HTMLElement {
      * @param {object} resource
      */
     set source(resource) {
-        const content = this._shadow.getElementById("content");
-        content.scrollTo(0, 0);
-        content.innerHTML = this.parse(resource).outerHTML;
-        content.style.cursor = "default";
+        this._content.scrollTo(0, 0);
+        this._content.innerHTML = this.parse(resource).outerHTML;
+        this._content.style.cursor = "default";
         this._resource = resource;
     }
 
@@ -159,9 +157,8 @@ class ResourceXmlView extends HTMLElement {
         const link = document.createElement('a');
         link.href = url;
         link.download = `${this.resourceType}#${file.name}.xml`;
-        this._shadow.appendChild(link);
         link.click();
-        this._shadow.removeChild(link);
+        link.remove();
         window.URL.revokeObjectURL(url);
     };
 
@@ -183,5 +180,5 @@ class ResourceXmlView extends HTMLElement {
             "files": [file]
         });
     };
-};
+}
 customElements.define('resource-xml-view', ResourceXmlView);

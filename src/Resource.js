@@ -16,29 +16,32 @@ import { FhirService } from "./services/Fhir"
 class Resource extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+
+        shadow.getElementById("help").onclick = this.helpClick;
+
+        this._referencesToggle = shadow.getElementById('referencesToggle');
+        this._referencesToggle.onclick = this.referenceToggleClick;
+        this._referencesPanel = shadow.querySelector('resource-references');
+
+        this._historyDisabled = null;
+        this._historyToggle = shadow.getElementById('historyToggle');
+        this._historyToggle.onclick = this.historyToggleClick;
+        this._historyPanel = shadow.querySelector('resource-history');
+
+        this._tabs = shadow.querySelector("app-tabs");
+        this._tabs.addEventListener('select', this.tabSelect);
+
+        this._title = shadow.getElementById('title');
+
         this._resourceType = null;
         this._resourceId = null;
         this._views = {};
-
-        this._shadow.getElementById("help").onclick = this.helpClick;
-
-        this._referencesToggle = this._shadow.getElementById('referencesToggle');
-        this._referencesToggle.onclick = this.referenceToggleClick;
-        this._referencesPanel = this._shadow.querySelector('resource-references');
-
-        this._historyDisabled = null;
-        this._historyToggle = this._shadow.getElementById('historyToggle');
-        this._historyToggle.onclick = this.historyToggleClick;
-        this._historyPanel = this._shadow.querySelector('resource-history');
-
-        this._shadow.querySelector("app-tabs").addEventListener('select', this.tabSelect);
-
-        FhirService.addListener(this.serverChanged);
     }
 
     connectedCallback() {
+        FhirService.addListener(this.serverChanged);
         new MutationObserver(this.panelHiddenObserver).observe(this._referencesPanel, { attributes: true });
         new MutationObserver(this.panelHiddenObserver).observe(this._historyPanel, { attributes: true });
     }
@@ -88,8 +91,7 @@ class Resource extends HTMLElement {
     };
 
     serverChanged = () => {
-        const tabs = this._shadow.querySelector("app-tabs");
-        while (tabs.firstChild) tabs.removeChild(tabs.lastChild);
+        while (this._tabs.firstChild) this._tabs.removeChild(this._tabs.lastChild);
 
         this._views = {};
 
@@ -98,7 +100,7 @@ class Resource extends HTMLElement {
             const section = document.createElement('section');
             section.dataset.caption = 'json';
             section.appendChild(view);
-            this._shadow.querySelector('app-tabs').appendChild(section);
+            this._tabs.appendChild(section);
             this._views.json = view;
         }
 
@@ -107,7 +109,7 @@ class Resource extends HTMLElement {
             const section = document.createElement('section');
             section.dataset.caption = 'xml';
             section.appendChild(view);
-            this._shadow.querySelector('app-tabs').appendChild(section);
+            this._tabs.appendChild(section);
             this._views.xml = view;
         }
 
@@ -116,7 +118,7 @@ class Resource extends HTMLElement {
             const section = document.createElement('section');
             section.dataset.caption = 'ttl';
             section.appendChild(view);
-            this._shadow.querySelector('app-tabs').appendChild(section);
+            this._tabs.appendChild(section);
             this._views.ttl = view;
         }
     }
@@ -137,7 +139,7 @@ class Resource extends HTMLElement {
             const view = this._views[format];
             view.source = resource;
             let resourceType = view.resourceType;
-            this._shadow.getElementById('title').innerText = resourceType;
+            this._title.innerText = resourceType;
             const resourceId = view.resourceId;
 
             if (resourceId != this._resourceId || resourceType != this._resourceType?.type) {
@@ -145,7 +147,7 @@ class Resource extends HTMLElement {
                 this._resourceId = resourceId;
                 Object.entries(this._views).filter(([key,]) => key != format).forEach(([, value]) => value.clear());
             }
-            this._shadow.querySelector('app-tabs').value = format;
+            this._tabs.value = format;
         }
 
         if (window.matchMedia("(max-width: 480px)").matches) {

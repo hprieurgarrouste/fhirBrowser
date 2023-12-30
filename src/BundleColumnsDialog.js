@@ -23,8 +23,8 @@ class BundleColumnsDialog extends HTMLElement {
         this._list = this._shadow.querySelector('app-list');
         this._list.onFilter = this.appListFilter;
 
-        this._shadow.getElementById("btnCancel").onclick = this.btnCancelClick;
-        this._shadow.getElementById("btnOk").onclick = this.btnOkClick;
+        this._shadow.getElementById('btnCancel').onclick = this.btnCancelClick;
+        this._shadow.getElementById('btnOk').onclick = this.btnOkClick;
     }
 
     btnOkClick = (event) => {
@@ -35,9 +35,7 @@ class BundleColumnsDialog extends HTMLElement {
         this._onValidate(columns);
     }
 
-    btnCancelClick = () => {
-        this.hidden = true;
-    }
+    btnCancelClick = () => { this.hidden = true };
 
     appListFilter = (value) => {
         const filter = value.toLowerCase();
@@ -52,19 +50,16 @@ class BundleColumnsDialog extends HTMLElement {
         event.stopPropagation();
     }
 
-    get onValidate() {
-        return this._onValidate;
-    }
-    set onValidate(promise) {
-        this._onValidate = promise;
-    }
+    get onValidate() { return this._onValidate }
+
+    set onValidate(promise) { this._onValidate = promise }
 
     checkValues = (values) => {
         Array.from(this._list.querySelectorAll('list-row-check')).forEach(row => {
             if (values.includes(row.dataset.id)) {
-                row.setAttribute("selected", "");
+                row.setAttribute('selected', '');
             } else {
-                row.removeAttribute("selected");
+                row.removeAttribute('selected');
             }
         });
     }
@@ -88,10 +83,10 @@ class BundleColumnsDialog extends HTMLElement {
             elements.sort((e1, e2) => e1.path.localeCompare(e2.path));
             elements.forEach(element => {
                 const item = document.createElement('list-item');
-                item.setAttribute("data-primary", element.path);
-                item.setAttribute("data-secondary", element.short);
+                item.setAttribute('data-primary', element.path);
+                item.setAttribute('data-secondary', element.short);
                 const row = document.createElement('list-row-check');
-                row.setAttribute("data-id", element.id);
+                row.setAttribute('data-id', element.id);
                 row.appendChild(item);
                 this._list.appendChild(row);
             });

@@ -3,15 +3,16 @@ import template from "./templates/BundleSearchModifier.html";
 class BundleSearchModifier extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' })
-        this._shadow.innerHTML = template;
+        const shadow = this.attachShadow({ mode: 'closed' })
+        shadow.innerHTML = template;
+        this._input = shadow.querySelector('input');
     }
 
     get value() {
-        return this._shadow.querySelector("input").value;
+        return this._input.value;
     }
     set value(newValue) {
-        this._shadow.querySelector("input").value = newValue;
+        this._input.value = newValue;
     }
 
 };
