@@ -10,15 +10,17 @@ import { FhirService } from "./services/Fhir.js"
 class ServerResources extends HTMLElement {
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._resourceType = null;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+
+        this._list = shadow.querySelector('app-list');
+        this._list.onFilter = this.appListFilter;
+        this._list.onclick = this.appListClick;
+
+        this._recent = new Set();
     }
 
     connectedCallback() {
-        const list = this._shadow.querySelector('app-list');
-        list.onFilter = this.appListFilter;
-        list.onclick = this.appListClick;
         FhirService.addListener(this.serverChanged);
         window.addEventListener("hashchange", this.locationHandler);
     }
@@ -39,50 +41,90 @@ class ServerResources extends HTMLElement {
     }
 
     serverChanged = () => {
-        const list = this._shadow.querySelector('app-list');
-        list.clear();
+        this._list.clear();
+        this._recent.clear();
         const resource = FhirService.server?.capabilities?.rest[0]?.resource;
         resource
             .filter(res => res.interaction.map(interaction => interaction.code).includes('search-type'))
             .forEach(resource => {
-                const row = document.createElement('list-row');
-                row.setAttribute("data-type", resource.type);
                 const item = document.createElement('list-item');
                 item.setAttribute("data-primary", resource.type);
                 item.setAttribute("data-icon", FhirService.ResourceIcon(resource.type));
+                const row = document.createElement('list-row');
+                row.setAttribute("data-type", resource.type);
                 row.appendChild(item);
-                list.appendChild(row);
+                this._list.appendChild(row);
             });
-        this.locationHandler();
-
     }
 
-    makeBadge = (value) => {
-        const badge = document.createElement('app-badge');
-        badge.slot = 'trailling';
-        badge.value = value;
-        return badge;
-    }
-
+    /**
+     * @param {event} event
+     */
     appListClick = ({ target }) => {
         const row = target.closest("list-row");
         if (row) {
-            this._resourceType = row.dataset.type;
-
-            const item = row.querySelector('list-item');
-            if (!item.querySelector('app-badge[slot="trailling"]')) {
-                this.getCount(this._resourceType).then(({ total }) => item.appendChild(this.makeBadge(total == undefined ? '?' : total)));
-            }
-
-            this._shadow.querySelector('app-list').querySelector("[selected]")?.removeAttribute("selected");
-            row.setAttribute("selected", "");
-
+            this._list.querySelector('list-row[selected]')?.removeAttribute('selected');
+            row.setAttribute('selected', '');
             location.hash = `#/${row.dataset.type}?_summary=true&_format=json`;
         }
     }
 
-    getCount = async (type) => {
-        const url = new URL(`${FhirService.server.url}/${type}`);
+    /**
+     * @param {string} value
+     */
+    appListFilter = (value) => {
+        this._list.childNodes.forEach(row => row.hidden = !row.dataset.type.toLowerCase().includes(value.toLowerCase()));
+        this._list.querySelector("list-row[selected]")?.scrollIntoView();
+    }
+
+    /**
+     * @returns {(string|null)}
+     */
+    get value() {
+        return this._list.querySelector("list-row[selected]").dataset.type;
+    }
+
+    /**
+     * @param {string} resourceType
+     */
+    set value(resourceType) {
+        this.selectRow(this._list.querySelector(`list-row[data-type="${resourceType}"]`));
+    }
+
+    /**
+     * @param {ListRow} row
+     */
+    selectRow = (row) => {
+        const currentRow = this._list.querySelector('list-row[selected]');
+        //unselect
+        if ('list-row' != row?.localName) {
+            currentRow?.removeAttribute('selected');
+            this._list.scrollTop = 0;
+            return;
+        }
+        //select
+        if (row != currentRow) {
+            currentRow?.removeAttribute('selected');
+            row.setAttribute('selected', '');
+            row.scrollIntoView();
+        }
+        //add badge
+        const item = row.querySelector('list-item');
+        if (!item.querySelector('app-badge[slot="trailling"]')) {
+            this.getCount(row.dataset.type).then(({ total }) => item.appendChild(this.makeBadge(total)));
+        }
+        //recent
+        this._recent.add(row.dataset.type);
+        if (this._recent.size > 10) this._recent.delete(this._recent.values().next().value);
+        //console.log(this._recent);
+    }
+
+    /**
+     * @param {string} resourceType
+     * @returns {promise} response of count fetch
+     */
+    getCount = async (resourceType) => {
+        const url = new URL(`${FhirService.server.url}/${resourceType}`);
         url.searchParams.set("_summary", "count");
         url.searchParams.set("_format", "json");
         const response = await fetch(url, {
@@ -91,33 +133,15 @@ class ServerResources extends HTMLElement {
         return response.json();
     }
 
-    appListFilter = (value) => {
-        const filter = value.toLowerCase();
-        this._shadow.querySelector('app-list').childNodes.forEach(row => {
-            row.hidden = !row.dataset.type.toLowerCase().includes(filter);
-        });
-    }
-
-    get value() {
-        return this._resourceType;
-    }
-
-    set value(resourceType) {
-        const list = this._shadow.querySelector('app-list');
-        if (!resourceType) {
-            list.querySelector("[selected]")?.removeAttribute("selected");
-            list.scrollTop = 0;
-            return;
-        }
-        if (resourceType != this._resourceType) {
-            const row = Array.from(list.childNodes).find(r => r.dataset.type === resourceType);
-            if (row) {
-                this._resourceType = resourceType;
-                list.querySelector("[selected]")?.removeAttribute("selected");
-                row.setAttribute("selected", "");
-                row.scrollIntoView();
-            }
-        }
+    /**
+     * @param {number} count
+     * @returns {AppBadge} Badge component
+     */
+    makeBadge = (count) => {
+        const badge = document.createElement('app-badge');
+        badge.slot = 'trailling';
+        badge.value = count == undefined ? '?' : count;
+        return badge;
     }
 
 };
