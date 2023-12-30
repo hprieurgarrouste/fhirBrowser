@@ -4,16 +4,13 @@ export class SnackbarsService {
 
     // TODO : Add message queuing
 
-    static {
-        this._container = document.body;
-    }
-
-    static set container(cnt) {
-        this._container = cnt;
-    }
-
     static error(message) {
         this.show(message, undefined, undefined, 'error');
+    }
+
+    static clear() {
+        const container = document.querySelector('fhir-browser').container;
+        Array.from(container.querySelectorAll('snack-bars')).forEach(msg => msg.remove());
     }
 
     static show(message, action, delay = 4000, type = 'info') {
@@ -24,10 +21,10 @@ export class SnackbarsService {
             action.setAttribute("slot", "right");
             bar.appendChild(action);
         }
-        this._container.appendChild(bar);
+        document.querySelector('fhir-browser').container.appendChild(bar);
         // TODO : disable timeout if action present
         setTimeout(() => {
-            bar.remove();
+            bar?.remove();
         }, delay);
     }
 }

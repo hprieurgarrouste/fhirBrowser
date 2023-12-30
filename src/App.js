@@ -28,7 +28,6 @@ class App extends HTMLElement {
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        SnackbarsService.container = shadow;
         this._shadow = shadow;
 
         this._serverPanel = shadow.querySelector('server-panel');
@@ -63,6 +62,7 @@ class App extends HTMLElement {
     }
 
     fetchHash = async (hash) => {
+        SnackbarsService.clear();
         const url = new URL(`${FhirService.server.url}${hash}`);
         const timeoutId = setTimeout(() => {
             this._waiting.style.visibility = 'visible';
@@ -73,7 +73,6 @@ class App extends HTMLElement {
                 "headers": FhirService.server.headers
             });
             if (!response.ok) {
-                //throw new Error(`${response.status} ${response.statusText}`);
                 SnackbarsService.error(`${response.status} ${response.statusText}`);
             }
             this._body.style.visibility = "visible";
