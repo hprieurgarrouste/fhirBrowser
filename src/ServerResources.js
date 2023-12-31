@@ -20,31 +20,13 @@ class ServerResources extends HTMLElement {
         this._recent = new Set();
     }
 
-    connectedCallback() {
-        FhirService.addListener(this.serverChanged);
-        window.addEventListener("hashchange", this.locationHandler);
-    }
-
-    locationHandler = () => {
-        let hash = window.location.hash.replace('#/', '').trim();
-        if (hash.length) {
-            let resourceType = '';
-            if (hash.indexOf('?') > 0) {
-                resourceType = hash.split('?')[0];
-            } else {
-                resourceType = hash.split("/")[0];
-            }
-            this.value = resourceType;
-        } else {
-            this.value = null;
-        }
-    }
-
-    serverChanged = () => {
+    /**
+     * @param {object} capabilityStatement
+     */
+    load = (capabilityStatement) => {
         this._list.clear();
         this._recent.clear();
-        const resource = FhirService.server?.capabilities?.rest[0]?.resource;
-        resource
+        capabilityStatement?.rest[0]?.resource
             .filter(res => res.interaction.map(interaction => interaction.code).includes('search-type'))
             .forEach(resource => {
                 const item = document.createElement('list-item');

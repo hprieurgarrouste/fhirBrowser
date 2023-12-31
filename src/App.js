@@ -39,10 +39,12 @@ class App extends HTMLElement {
         this._waiting = shadow.getElementById('waiting');
 
         this._serverDialog = shadow.querySelector('server-dialog');
-        this._serverDialog.addEventListener('serverchanged', ({ detail }) => this.connect(detail.serverCode, detail.server));
+        this._serverDialog.onSelect = this.connect; //addEventListener('serverchanged', ({ detail }) => this.connect(detail.serverCode, detail.server));
 
-        shadow.getElementById('serverDialogToggle').onclick = () => this._serverDialog.hidden = false;
-
+        shadow.getElementById('serverDialogToggle').onclick = () => {
+            this._serverDialog.value = FhirService.server.serverCode;
+            this._serverDialog.hidden = false;
+        }
 
         shadow.getElementById('aboutDialogToggle').onclick = this.aboutDialogToggleClick;
 
@@ -98,14 +100,16 @@ class App extends HTMLElement {
                     this._operationOutcomeView.source = source;
                 } else if ('Bundle' == sourceType) {
                     this._bundleView.hidden = false;
-                    this._bundleView.source = source;
                     this._resourceView.hidden = true;
                     this._operationOutcomeView.hidden = true;
+                    this._bundleView.source = source;
+                    this._serverPanel.value = this._bundleView.resourceType.type;
                 } else {
                     this._bundleView.hidden = true;
                     this._resourceView.hidden = false;
-                    this._resourceView.source = source;
                     this._operationOutcomeView.hidden = true;
+                    this._resourceView.source = source;
+                    this._serverPanel.value = this._resourceView.resourceType.type;
                 }
             } else {
                 throw new Error('Unknown response format');
@@ -121,10 +125,10 @@ class App extends HTMLElement {
     locationHandler = () => {
         let hash = window.location.hash.replace('#', '').trim();
         if (hash.length) {
-            this.fetchHash(hash);
             if (window.matchMedia("(max-width: 480px)").matches) {
                 this._serverPanel.classList.add("hidden");
             }
+            this.fetchHash(hash);
         } else {
             this._body.style.visibility = "hidden";
             this._serverPanel.classList.remove("hidden");
@@ -141,20 +145,22 @@ class App extends HTMLElement {
         const preferedServer = PreferencesService.get("server");
         if (preferedServer) {
             SettingsService.get(preferedServer).then((server) => {
-                this.connect(preferedServer, server);
+                this.connect({
+                    'serverCode': preferedServer,
+                    'server': server
+                });
             });
         } else {
             this._serverDialog.hidden = false;
         }
     }
 
-    connect(serverCode, server) {
+    connect = ({ serverCode, server }) => {
         this._waiting.style.visibility = 'visible';
         FhirService.connect(serverCode, server).then(() => {
             SnackbarsService.show(`Connected to "${serverCode}" server.`);
             PreferencesService.set("server", serverCode);
             this._navigationToggle.hidden = false;
-            this._serverDialog.value = serverCode;
             if (location.hash) {
                 location.hash = '';
             } else {

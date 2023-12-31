@@ -87,15 +87,19 @@ class ServerDialog extends HTMLElement {
             this.hidden = true;
             event.preventDefault();
             event.stopPropagation();
-            this.dispatchEvent(new CustomEvent("serverchanged", {
-                bubbles: false,
-                cancelable: false,
-                detail: {
-                    "serverCode": serverCode,
-                    "server": server
-                }
-            }));
+            this._onSelect({
+                'serverCode': serverCode,
+                'server': server
+            });
         }
+    }
+
+    _onSelect = () => { }
+    get onSelect() {
+        return this._onSelect;
+    }
+    set onSelect(callback) {
+        this._onSelect = callback;
     }
 
     serverFormDelete = () => {

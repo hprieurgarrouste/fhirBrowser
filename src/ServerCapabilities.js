@@ -14,11 +14,10 @@ class ServerCapabilities extends HTMLElement {
         this._list = shadow.querySelector('app-list');
     }
 
-    connectedCallback() {
-        FhirService.addListener(this.serverChanged);
-    }
-
-    serverChanged = () => {
+    /**
+     * @param {object} capabilityStatement
+     */
+    load = (capabilityStatement) => {
         const make = (name, value) => {
             if (typeof value === 'undefined') return;
 
@@ -31,8 +30,6 @@ class ServerCapabilities extends HTMLElement {
         }
 
         this._list.clear();
-
-        const capabilityStatement = FhirService.server?.capabilities;
 
         make('copyright', capabilityStatement.copyright);
         make('description', capabilityStatement.description);

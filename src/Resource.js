@@ -167,6 +167,9 @@ class Resource extends HTMLElement {
         if (!this._referencesPanel.hidden) this._referencesPanel.load(this._resourceType, this._resourceId);
     }
 
+    get resourceType() {
+        return this._resourceType;
+    }
 };
 
 customElements.define('fhir-resource', Resource)
