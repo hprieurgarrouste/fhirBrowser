@@ -94,8 +94,9 @@ class Resource extends HTMLElement {
         while (this._tabs.firstChild) this._tabs.removeChild(this._tabs.lastChild);
 
         this._views = {};
+        const server = FhirService.server;
 
-        if (FhirService.formatEnable("json")) {
+        if (server.isFormatEnable('json')) {
             const view = document.createElement('resource-json-view');
             const section = document.createElement('section');
             section.dataset.caption = 'json';
@@ -104,7 +105,7 @@ class Resource extends HTMLElement {
             this._views.json = view;
         }
 
-        if (FhirService.formatEnable("xml")) {
+        if (server.isFormatEnable('xml')) {
             const view = document.createElement('resource-xml-view');
             const section = document.createElement('section');
             section.dataset.caption = 'xml';
@@ -113,7 +114,7 @@ class Resource extends HTMLElement {
             this._views.xml = view;
         }
 
-        if (FhirService.formatEnable("ttl")) {
+        if (server.isFormatEnable('ttl')) {
             const view = document.createElement('resource-ttl-view');
             const section = document.createElement('section');
             section.dataset.caption = 'ttl';

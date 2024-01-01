@@ -69,12 +69,12 @@ class BundleColumnsDialog extends HTMLElement {
     * @param {string[]} values
     */
     load = (resourceType, values) => {
-        if (resourceType === this._resourceType && FhirService.release === this._release) {
+        if (resourceType === this._resourceType && FhirService.server.release === this._release) {
             this.checkValues(values);
             return;
         }
         this._resourceType = resourceType;
-        this._release = FhirService.release;
+        this._release = FhirService.server.release;
 
         this._list.clear();
 

@@ -33,7 +33,7 @@ class ServerCapabilities extends HTMLElement {
 
         make('copyright', capabilityStatement.copyright);
         make('description', capabilityStatement.description);
-        make('fhirVersion', `${capabilityStatement.fhirVersion} (${FhirService.release})`);
+        make('fhirVersion', `${capabilityStatement.fhirVersion} (${FhirService.server.release})`);
 
         const ul = document.createElement('UL');
         capabilityStatement.format.forEach((f) => {

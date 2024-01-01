@@ -1,4 +1,6 @@
-import template from "./templates/ResourceReferences.html";
+import template from "./templates/ResourceReferences.html"
+
+import resourceIcon from "./fhirIconSet"
 
 import "./components/ListItem"
 import "./components/ListRow"
@@ -47,12 +49,12 @@ class ResourceReferences extends HTMLElement {
 
         this._list.clear();
 
-        const references = FhirService.references(resourceType.type);
+        const references = FhirService.server.references(resourceType.type);
         if (references) {
             Object.entries(references).forEach(([key, value]) => {
                 value.forEach(v => {
                     const item = document.createElement('list-item');
-                    item.setAttribute("data-icon", FhirService.ResourceIcon(key));
+                    item.setAttribute("data-icon", resourceIcon[key.toLowerCase()]);
                     item.setAttribute("data-primary", `${key}.${v.name}`);
                     item.setAttribute("data-secondary", v.documentation.length > 100 ? `${v.documentation.substring(0, 100)}...` : v.documentation);
                     const row = document.createElement('list-row');

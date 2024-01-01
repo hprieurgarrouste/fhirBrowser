@@ -88,8 +88,8 @@ class ServerDialog extends HTMLElement {
             event.preventDefault();
             event.stopPropagation();
             this._onSelect({
-                'serverCode': serverCode,
-                'server': server
+                'code': serverCode,
+                'configuration': server
             });
         }
     }

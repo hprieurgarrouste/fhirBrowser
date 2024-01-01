@@ -1,4 +1,6 @@
-import template from "./templates/ServerResources.html";
+import template from "./templates/ServerResources.html"
+
+import resourceIcon from "./fhirIconSet"
 
 import "./components/AppList"
 import "./components/AppBadge"
@@ -31,7 +33,7 @@ class ServerResources extends HTMLElement {
             .forEach(resource => {
                 const item = document.createElement('list-item');
                 item.setAttribute("data-primary", resource.type);
-                item.setAttribute("data-icon", FhirService.ResourceIcon(resource.type));
+                item.setAttribute("data-icon", resourceIcon[resource.type.toLowerCase()]);
                 const row = document.createElement('list-row');
                 row.setAttribute("data-type", resource.type);
                 row.appendChild(item);

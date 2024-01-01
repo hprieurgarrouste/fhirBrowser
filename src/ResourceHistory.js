@@ -37,7 +37,7 @@ class ResourceHistory extends HTMLElement {
     }
 
     helpClick = (event) => {
-        window.open(`https://hl7.org/fhir/${FhirService.release}/http.html#history`, "FhirBrowserHelp");
+        window.open(`https://hl7.org/fhir/${FhirService.server.release}/http.html#history`, "FhirBrowserHelp");
         event.preventDefault();
         event.stopPropagation();
     }
@@ -55,11 +55,11 @@ class ResourceHistory extends HTMLElement {
         this._progress.hidden = false;
         this._list.clear();
 
-        FhirService.read(resourceType.type, resourceId).then(resource => {
+        this._readResource(resourceType.type, resourceId).then(resource => {
             this._resourceType = resourceType.type;
             this._resourceId = resource.id;
             const resourceVersionId = resource.meta?.versionId;
-            FhirService.readHistory(resourceType.type, resource.id).then(response => {
+            this._readHistory(resourceType.type, resource.id).then(response => {
                 if ('Bundle' == response.resourceType && 'history' == response.type && response.total > 0) {
                     response.entry
                         .filter(element => element?.resource?.meta)
@@ -95,6 +95,20 @@ class ResourceHistory extends HTMLElement {
             });
         });
     }
+
+    _readResource = async (type, id) => {
+        return await FhirService.server.fetch(`/${type}/${id}`, {
+            _format: 'json'
+        });
+    }
+
+    _readHistory = async (type, id) => {
+        return await FhirService.server.fetch(`/${type}/${id}/_history`, {
+            _format: 'json',
+            _summary: 'text'
+        });
+    }
+
 };
 
 customElements.define('resource-history', ResourceHistory)
