@@ -1,4 +1,4 @@
-export class ServerConfiguration {
+export default class ServerConfiguration {
     _url = '';
     _method = ServerConfiguration.None;
     _headers = {};
@@ -22,7 +22,7 @@ export class ServerConfiguration {
         if (conf == null) return;
 
         this.url = conf.url;
-        this.method = conf.auth.method;
+        this.method = conf.auth?.method || ServerConfiguration.METHODS.None;
         this.headers = conf.headers;
         switch (this._method) {
             case ServerConfiguration.METHODS.APIKey:

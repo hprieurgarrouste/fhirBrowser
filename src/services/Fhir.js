@@ -1,41 +1,22 @@
-export class FhirService {
-    static {
-        this._server = null;
-        this._serverChangeListener = [];
-    }
+import context from "./Context"
 
-    static addListener = (callback) => {
-        this._serverChangeListener.push(callback);
-    }
-    static dispatchServerChange = () => {
-        this._serverChangeListener.forEach(callback => {
-            callback.call();
-        })
-    }
-
-    /**
-     * @returns {Server} Current server
-     */
-    static get server() {
-        return this._server;
-    }
-    /**
-     * @param {Server} srv - Current server
-     */
-    static set server(srv) {
-        if (srv != this._server) {
-            this._server = srv;
-            this.dispatchServerChange();
-        }
-    }
-
+class FhirService {
+    server_url = "https://hl7.org/fhir";
     /**
      * Get resource type help url
      * @param {string} resourceType
      * @returns {string}
      */
-    static helpUrl(resourceType) {
-        return `https://hl7.org/fhir/${this.server.release}/${resourceType.toLowerCase()}.html`;
+    helpUrl(resourceType) {
+        return `${this.server_url}/${context.server.release}/${resourceType.toLowerCase()}.html`;
+    }
+
+    /**
+     * Get history help url
+     * @returns {string}
+     */
+    historyUrl() {
+        return `${this.server_url}/${context.server.release}//http.html#history.html`;
     }
 
     /**
@@ -43,8 +24,8 @@ export class FhirService {
      * @param {string} resourceType
      * @returns {object}
      */
-    static async structureDefinition(resourceType) {
-        const url = new URL(`https://hl7.org/fhir/${this.server.release}/${resourceType.toLowerCase()}.profile.json`);
+    async structureDefinition(resourceType) {
+        const url = new URL(`${this.server_url}/${context.server.release}/${resourceType.toLowerCase()}.profile.json`);
         const response = await fetch(url, {
             "cache": "force-cache"
         });
@@ -52,3 +33,5 @@ export class FhirService {
     }
 
 }
+
+export default new FhirService();

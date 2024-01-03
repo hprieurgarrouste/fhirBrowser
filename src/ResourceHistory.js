@@ -1,6 +1,7 @@
 import template from "./templates/ResourceHistory.html";
 
-import { FhirService } from "./services/Fhir"
+import context from "./services/Context"
+import fhirService from "./services/Fhir"
 
 class ResourceHistory extends HTMLElement {
     constructor() {
@@ -10,10 +11,10 @@ class ResourceHistory extends HTMLElement {
 
         shadow.getElementById('help').onclick = this.helpClick;
 
-        this._list = shadow.querySelector('app-list');
+        this._list = shadow.querySelector('m2-list');
         this._list.onclick = this.appListClick;
 
-        this._progress = shadow.querySelector('linear-progress');
+        this._progress = shadow.querySelector('m2-linear-progress');
 
         shadow.getElementById('close').onclick = this.sidePanelClose;
 
@@ -24,10 +25,10 @@ class ResourceHistory extends HTMLElement {
     appListClick = (event) => {
         event.preventDefault();
         event.stopPropagation();
-        const item = event.target.closest("list-row");
+        const item = event.target.closest("m2-list-row");
         if (item) {
             if (item.hasAttribute('selected')) return;
-            this._list.querySelector("list-row[selected]")?.removeAttribute("selected");
+            this._list.querySelector("m2-list-row[selected]")?.removeAttribute("selected");
             item.setAttribute("selected", "")
             location.hash = `#/${this._resourceType}/${this._resourceId}/_history/${item.dataset.versionid}`;
         } else {
@@ -37,7 +38,7 @@ class ResourceHistory extends HTMLElement {
     }
 
     helpClick = (event) => {
-        window.open(`https://hl7.org/fhir/${FhirService.server.release}/http.html#history`, "FhirBrowserHelp");
+        window.open(fhirService.historyUrl, "FhirBrowserHelp");
         event.preventDefault();
         event.stopPropagation();
     }
@@ -68,13 +69,13 @@ class ResourceHistory extends HTMLElement {
                             const d2 = new Date(e2.resource.meta.lastUpdated);
                             return d2 - d1;
                         }).forEach(element => {
-                            const row = document.createElement('list-row');
+                            const row = document.createElement('m2-list-row');
                             row.setAttribute("data-versionid", element.resource.meta.versionId);
                             if (resourceVersionId == element.resource.meta.versionId) {
                                 row.setAttribute("selected", "");
                             }
                             const date = new Date(element.resource.meta.lastUpdated);
-                            const item = document.createElement('list-item');
+                            const item = document.createElement('m2-list-item');
                             item.setAttribute("data-icon", "history");
                             item.setAttribute("data-primary", `${date.toLocaleString(undefined, {
                                 year: "numeric",
@@ -97,13 +98,13 @@ class ResourceHistory extends HTMLElement {
     }
 
     _readResource = async (type, id) => {
-        return await FhirService.server.fetch(`/${type}/${id}`, {
+        return await context.server.fetch(`/${type}/${id}`, {
             _format: 'json'
         });
     }
 
     _readHistory = async (type, id) => {
-        return await FhirService.server.fetch(`/${type}/${id}/_history`, {
+        return await context.server.fetch(`/${type}/${id}/_history`, {
             _format: 'json',
             _summary: 'text'
         });

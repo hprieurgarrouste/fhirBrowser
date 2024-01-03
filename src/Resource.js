@@ -1,9 +1,9 @@
 import template from "./templates/Resource.html";
 
-import "./components/AppBar"
-import "./components/RoundButton"
-import "./components/SidePanel"
-import "./components/AppTabs"
+import "./components/M2AppBar"
+import "./components/M2RoundButton"
+import "./components/M2SidePanel"
+import "./components/M2Tabs"
 
 import "./ResourceHistory"
 import "./ResourceReferences"
@@ -11,7 +11,8 @@ import "./ResourceJsonView"
 import "./ResourceTtlView"
 import "./ResourceXmlView"
 
-import { FhirService } from "./services/Fhir"
+import context from "./services/Context"
+import fhirService from "./services/Fhir"
 
 class Resource extends HTMLElement {
     constructor() {
@@ -30,7 +31,7 @@ class Resource extends HTMLElement {
         this._historyToggle.onclick = this.historyToggleClick;
         this._historyPanel = shadow.querySelector('resource-history');
 
-        this._tabs = shadow.querySelector("app-tabs");
+        this._tabs = shadow.querySelector("m2-tabs");
         this._tabs.addEventListener('select', this.tabSelect);
 
         this._title = shadow.getElementById('title');
@@ -41,7 +42,7 @@ class Resource extends HTMLElement {
     }
 
     connectedCallback() {
-        FhirService.addListener(this.serverChanged);
+        context.addListener(this.serverChanged);
         new MutationObserver(this.panelHiddenObserver).observe(this._referencesPanel, { attributes: true });
         new MutationObserver(this.panelHiddenObserver).observe(this._historyPanel, { attributes: true });
     }
@@ -87,14 +88,14 @@ class Resource extends HTMLElement {
     };
 
     helpClick = () => {
-        window.open(`${FhirService.helpUrl(this._resourceType.type)}#resource`, "FhirBrowserHelp");
+        window.open(`${fhirService.helpUrl(this._resourceType.type)}#resource`, "FhirBrowserHelp");
     };
 
     serverChanged = () => {
         while (this._tabs.firstChild) this._tabs.removeChild(this._tabs.lastChild);
 
         this._views = {};
-        const server = FhirService.server;
+        const server = context.server;
 
         if (server.isFormatEnable('json')) {
             const view = document.createElement('resource-json-view');
@@ -144,7 +145,7 @@ class Resource extends HTMLElement {
             const resourceId = view.resourceId;
 
             if (resourceId != this._resourceId || resourceType != this._resourceType?.type) {
-                this._resourceType = FhirService.server.capabilities.rest[0].resource.find(res => res.type === resourceType);
+                this._resourceType = context.server.capabilities.rest[0].resource.find(res => res.type === resourceType);
                 this._resourceId = resourceId;
                 Object.entries(this._views).filter(([key,]) => key != format).forEach(([, value]) => value.clear());
             }

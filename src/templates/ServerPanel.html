@@ -9,24 +9,24 @@
         padding: 1em;
     }
 
-    app-tabs {
+    m2-tabs {
         flex: 1 1 auto;
     }
 
-    app-tabs>section {
+    m2-tabs>section {
         border-top: 1px solid var(--border-color);
     }
 </style>
 <main>
     <header>
-        <list-item id="serverTitle"></list-item>
+        <m2-list-item id="serverTitle"></m2-list-item>
     </header>
-    <app-tabs>
+    <m2-tabs>
         <section data-caption="Resource Types">
             <server-resources></server-resources>
         </section>
         <section data-caption="Details">
             <server-capabilities></server-capabilities>
         </section>
-    </app-tabs>
+    </m2-tabs>
 </main>

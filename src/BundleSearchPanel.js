@@ -1,10 +1,11 @@
 import template from "./templates/BundleSearchPanel.html";
 
-import "./components/RoundButton"
+import "./components/M2RoundButton"
 
 import "./BundleSearchItem"
 
-import { FhirService } from "./services/Fhir"
+import context from "./services/Context"
+import fhirService from "./services/Fhir"
 
 class BundleSearchPanel extends HTMLElement {
     constructor() {
@@ -55,7 +56,7 @@ class BundleSearchPanel extends HTMLElement {
     }
 
     helpClick = (event) => {
-        window.open(FhirService.helpUrl("search"), "FhirBrowserHelp");
+        window.open(fhirService.helpUrl("search"), "FhirBrowserHelp");
         event.preventDefault();
         event.stopPropagation();
     }
@@ -78,10 +79,10 @@ class BundleSearchPanel extends HTMLElement {
         const resourceName = hash.split('?')[0];
         if (!resourceName) return;
         //TODO: refactor it's ugly
-        while (!FhirService.server) {
+        while (!context.server) {
             await delay(1000);
         }
-        const resourceType = FhirService.server.capabilities.rest[0].resource.find(res => res.type === resourceName);
+        const resourceType = context.server.capabilities.rest[0].resource.find(res => res.type === resourceName);
         if (resourceType) {
             if (resourceType.type !== this._resourceType?.type) {
                 this._resourceType = resourceType;

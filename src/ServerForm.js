@@ -1,8 +1,8 @@
 import template from "./templates/ServerForm.html"
 
-import "./components/AppButton"
-import "./components/AppConfirm"
-import "./components/TextField"
+import "./components/M2Button"
+import "./components/M2Confirm"
+import "./components/M2TextField"
 
 class ServerForm extends HTMLElement {
     constructor() {
@@ -10,7 +10,7 @@ class ServerForm extends HTMLElement {
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        this._appDialog = shadow.querySelector('app-dialog');
+        this._appDialog = shadow.querySelector('m2-dialog');
         this._appDialog.onClose = this.appDialogClose;
         this._content = shadow.getElementById('content');
 
@@ -40,7 +40,7 @@ class ServerForm extends HTMLElement {
         this._oauthClientsecret = shadow.getElementById('oauthClientsecret');
         this._oauthGranttype = shadow.getElementById('oauthGranttype');
 
-        this._appConfirm = shadow.querySelector('app-confirm');
+        this._appConfirm = shadow.querySelector('m2-confirm');
         this._appConfirm.onValidate = this.deleteConfirm;
 
         shadow.getElementById('formOk').onclick = this.formOkClick;
@@ -224,7 +224,7 @@ class ServerForm extends HTMLElement {
     }
 
     clear() {
-        const fields = this._content.querySelectorAll("text-field");
+        const fields = this._content.querySelectorAll("m2-textfield");
         fields.forEach(field => field.value = '');
         // only grant type allowed
         this._oauthGranttype.value = "client_credentials";

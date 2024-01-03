@@ -7,17 +7,17 @@
         height: 100%;
     }
 
-    app-list {
+    m2-list {
         flex: 1 1 auto;
         height: 0;
 
     }
 </style>
-<side-panel data-title="History">
-    <round-button id="help" title="Help" data-icon="help" slot="appBarLeft"></round-button>
-    <round-button id="close" title="Close" data-icon="close" slot="appBarRight"></round-button>
+<m2-side-panel data-title="History">
+    <m2-round-button id="help" title="Help" data-icon="help" slot="appBarLeft"></m2-round-button>
+    <m2-round-button id="close" title="Close" data-icon="close" slot="appBarRight"></m2-round-button>
     <main slot="main">
-        <linear-progress></linear-progress>
-        <app-list></app-list>
+        <m2-linear-progress></m2-linear-progress>
+        <m2-list></m2-list>
     </main>
-</side-panel>
+</m2-side-panel>

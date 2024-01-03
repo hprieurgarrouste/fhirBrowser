@@ -8,7 +8,7 @@
         height: 100%;
     }
 
-    app-list {
+    m2-list {
         flex: 1 1 auto;
         height: 0;
     }
@@ -20,13 +20,13 @@
         overflow: hidden;
     }
 </style>
-<app-dialog id="settingsDialog" data-title="Settings">
+<m2-dialog id="settingsDialog" data-title="Settings">
     <main>
-        <linear-progress></linear-progress>
-        <app-list></app-list>
+        <m2-linear-progress></m2-linear-progress>
+        <m2-list></m2-list>
         <footer>
-            <app-button id="btnCancel" value="Cancel"></app-button>
-            <app-button id="btnOk" value="Apply"></app-button>
+            <m2-button id="btnCancel">Cancel</m2-button>
+            <m2-button id="btnOk">Apply</m2-button>
         </footer>
     </main>
-</app-dialog>
+</m2-dialog>

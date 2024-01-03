@@ -1,10 +1,10 @@
 import template from "./templates/ResourceXmlView.html";
 
-import "./components/AppSwitch"
+import "./components/M2Switch"
 
-import { FhirService } from "./services/Fhir"
-import { PreferencesService } from "./services/Preferences"
-import { SnackbarsService } from "./services/Snackbars"
+import context from "./services/Context"
+import preferencesService from "./services/Preferences"
+import snackbarService from "./services/Snackbar"
 
 class ResourceXmlView extends HTMLElement {
     constructor() {
@@ -17,7 +17,7 @@ class ResourceXmlView extends HTMLElement {
         this._content = shadow.getElementById('content');
         this._content.onclick = this.contentClick;
 
-        this._preferences = PreferencesService.get('xmlView', { 'sorted': false });
+        this._preferences = preferencesService.get('xmlView', { 'sorted': false });
 
         this._sort = this._preferences.sorted;
         this._sortToggle = shadow.getElementById('sort-toggle');
@@ -37,7 +37,7 @@ class ResourceXmlView extends HTMLElement {
 
     sortToggleClick = () => {
         this._sort = !this._sort;
-        PreferencesService.set('xmlView', { 'sorted': this._sort });
+        preferencesService.set('xmlView', { 'sorted': this._sort });
         this.sortChange();
     }
     sortChange = () => {
@@ -115,7 +115,7 @@ class ResourceXmlView extends HTMLElement {
                     let val = document.createElement('span');
                     val.className = "values";
                     if ("reference" === e.nodeName && "value" === a.nodeName) {
-                        let url = a.nodeValue.replace(`${FhirService.server.url}`, '')
+                        let url = a.nodeValue.replace(`${context.server.url}`, '')
                         if (!url.startsWith('/') && !url.startsWith('?')) url = `/${url}`;
                         let link = document.createElement('a');
                         link.setAttribute("href", `#${url}`);
@@ -165,9 +165,9 @@ class ResourceXmlView extends HTMLElement {
     copyClick = () => {
         const content = new XMLSerializer().serializeToString(this._resource);
         navigator.clipboard.writeText(content).then(function () {
-            SnackbarsService.show("Copying to clipboard was successful");
+            SnackbarService.show("Copying to clipboard was successful");
         }, function (err) {
-            SnackbarsService.error("Could not copy text");
+            SnackbarService.error("Could not copy text");
         });
     };
 

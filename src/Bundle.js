@@ -1,15 +1,16 @@
 import template from "./templates/Bundle.html";
 
-import "./components/AppBar"
-import "./components/DataTable"
-import "./components/LinearProgress"
+import "./components/M2AppBar"
+import "./components/M2DataTable"
+import "./components/M2LinearProgress"
 
 import "./BundleSearchPanel"
 import "./BundleColumnsDialog"
 
-import { FhirService } from "./services/Fhir"
-import { SnackbarsService } from "./services/Snackbars"
-import { PreferencesService } from "./services/Preferences"
+import context from "./services/Context"
+import fhirService from "./services/Fhir"
+import preferencesService from "./services/Preferences"
+import snackbarService from "./services/Snackbar"
 
 class Bundle extends HTMLElement {
     constructor() {
@@ -78,7 +79,7 @@ class Bundle extends HTMLElement {
     onRowClick = ({ detail }) => {
         const entry = this._source.entry.find(({ resource }) => resource.id == detail.resourceId);
         if (entry) {
-            const url = entry.fullUrl.replace(`${FhirService.server.url}`, '');
+            const url = entry.fullUrl.replace(`${context.server.url}`, '');
             location.hash = `#${url}`;
         }
     }
@@ -98,9 +99,9 @@ class Bundle extends HTMLElement {
         this._columns.forEach(column => dataTable.addColumn(column));
         this.parsePage(this._source);
 
-        const pref = PreferencesService.get("columns", {});
+        const pref = preferencesService.get("columns", {});
         pref[this._resourceType.type] = this._columns;
-        PreferencesService.set("columns", pref);
+        preferencesService.set("columns", pref);
     }
 
     settingsDialogToggleClick = () => {
@@ -109,19 +110,19 @@ class Bundle extends HTMLElement {
     }
 
     paginationClick = ({ target }) => {
-        if ("ROUND-BUTTON" != target.nodeName) return;
+        if ("m2-round-button" != target.localName) return;
         let url = target.dataset.url;
-        url = url.replace(`${FhirService.server.url}`, '');
+        url = url.replace(`${context.server.url}`, '');
         location.hash = `#${url}`;
     }
 
     helpClick = () => {
-        window.open(FhirService.helpUrl(this._resourceType.type), "FhirBrowserHelp");
+        window.open(fhirService.helpUrl(this._resourceType.type), "FhirBrowserHelp");
     }
 
     copyClick = () => {
         navigator.clipboard.writeText(JSON.stringify(this._source)).then(function () {
-            SnackbarsService.show("Copying to clipboard was successful");
+            snackbarService.show("Copying to clipboard was successful");
         }, function (err) {
             console.error('Async: Could not copy text: ', err);
         });
@@ -159,7 +160,7 @@ class Bundle extends HTMLElement {
         this._total.hidden = true;
         if (data.total) {
             this._total.hidden = false;
-            this._total.innerHTML = `<b>Total:&nbsp;</b>${data.total}`;
+            this._total.innerHTML = `Total:&nbsp;${data.total}`;
         }
         if (data.entry) {
             const dataTable = this._shadow.getElementById('table');
@@ -231,12 +232,12 @@ class Bundle extends HTMLElement {
             resourceType = RegExp(/^\w+/).exec(hash)[0];
         }
 
-        this._resourceType = FhirService.server.capabilities.rest[0].resource.find(res => res.type === resourceType);
+        this._resourceType = context.server.capabilities.rest[0].resource.find(res => res.type === resourceType);
 
         let title = resourceType;
 
         if (singleResourceType) {
-            const pref = PreferencesService.get('columns', {});
+            const pref = preferencesService.get('columns', {});
             this._columns = pref[resourceType] || ['id', 'meta.lastUpdated'];
             this._shadow.getElementById('settingsDialogToggle').hidden = false;
             this._searchPanel.hidden = false;

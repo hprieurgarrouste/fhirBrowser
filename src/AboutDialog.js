@@ -9,7 +9,7 @@ class AboutDialog extends HTMLElement {
 
         shadow.getElementById('closeButton').onclick = this.appDialogClose;
 
-        shadow.querySelector('app-dialog').onClose = (event) => {
+        shadow.querySelector('m2-dialog').onClose = (event) => {
             event.preventDefault();
             event.stopPropagation();
             this.appDialogClose();

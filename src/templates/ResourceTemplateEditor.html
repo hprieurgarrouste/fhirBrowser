@@ -38,23 +38,23 @@
     #template.drag.over,
     #template.drag fieldset.over,
     #template section.over,
-    #template text-field.over {
+    #template m2-textfield.over {
         border: 1px dashed black;
         background-color: var(--hover-color, rgb(0 0 0 / 4%));
     }
 
-    side-panel {
+    m2-side-panel {
         border-left: 1px solid var(--border-color);
     }
 
-    app-list>* {
+    m2-list>* {
         cursor: grab;
     }
 </style>
 <main>
     <section id="template"></section>
-    <side-panel data-title="Data">
-        <linear-progress slot="main"></linear-progress>
-        <app-list slot="main"></app-list>
-    </side-panel>
+    <m2-side-panel data-title="Data">
+        <m2-linear-progress slot="main"></m2-linear-progress>
+        <m2-list slot="main"></m2-list>
+    </m2-side-panel>
 </main>

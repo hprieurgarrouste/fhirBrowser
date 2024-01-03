@@ -1,17 +1,17 @@
 import template from "./templates/ServerCapabilities.html";
 
-import "./components/AppList"
-import "./components/ListItem"
-import "./components/ListRow"
+import "./components/M2List"
+import "./components/M2ListItem"
+import "./components/M2ListRow"
 
-import { FhirService } from "./services/Fhir"
+import context from "./services/Context"
 
 class ServerCapabilities extends HTMLElement {
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
-        this._list = shadow.querySelector('app-list');
+        this._list = shadow.querySelector('m2-list');
     }
 
     /**
@@ -21,9 +21,9 @@ class ServerCapabilities extends HTMLElement {
         const make = (name, value) => {
             if (typeof value === 'undefined') return;
 
-            const item = document.createElement('list-item');
+            const item = document.createElement('m2-list-item');
             item.setAttribute('data-primary', name);
-            const row = document.createElement('list-row');
+            const row = document.createElement('m2-list-row');
             item.setAttribute('data-secondary', value);
             row.appendChild(item);
             this._list.appendChild(row);
@@ -33,7 +33,7 @@ class ServerCapabilities extends HTMLElement {
 
         make('copyright', capabilityStatement.copyright);
         make('description', capabilityStatement.description);
-        make('fhirVersion', `${capabilityStatement.fhirVersion} (${FhirService.server.release})`);
+        make('fhirVersion', `${capabilityStatement.fhirVersion} (${context.server.release})`);
 
         const ul = document.createElement('UL');
         capabilityStatement.format.forEach((f) => {

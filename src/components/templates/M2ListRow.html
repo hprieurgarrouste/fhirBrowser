@@ -1,0 +1,14 @@
+<style>
+    main {
+        padding: 0.75em 1em;
+        background-color: inherit;
+    }
+
+    main[selected],
+    main:hover {
+        background-color: var(--hover-color, rgba(0, 0, 0, 5%));
+    }
+</style>
+<main>
+    <slot></slot>
+</main>

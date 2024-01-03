@@ -1,11 +1,14 @@
-import { ServerConfiguration } from "./ServerConfiguration";
+import ServerConfiguration from "./ServerConfiguration";
 
-export class Server {
+/**
+ * @class Server
+ */
+export default class Server {
 
+    _code = null;
     /**
      * @type ServerConfiguration
      */
-    _code = null;
     _serverConfiguration = null;
     _capabilities = null;
     _fhirReferences = null;

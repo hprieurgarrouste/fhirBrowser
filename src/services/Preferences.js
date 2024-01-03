@@ -1,9 +1,7 @@
-export class PreferencesService {
-    static {
-        this.KEY = 'preferences';
-    }
+class PreferencesService {
+    KEY = 'preferences';
 
-    static get(key, defaultValue = null) {
+    get(key, defaultValue = null) {
         const lsp = localStorage.getItem(this.KEY);
         let preferences = null;
         if (lsp !== null) {
@@ -14,7 +12,7 @@ export class PreferencesService {
         return preferences[key] || defaultValue;
     }
 
-    static set(key, value) {
+    set(key, value) {
         const lsp = localStorage.getItem(this.KEY);
         let preferences = null;
         if (lsp !== null) {
@@ -26,3 +24,5 @@ export class PreferencesService {
         localStorage.setItem(this.KEY, JSON.stringify(preferences));
     }
 }
+
+export default new PreferencesService();

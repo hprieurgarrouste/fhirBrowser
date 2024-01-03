@@ -1,10 +1,10 @@
 import template from "./templates/OperationOutcome.html";
 
-import "./components/AppBar"
-import "./components/AppCard"
-import "./components/RoundButton"
+import "./components/M2AppBar"
+import "./components/M2Card"
+import "./components/M2RoundButton"
 
-import { FhirService } from "./services/Fhir"
+import fhirService from "./services/Fhir"
 
 class OperationOutcome extends HTMLElement {
     constructor() {
@@ -21,7 +21,7 @@ class OperationOutcome extends HTMLElement {
     }
 
     helpClick = () => {
-        window.open(FhirService.helpUrl(this._resource.resourceType), "FhirBrowserHelp");
+        window.open(fhirService.helpUrl(this._resource.resourceType), "FhirBrowserHelp");
     }
 
     clear = () => {
@@ -55,7 +55,7 @@ class OperationOutcome extends HTMLElement {
         resource.issue.forEach(issue => {
             const diagnostics = document.createElement('p');
             diagnostics.innerText = issue.diagnostics;
-            const card = document.createElement('app-card');
+            const card = document.createElement('m2-card');
             card.setAttribute('data-icon', severityIcon[issue.severity] || 'error');
             card.setAttribute('data-primary', issue.code);
             card.setAttribute('data-secondary', issue.severity);

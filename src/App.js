@@ -1,9 +1,9 @@
-import template from "./templates/App.html";
+import template from "./templates/App.html"
 
-import "./components/AppBar"
-import "./components/AppDialog"
-import "./components/ColorScheme"
-import "./components/CircularProgress"
+import "./components/M2AppBar"
+import "./components/M2Dialog"
+import "./components/M2ColorScheme"
+import "./components/M2CircularProgress"
 
 import "./AboutDialog"
 import "./Bundle"
@@ -12,13 +12,13 @@ import "./Resource"
 import "./ServerDialog"
 import "./OperationOutcome"
 
-import { FhirService } from "./services/Fhir"
-import { PreferencesService } from "./services/Preferences"
-import { SettingsService } from "./services/Settings"
-import { SnackbarsService } from "./services/Snackbars"
+import context from "./services/Context"
+import preferencesService from "./services/Preferences"
+import settingsService from "./services/Settings"
+import snackbarService from "./services/Snackbar"
 
-import { Server } from "./Server";
-import { ServerConfiguration } from "./ServerConfiguration";
+import Server from "./Server";
+import ServerConfiguration from "./ServerConfiguration";
 
 /* Only register a service worker if it's supported */
 if ('serviceWorker' in navigator) {
@@ -26,16 +26,13 @@ if ('serviceWorker' in navigator) {
 }
 
 class App extends HTMLElement {
-    /**
-     * @type Server
-     */
-    _server = null;
 
     constructor() {
         super();
 
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
+        context.appContainer = shadow;
 
         this._shadow = shadow;
 
@@ -51,7 +48,7 @@ class App extends HTMLElement {
         this._serverDialog.onSelect = this.connect;
 
         shadow.getElementById('serverDialogToggle').onclick = () => {
-            this._serverDialog.value = this._server.serverCode;
+            this._serverDialog.value = context.server.serverCode;
             this._serverDialog.hidden = false;
         }
 
@@ -73,18 +70,18 @@ class App extends HTMLElement {
     }
 
     fetchHash = async (hash) => {
-        SnackbarsService.clear();
-        const url = new URL(`${this._server.url}${hash}`);
+        snackbarService.clear();
+        const url = new URL(`${context.server.url}${hash}`);
         const timeoutId = setTimeout(() => {
             this._waiting.style.visibility = 'visible';
         }, 500);
 
         try {
             const response = await fetch(url, {
-                "headers": this._server.headers
+                "headers": context.server.headers
             });
             if (!response.ok) {
-                SnackbarsService.error(`${response.status} ${response.statusText}`);
+                snackbarService.error(`${response.status} ${response.statusText}`);
             }
             this._body.style.visibility = "visible";
             const contentType = response.headers.get("Content-Type");
@@ -124,7 +121,7 @@ class App extends HTMLElement {
                 throw new Error('Unknown response format');
             }
         } catch (error) {
-            SnackbarsService.show(error, undefined, undefined, 'error');
+            snackbarService.show(error, undefined, undefined, 'error');
         } finally {
             clearTimeout(timeoutId);
             this._waiting.style.visibility = 'hidden'
@@ -144,16 +141,12 @@ class App extends HTMLElement {
         }
     }
 
-    get container() {
-        return this._shadow;
-    }
-
     connectedCallback() {
         window.addEventListener("hashchange", this.locationHandler);
 
-        const preferedServer = PreferencesService.get("server");
+        const preferedServer = preferencesService.get("server");
         if (preferedServer) {
-            SettingsService.get(preferedServer).then((configuration) => {
+            settingsService.get(preferedServer).then((configuration) => {
                 this.connect({
                     "code": preferedServer,
                     "configuration": configuration
@@ -169,10 +162,9 @@ class App extends HTMLElement {
         const serverConfiguration = new ServerConfiguration(configuration);
         const server = new Server(code, serverConfiguration);
         server.connect().then(() => {
-            this._server = server;
-            FhirService.server = this._server;
-            SnackbarsService.show(`Connected to "${code}" server.`);
-            PreferencesService.set("server", code);
+            context.server = server;
+            snackbarService.show(`Connected to "${code}" server.`);
+            preferencesService.set("server", code);
             this._navigationToggle.hidden = false;
             if (location.hash) {
                 location.hash = '';
@@ -180,7 +172,7 @@ class App extends HTMLElement {
                 this.locationHandler();
             }
         }).catch(error => {
-            SnackbarsService.error(`An error occurred while connecting to the server "${code}"`);
+            snackbarService.error(`An error occurred while connecting to the server "${code}"`);
             console.log(error);
         }).finally(() => {
             this._waiting.style.visibility = 'hidden';

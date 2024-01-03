@@ -1,8 +1,10 @@
 import template from "./templates/ResourceTemplateView.html"
 
-import "./components/TextField"
+import "./components/M2TextField"
 import "./ResourceTemplateEditor"
 import "./ResourceTemplateEditorDialog"
+
+import context from "./services/Context"
 
 class ResourceTemplateView extends HTMLElement {
     constructor() {
@@ -11,7 +13,7 @@ class ResourceTemplateView extends HTMLElement {
         this._shadow.innerHTML = template;
         this._template = this._shadow.getElementById('template');
         this._resource = null;
-        this._templateEditorButton = this._shadow.querySelector('round-button[class~="fab"]');
+        this._templateEditorButton = this._shadow.querySelector('m2-round-button[class~="fab"]');
         this._templateEditorButton.onclick = this.showEditor;
         this._emptyMsg = this._shadow.getElementById('emptyMsg');
     }
@@ -49,7 +51,7 @@ class ResourceTemplateView extends HTMLElement {
     }
 
     createField = (name, placeholder) => {
-        const textField = document.createElement('text-field');
+        const textField = document.createElement('m2-textfield');
         textField.id = name;
         textField.setAttribute("placeholder", placeholder);
         textField.setAttribute("readonly", "");
@@ -57,7 +59,7 @@ class ResourceTemplateView extends HTMLElement {
     }
 
     setValues = (resource) => {
-        const fields = Array.from(this._shadow.querySelectorAll("text-field"));
+        const fields = Array.from(this._shadow.querySelectorAll("m2-textfield"));
         fields.forEach(field => {
             let value = '';
             if (field.id) {
@@ -104,7 +106,7 @@ class ResourceTemplateView extends HTMLElement {
     }
 
     cleanEmpty = () => {
-        Array.from(this._template.querySelectorAll('section:not(:has(text-field))')).forEach(e => e.remove());
+        Array.from(this._template.querySelectorAll('section:not(:has(m2-textfield))')).forEach(e => e.remove());
         Array.from(this._template.querySelectorAll('fieldset:not(:has(section))')).forEach(e => e.remove());
     }
 
@@ -114,7 +116,7 @@ class ResourceTemplateView extends HTMLElement {
         this._editor.onClose = () => {
             this.source = this._resource;
         }
-        document.querySelector('fhir-browser').container.appendChild(this._editor);
+        context.appContainer.appendChild(this._editor);
     }
 
 };

@@ -1,0 +1,53 @@
+<style>
+    @import url(/assets/material.css);
+
+    main {
+        background-color: var(--background-color, white);
+        color: var(--text-color-normal, white);
+        display: flex;
+        flex-direction: column;
+        font-family: var(--font-family);
+        height: 100%;
+        width: 400px;
+    }
+
+    header {
+        padding-bottom: 3px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    header h3 {
+        margin: 0;
+    }
+
+    #content {
+        overflow: auto;
+        flex: 1 1 auto;
+        height: 0;
+    }
+
+    @media (max-width:480px) {
+        main {
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+        }
+    }
+</style>
+<main>
+    <header slot="header">
+        <m2-app-bar>
+            <section slot="left">
+                <slot name="appBarLeft"></slot>
+            </section>
+            <h3 id="title" slot="middle">Side panel</h3>
+            <section slot="right">
+                <slot name="appBarRight"></slot>
+            </section>
+        </m2-app-bar>
+    </header>
+    <section id="content">
+        <slot name="main"></slot>
+    </section>
+</main>

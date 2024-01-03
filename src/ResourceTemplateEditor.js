@@ -1,10 +1,10 @@
 import template from "./templates/ResourceTemplateEditor.html"
 
-import "./components/AppList"
-import "./components/SidePanel"
-import "./components/TextField"
+import "./components/M2List"
+import "./components/M2SidePanel"
+import "./components/M2TextField"
 
-import { FhirService } from "./services/Fhir"
+import fhirService from "./services/Fhir"
 
 class ResourceTemplateEditor extends HTMLElement {
     constructor() {
@@ -23,7 +23,7 @@ class ResourceTemplateEditor extends HTMLElement {
         dragZone.ondragend = this.onDragEnd;
         dragZone.ondrop = this.onDragDrop;
 
-        this._list = this._shadow.querySelector('app-list');
+        this._list = this._shadow.querySelector('m2-list');
         this._list.onFilter = this.dataListFilter;
     }
 
@@ -72,7 +72,7 @@ class ResourceTemplateEditor extends HTMLElement {
     }
 
     createField = (name, placeholder) => {
-        const textField = document.createElement('text-field');
+        const textField = document.createElement('m2-textfield');
         textField.id = name;
         textField.setAttribute("placeholder", placeholder);
         textField.setAttribute("readonly", "");
@@ -81,7 +81,7 @@ class ResourceTemplateEditor extends HTMLElement {
     }
 
     setValues = (resource) => {
-        const fields = Array.from(this._shadow.querySelectorAll("text-field"));
+        const fields = Array.from(this._shadow.querySelectorAll("m2-textfield"));
         fields.forEach(field => {
             let value = '';
             if (field.id) {
@@ -133,7 +133,7 @@ class ResourceTemplateEditor extends HTMLElement {
     get template() {
         let ret = [];
         Array.from(this._template.childNodes)
-            .filter(node => 'FIELDSET' == node.nodeName)
+            .filter(node => 'fieldset' == node.localName)
             .forEach(fieldset => ret.push(parseFieldset(fieldset)));
         return ret;
 
@@ -143,9 +143,9 @@ class ResourceTemplateEditor extends HTMLElement {
                 'row': []
             }
             Array.from(fieldset.childNodes).forEach(node => {
-                if ('INPUT' == node.nodeName) {
+                if ('input' == node.localName) {
                     fs.label = node.value;
-                } else if ('SECTION' == node.nodeName) {
+                } else if ('section' == node.localName) {
                     fs.row.push(parseSection(node));
                 }
             });
@@ -154,7 +154,7 @@ class ResourceTemplateEditor extends HTMLElement {
         function parseSection(section) {
             let ret = [];
             Array.from(section.childNodes)
-                .filter(node => 'TEXT-FIELD' == node.nodeName)
+                .filter(node => 'm2-textfield' == node.localName)
                 .forEach(node => ret.push(parseField(node)))
             return ret;
         }
@@ -169,27 +169,27 @@ class ResourceTemplateEditor extends HTMLElement {
     loadData = (resourceType) => {
         this._list.clear();
 
-        this._shadow.querySelector('linear-progress').hidden = false;
+        this._shadow.querySelector('m2-linear-progress').hidden = false;
         sdParse(resourceType, '').then((elements) => {
             elements.sort((e1, e2) => e1.path.localeCompare(e2.path));
             elements.forEach(element => {
-                const item = document.createElement('list-item');
+                const item = document.createElement('m2-list-item');
                 item.setAttribute("data-icon", 'drag_indicator');
                 item.setAttribute("data-primary", element.path);
                 item.setAttribute("data-secondary", element.short);
-                const row = document.createElement('list-row');
+                const row = document.createElement('m2-list-row');
                 row.setAttribute('draggable', 'true');
                 row.setAttribute("data-id", element.id);
                 row.appendChild(item);
                 this._list.appendChild(row);
             });
-            this._shadow.querySelector('linear-progress').hidden = true;
+            this._shadow.querySelector('m2-linear-progress').hidden = true;
         });
 
         function sdParse(resourceType, path) {
             return new Promise((resolve) => {
                 const elements = [];
-                FhirService.structureDefinition(resourceType).then((structureDefinition) => {
+                fhirService.structureDefinition(resourceType).then((structureDefinition) => {
                     const subPromises = [];
                     structureDefinition.snapshot.element
                         .filter(e => e.type)
@@ -227,7 +227,7 @@ class ResourceTemplateEditor extends HTMLElement {
     }
 
     cleanEmpty = () => {
-        Array.from(this._template.querySelectorAll('section:not(:has(text-field))')).forEach(e => e.remove());
+        Array.from(this._template.querySelectorAll('section:not(:has(m2-textfield))')).forEach(e => e.remove());
         Array.from(this._template.querySelectorAll('fieldset:not(:has(section))')).forEach(e => e.remove());
     }
 
@@ -236,26 +236,26 @@ class ResourceTemplateEditor extends HTMLElement {
             (
                 (target.id == 'template') ||
                 (target.closest('#template') == null) ||
-                ('FIELDSET' == src.tagName && (
+                ('fieldset' == src.localName && (
                     'template' == target.id ||
-                    'FIELDSET' == target.tagName
+                    'fieldset' == target.localName
                 )) ||
-                ('SECTION' == src.tagName && (
+                ('section' == src.localName && (
                     'template' == target.id ||
-                    'FIELDSET' == target.tagName ||
-                    'SECTION' == target.tagName
+                    'fieldset' == target.localName ||
+                    'section' == target.localName
                 )) ||
-                ('TEXT-FIELD' == src.tagName && (
+                ('m2-textfield' == src.localName && (
                     'template' == target.id ||
-                    'FIELDSET' == target.tagName ||
-                    'SECTION' == target.tagName ||
-                    'TEXT-FIELD' == target.tagName
+                    'fieldset' == target.localName ||
+                    'section' == target.localName ||
+                    'm2-textfield' == target.localName
                 )) ||
-                ('LIST-ROW' == src.tagName && (
+                ('m2-list-row' == src.localName && (
                     'template' == target.id ||
-                    'FIELDSET' == target.tagName ||
-                    'SECTION' == target.tagName ||
-                    'TEXT-FIELD' == target.tagName
+                    'fieldset' == target.localName ||
+                    'section' == target.localName ||
+                    'm2-textfield' == target.localName
                 ))
             );
     }
@@ -302,7 +302,7 @@ class ResourceTemplateEditor extends HTMLElement {
                     }
                 }
 
-                if ('LIST-ROW' == src.tagName) {
+                if ('m2-list-row' == src.localName) {
                     const id = this._dragSrcEl.dataset.id;
                     src = this.createField(id, id.split(".").pop());
                     src.setAttribute('value', this.calcValue(this._resource, id));
@@ -312,45 +312,45 @@ class ResourceTemplateEditor extends HTMLElement {
                         const fieldset = this.createFieldset();
                         fieldset.appendChild(section);
                         target.appendChild(fieldset);
-                    } else if ('FIELDSET' == target.tagName) {
+                    } else if ('fieldset' == target.localName) {
                         const section = this.createSection();
                         section.appendChild(src);
                         target.appendChild(section);
-                    } else if ('SECTION' == target.tagName) {
+                    } else if ('section' == target.localName) {
                         target.appendChild(src);
-                    } else if ('TEXT-FIELD' == target.tagName) {
+                    } else if ('m2-textfield' == target.localName) {
                         target.parentNode.insertBefore(src, target);
                     }
-                } else if ('FIELDSET' == src.tagName) {
+                } else if ('fieldset' == src.localName) {
                     if ('template' == target.id) {
                         target.appendChild(src);
-                    } else if ('FIELDSET' == target.tagName) {
+                    } else if ('fieldset' == target.localName) {
                         target.parentNode.insertBefore(src, target);
                     }
-                } else if ('SECTION' == src.tagName) {
+                } else if ('section' == src.localName) {
                     if ('template' == target.id) {
                         const fieldset = this.createFieldset();
                         fieldset.appendChild(src);
                         target.appendChild(fieldset);
-                    } else if ('FIELDSET' == target.tagName) {
+                    } else if ('fieldset' == target.localName) {
                         target.appendChild(src);
-                    } else if ('SECTION' == target.tagName) {
+                    } else if ('section' == target.localName) {
                         target.parentNode.insertBefore(src, target);
                     }
-                } else if ('TEXT-FIELD' == src.tagName) {
+                } else if ('m2-textfield' == src.localName) {
                     if ('template' == target.id) {
                         const section = this.createSection();
                         section.appendChild(src);
                         const fieldset = this.createFieldset();
                         fieldset.appendChild(section);
                         target.appendChild(fieldset);
-                    } else if ('FIELDSET' == target.tagName) {
+                    } else if ('fieldset' == target.localName) {
                         const section = this.createSection();
                         section.appendChild(src);
                         target.appendChild(section);
-                    } else if ('SECTION' == target.tagName) {
+                    } else if ('section' == target.localName) {
                         target.appendChild(src);
-                    } else if ('TEXT-FIELD' == target.tagName) {
+                    } else if ('m2-textfield' == target.localName) {
                         target.parentNode.insertBefore(src, target);
                     }
                 }

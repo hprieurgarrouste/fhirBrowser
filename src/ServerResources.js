@@ -1,13 +1,13 @@
 import template from "./templates/ServerResources.html"
 
-import resourceIcon from "./fhirIconSet"
+import resourceIcon from "./assets/fhirIconSet"
 
-import "./components/AppList"
-import "./components/AppBadge"
-import "./components/ListItem"
-import "./components/ListRow"
+import "./components/M2List"
+import "./components/M2Badge"
+import "./components/M2ListItem"
+import "./components/M2ListRow"
 
-import { FhirService } from "./services/Fhir.js"
+import context from "./services/Context"
 
 class ServerResources extends HTMLElement {
     constructor() {
@@ -15,7 +15,7 @@ class ServerResources extends HTMLElement {
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        this._list = shadow.querySelector('app-list');
+        this._list = shadow.querySelector('m2-list');
         this._list.onFilter = this.appListFilter;
         this._list.onclick = this.appListClick;
 
@@ -31,10 +31,10 @@ class ServerResources extends HTMLElement {
         capabilityStatement?.rest[0]?.resource
             .filter(res => res.interaction.map(interaction => interaction.code).includes('search-type'))
             .forEach(resource => {
-                const item = document.createElement('list-item');
+                const item = document.createElement('m2-list-item');
                 item.setAttribute("data-primary", resource.type);
                 item.setAttribute("data-icon", resourceIcon[resource.type.toLowerCase()]);
-                const row = document.createElement('list-row');
+                const row = document.createElement('m2-list-row');
                 row.setAttribute("data-type", resource.type);
                 row.appendChild(item);
                 this._list.appendChild(row);
@@ -45,9 +45,9 @@ class ServerResources extends HTMLElement {
      * @param {event} event
      */
     appListClick = ({ target }) => {
-        const row = target.closest("list-row");
+        const row = target.closest("m2-list-row");
         if (row) {
-            this._list.querySelector('list-row[selected]')?.removeAttribute('selected');
+            this._list.querySelector('m2-list-row[selected]')?.removeAttribute('selected');
             row.setAttribute('selected', '');
             location.hash = `#/${row.dataset.type}?_summary=true&_format=json`;
         }
@@ -58,30 +58,30 @@ class ServerResources extends HTMLElement {
      */
     appListFilter = (value) => {
         this._list.childNodes.forEach(row => row.hidden = !row.dataset.type.toLowerCase().includes(value.toLowerCase()));
-        this._list.querySelector("list-row[selected]")?.scrollIntoView();
+        this._list.querySelector("m2-list-row[selected]")?.scrollIntoView();
     }
 
     /**
      * @returns {(string|null)}
      */
     get value() {
-        return this._list.querySelector("list-row[selected]").dataset.type;
+        return this._list.querySelector("m2-list-row[selected]").dataset.type;
     }
 
     /**
      * @param {string} resourceType
      */
     set value(resourceType) {
-        this.selectRow(this._list.querySelector(`list-row[data-type="${resourceType}"]`));
+        this.selectRow(this._list.querySelector(`m2-list-row[data-type="${resourceType}"]`));
     }
 
     /**
      * @param {ListRow} row
      */
     selectRow = (row) => {
-        const currentRow = this._list.querySelector('list-row[selected]');
+        const currentRow = this._list.querySelector('m2-list-row[selected]');
         //unselect
-        if ('list-row' != row?.localName) {
+        if ('m2-list-row' != row?.localName) {
             currentRow?.removeAttribute('selected');
             this._list.scrollTop = 0;
             return;
@@ -93,9 +93,14 @@ class ServerResources extends HTMLElement {
             row.scrollIntoView();
         }
         //add badge
-        const item = row.querySelector('list-item');
-        if (!item.querySelector('app-badge[slot="trailling"]')) {
-            this.getCount(row.dataset.type).then(({ total }) => item.appendChild(this.makeBadge(total)));
+        const item = row.querySelector('m2-list-item');
+        if (!item.querySelector('m2-badge[slot="trailling"]')) {
+            this.getCount(row.dataset.type).then(({ total }) => {
+                //TODO avoid double badge
+                if (!item.querySelector('m2-badge[slot="trailling"]')) {
+                    item.appendChild(this.makeBadge(total))
+                }
+            });
         }
         //recent
         this._recent.add(row.dataset.type);
@@ -108,11 +113,11 @@ class ServerResources extends HTMLElement {
      * @returns {promise} response of count fetch
      */
     getCount = async (resourceType) => {
-        const url = new URL(`${FhirService.server.url}/${resourceType}`);
+        const url = new URL(`${context.server.url}/${resourceType}`);
         url.searchParams.set("_summary", "count");
         url.searchParams.set("_format", "json");
         const response = await fetch(url, {
-            "headers": FhirService.server.headers
+            "headers": context.server.headers
         });
         return response.json();
     }
@@ -122,7 +127,7 @@ class ServerResources extends HTMLElement {
      * @returns {AppBadge} Badge component
      */
     makeBadge = (count) => {
-        const badge = document.createElement('app-badge');
+        const badge = document.createElement('m2-badge');
         badge.slot = 'trailling';
         badge.value = count == undefined ? '?' : count;
         return badge;

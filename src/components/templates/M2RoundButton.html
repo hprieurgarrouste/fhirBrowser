@@ -1,0 +1,22 @@
+<style>
+    @import url(/assets/material.css);
+
+    button {
+        padding: 8px;
+        border: 0 none;
+        color: inherit;
+        background-color: transparent;
+        border-radius: 50%;
+        user-select: none;
+    }
+
+    button:not([disabled]):hover {
+        background-color: var(--hover-color, rgb(0 0 0 /5%));
+        cursor: pointer;
+    }
+
+    button[disabled] {
+        color: var(--text-color-disabled);
+    }
+</style>
+<button class="material-symbols-sharp" type="button"></button>

@@ -1,0 +1,36 @@
+<style>
+    @import url(/assets/material.css);
+
+    main {
+        display: flex;
+        padding: 0.7em;
+        font-size: smaller;
+    }
+
+    main:focus-within {
+        border-bottom-color: var(--primary-color, black);
+    }
+
+    #text {
+        background: none;
+        border: 0 none;
+        color: var(--text-color-normal);
+        flex: 1 1 auto;
+        font-family: inherit;
+        font-size: inherit;
+    }
+
+    #text:focus {
+        outline: none;
+    }
+
+    #clear {
+        cursor: pointer;
+        font-size: inherit;
+        line-height: unset;
+    }
+</style>
+<main>
+    <input id="text" type="text" placeholder="Type to filter" spellcheck="false" />
+    <i id="clear" class="material-symbols-sharp" title="clear">close</i>
+</main>

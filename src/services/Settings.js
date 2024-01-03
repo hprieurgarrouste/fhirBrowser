@@ -1,13 +1,11 @@
-export class SettingsService {
-    static {
-        this.KEY = 'conf';
-    }
+class SettingsService {
+    KEY = 'conf';
 
-    static setAll(conf) {
+    setAll(conf) {
         localStorage.setItem(this.KEY, JSON.stringify(conf));
     }
 
-    static async getAll() {
+    async getAll() {
         let conf = localStorage.getItem(this.KEY);
         if (conf === null) {
             return await fetch(`./default.conf`, { "cache": "reload" })
@@ -21,10 +19,12 @@ export class SettingsService {
         }
     }
 
-    static async get(key) {
+    async get(key) {
         return await this.getAll().then(conf => {
             return conf[key]
         });
     }
 
 }
+
+export default new SettingsService();

@@ -62,16 +62,16 @@
 <div id="wrapper">
     <section id="resourceCnt">
         <header>
-            <app-bar id="header">
-                <round-button slot="left" id="help" title="Help" data-icon="help"></round-button>
+            <m2-app-bar id="header">
+                <m2-round-button slot="left" id="help" title="Help" data-icon="help"></m2-round-button>
                 <h3 slot="middle" id="title"></h3>
-                <round-button slot="right" id="referencesToggle" title="References"
-                    data-icon="article_shortcut"></round-button>
-                <round-button slot="right" id="historyToggle" title="History" data-icon="history"></round-button>
-            </app-bar>
+                <m2-round-button slot="right" id="referencesToggle" title="References"
+                    data-icon="article_shortcut"></m2-round-button>
+                <m2-round-button slot="right" id="historyToggle" title="History" data-icon="history"></m2-round-button>
+            </m2-app-bar>
         </header>
         <main>
-            <app-tabs></app-tabs>
+            <m2-tabs></m2-tabs>
         </main>
     </section>
     <resource-references slot="main" hidden></resource-references>

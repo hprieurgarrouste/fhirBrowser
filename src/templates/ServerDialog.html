@@ -29,15 +29,15 @@
         overflow: hidden;
     }
 
-    app-dialog #setupToggle,
-    app-dialog.edit footer,
-    app-dialog.edit #setupAdd {
+    m2-dialog #setupToggle,
+    m2-dialog.edit footer,
+    m2-dialog.edit #setupAdd {
         display: block;
     }
 
-    app-dialog.edit #setupToggle,
-    app-dialog footer,
-    app-dialog #setupAdd {
+    m2-dialog.edit #setupToggle,
+    m2-dialog footer,
+    m2-dialog #setupAdd {
         display: none;
     }
 
@@ -55,19 +55,19 @@
         }
     }
 </style>
-<app-dialog id="serverDialog" data-title="Connections">
-    <round-button slot="appBarLeft" id="setupClose" title="close" data-icon="close"></round-button>
-    <round-button slot="appBarRight" id="setupToggle" title="setup" data-icon="edit"></round-button>
+<m2-dialog id="serverDialog" data-title="Connections">
+    <m2-round-button slot="appBarLeft" id="setupClose" title="close" data-icon="close"></m2-round-button>
+    <m2-round-button slot="appBarRight" id="setupToggle" title="setup" data-icon="edit"></m2-round-button>
     <main>
         <section id="list">
             <server-list></server-list>
-            <round-button id="setupAdd" title="add" data-icon="add"></round-button>
+            <m2-round-button id="setupAdd" title="add" data-icon="add"></m2-round-button>
         </section>
         <footer>
-            <app-button id="setupCancel" value="cancel"></app-button>
-            <app-button id="setupOk" value="save"></app-button>
+            <m2-button id="setupCancel">cancel</m2-button>
+            <m2-button id="setupOk">save</m2-button>
         </footer>
     </main>
-</app-dialog>
+</m2-dialog>
 
 <server-form hidden></server-form>

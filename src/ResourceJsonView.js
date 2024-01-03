@@ -1,11 +1,11 @@
 import template from "./templates/ResourceJsonView.html";
 
-import "./components/AppSwitch"
+import "./components/M2Switch"
 import "./ResourceTemplateView"
 
-import { FhirService } from "./services/Fhir"
-import { PreferencesService } from "./services/Preferences"
-import { SnackbarsService } from "./services/Snackbars"
+import context from "./services/Context"
+import preferencesService from "./services/Preferences"
+import snackbarService from "./services/Snackbar"
 
 class ResourceJsonView extends HTMLElement {
     constructor() {
@@ -18,7 +18,7 @@ class ResourceJsonView extends HTMLElement {
         this._content = shadow.getElementById("content");
         this._content.onclick = this.contentClick;
 
-        this._preferences = PreferencesService.get('jsonView', { 'sorted': false, 'template': false });
+        this._preferences = preferencesService.get('jsonView', { 'sorted': false, 'template': false });
 
         this._sort = this._preferences.sorted;
         this._sortToggle = shadow.getElementById('sort-toggle');
@@ -47,7 +47,7 @@ class ResourceJsonView extends HTMLElement {
     sortToggleClick = () => {
         this._sort = !this._sort;
         this._preferences.sorted = this._sort;
-        PreferencesService.set('jsonView', this._preferences);
+        preferencesService.set('jsonView', this._preferences);
         this.sortChange();
     }
 
@@ -59,7 +59,7 @@ class ResourceJsonView extends HTMLElement {
     templateToggleClick = () => {
         this._template = !this._template;
         this._preferences.template = this._template;
-        PreferencesService.set('jsonView', this._preferences);
+        preferencesService.set('jsonView', this._preferences);
 
         this.showTemplate();
     }
@@ -144,7 +144,7 @@ class ResourceJsonView extends HTMLElement {
             } else if ("string" === typeof (value)) {
                 valueElm.classList.add("string");
                 if (key === "reference") {
-                    let url = value.replace(`${FhirService.server.url}`, '')
+                    let url = value.replace(`${context.server.url}`, '')
                     if (!url.startsWith('/') && !url.startsWith('?')) url = `/${url}`;
                     let a = document.createElement('a');
                     a.setAttribute("href", `#${url}`);
@@ -183,9 +183,9 @@ class ResourceJsonView extends HTMLElement {
     copyClick = () => {
         const content = JSON.stringify(this._resource);
         navigator.clipboard.writeText(content).then(function () {
-            SnackbarsService.show("Copying to clipboard was successful");
+            snackbarService.show("Copying to clipboard was successful");
         }, function (err) {
-            SnackbarsService.error("Could not copy text");
+            snackbarService.error("Could not copy text");
         });
     };
 

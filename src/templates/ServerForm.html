@@ -53,12 +53,12 @@
         }
     }
 </style>
-<app-dialog id="formDialog" centered>
-    <round-button slot="appBarRight" id="formDelete" title="Delete" data-icon="delete"></round-button>
+<m2-dialog id="formDialog" centered>
+    <m2-round-button slot="appBarRight" id="formDelete" title="Delete" data-icon="delete"></m2-round-button>
     <main>
         <section id="content">
-            <text-field id="key" placeholder="Code" required></text-field>
-            <text-field id="url" placeholder="Url" required></text-field>
+            <m2-textfield id="key" placeholder="Code" required></m2-textfield>
+            <m2-textfield id="url" placeholder="Url" required></m2-textfield>
             <div class="authMethod">
                 <label for="authNo">No Auth
                     <input type="radio" id="authNo" name="authMethod" value="No Auth" checked />
@@ -74,27 +74,27 @@
                 </label>
             </div>
             <section id="apiSection" hidden>
-                <text-field id="apiKey" placeholder="Key" required></text-field>
-                <text-field id="apiValue" placeholder="Value" required></text-field>
+                <m2-textfield id="apiKey" placeholder="Key" required></m2-textfield>
+                <m2-textfield id="apiValue" placeholder="Value" required></m2-textfield>
             </section>
             <section id="basicSection" hidden>
-                <text-field id="basicUsername" placeholder="Username" required></text-field>
-                <text-field id="basicPassword" placeholder="Password" required></text-field>
+                <m2-textfield id="basicUsername" placeholder="Username" required></m2-textfield>
+                <m2-textfield id="basicPassword" placeholder="Password" required></m2-textfield>
             </section>
             <section id="oauthSection" hidden>
-                <text-field id="oauthTokenurl" placeholder="Access Token URL" required></text-field>
-                <text-field id="oauthClientid" placeholder="Client ID" required></text-field>
-                <text-field id="oauthClientsecret" placeholder="Client Secret" required></text-field>
-                <text-field id="oauthGranttype" placeholder="Grant Type" value="client_credentials" required
-                    readonly></text-field>
+                <m2-textfield id="oauthTokenurl" placeholder="Access Token URL" required></m2-textfield>
+                <m2-textfield id="oauthClientid" placeholder="Client ID" required></m2-textfield>
+                <m2-textfield id="oauthClientsecret" placeholder="Client Secret" required></m2-textfield>
+                <m2-textfield id="oauthGranttype" placeholder="Grant Type" value="client_credentials" required
+                    readonly></m2-textfield>
             </section>
         </section>
         <footer>
-            <app-button id="formCancel" value="Cancel"></app-button>
-            <app-button id="formOk" value="Apply"></app-button>
+            <m2-button id="formCancel">cancel</m2-button>
+            <m2-button id="formOk">apply</m2-button>
         </footer>
     </main>
-</app-dialog>
-<app-confirm data-ok-text="delete" hidden>
+</m2-dialog>
+<m2-confirm data-ok-text="delete" hidden>
     <p>Delete this configuration?</p>
-</app-confirm>
+</m2-confirm>

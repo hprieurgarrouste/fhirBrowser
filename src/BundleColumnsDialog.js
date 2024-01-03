@@ -1,13 +1,14 @@
 import template from "./templates/BundleColumnsDialog.html";
 
-import "./components/AppButton"
-import "./components/AppDialog"
-import "./components/AppList"
-import "./components/LinearProgress"
-import "./components/ListItem"
-import "./components/ListRowCheck"
+import "./components/M2Button"
+import "./components/M2Dialog"
+import "./components/M2List"
+import "./components/M2LinearProgress"
+import "./components/M2ListItem"
+import "./components/M2ListRowCheck"
 
-import { FhirService } from "./services/Fhir"
+import context from "./services/Context"
+import fhirService from "./services/Fhir"
 
 class BundleColumnsDialog extends HTMLElement {
     constructor() {
@@ -18,9 +19,9 @@ class BundleColumnsDialog extends HTMLElement {
         this._release = null;
         this._onValidate = () => { };
         this._list = null;
-        this._shadow.querySelector('app-dialog').onClose = this.appDialogClose;
+        this._shadow.querySelector('m2-dialog').onClose = this.appDialogClose;
 
-        this._list = this._shadow.querySelector('app-list');
+        this._list = this._shadow.querySelector('m2-list');
         this._list.onFilter = this.appListFilter;
 
         this._shadow.getElementById('btnCancel').onclick = this.btnCancelClick;
@@ -31,7 +32,7 @@ class BundleColumnsDialog extends HTMLElement {
         event.preventDefault();
         event.stopPropagation();
         this.hidden = true;
-        const columns = Array.from(this._list.querySelectorAll('list-row-check[selected]')).map(r => r.dataset.id);
+        const columns = Array.from(this._list.querySelectorAll('m2-list-row-check[selected]')).map(r => r.dataset.id);
         this._onValidate(columns);
     }
 
@@ -55,7 +56,7 @@ class BundleColumnsDialog extends HTMLElement {
     set onValidate(promise) { this._onValidate = promise }
 
     checkValues = (values) => {
-        Array.from(this._list.querySelectorAll('list-row-check')).forEach(row => {
+        Array.from(this._list.querySelectorAll('m2-list-row-check')).forEach(row => {
             if (values.includes(row.dataset.id)) {
                 row.setAttribute('selected', '');
             } else {
@@ -69,35 +70,35 @@ class BundleColumnsDialog extends HTMLElement {
     * @param {string[]} values
     */
     load = (resourceType, values) => {
-        if (resourceType === this._resourceType && FhirService.server.release === this._release) {
+        if (resourceType === this._resourceType && context.server.release === this._release) {
             this.checkValues(values);
             return;
         }
         this._resourceType = resourceType;
-        this._release = FhirService.server.release;
+        this._release = context.server.release;
 
         this._list.clear();
 
-        this._shadow.querySelector('linear-progress').hidden = false;
+        this._shadow.querySelector('m2-linear-progress').hidden = false;
         sdParse(resourceType, '').then((elements) => {
             elements.sort((e1, e2) => e1.path.localeCompare(e2.path));
             elements.forEach(element => {
-                const item = document.createElement('list-item');
+                const item = document.createElement('m2-list-item');
                 item.setAttribute('data-primary', element.path);
                 item.setAttribute('data-secondary', element.short);
-                const row = document.createElement('list-row-check');
+                const row = document.createElement('m2-list-row-check');
                 row.setAttribute('data-id', element.id);
                 row.appendChild(item);
                 this._list.appendChild(row);
             });
-            this._shadow.querySelector('linear-progress').hidden = true;
+            this._shadow.querySelector('m2-linear-progress').hidden = true;
             this.checkValues(values);
         });
 
         function sdParse(resourceType, path) {
             return new Promise((resolve) => {
                 const elements = [];
-                FhirService.structureDefinition(resourceType).then((structureDefinition) => {
+                fhirService.structureDefinition(resourceType).then((structureDefinition) => {
                     const subPromises = [];
                     structureDefinition.snapshot.element
                         .filter(e => e.isSummary && e.type)

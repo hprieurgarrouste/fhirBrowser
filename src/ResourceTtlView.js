@@ -1,6 +1,6 @@
 import template from "./templates/ResourceTtlView.html";
 
-import { SnackbarsService } from "./services/Snackbars"
+import snackbarService from "./services/Snackbar"
 
 class ResourceTtlView extends HTMLElement {
     constructor() {
@@ -62,9 +62,9 @@ class ResourceTtlView extends HTMLElement {
     copyClick = () => {
         const content = this._resource;
         navigator.clipboard.writeText(content).then(function () {
-            SnackbarsService.show("Copying to clipboard was successful");
+            SnackbarService.show("Copying to clipboard was successful");
         }, function (err) {
-            SnackbarsService.error("Could not copy text");
+            SnackbarService.error("Could not copy text");
         });
     };
 

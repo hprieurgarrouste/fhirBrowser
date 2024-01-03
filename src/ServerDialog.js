@@ -1,15 +1,15 @@
 import template from "./templates/ServerDialog.html";
 
-import "./components/AppButton"
-import "./components/AppDialog"
-import "./components/RoundButton"
+import "./components/M2Button"
+import "./components/M2Dialog"
+import "./components/M2RoundButton"
 
 import "./ServerList"
 import "./ServerForm"
 
-import { FhirService } from "./services/Fhir"
-import { SettingsService } from "./services/Settings"
-import { SnackbarsService } from "./services/Snackbars"
+import context from "./services/Context"
+import settingsService from "./services/Settings"
+import snackbarService from "./services/Snackbar"
 
 class ServerDialog extends HTMLElement {
     constructor() {
@@ -26,7 +26,7 @@ class ServerDialog extends HTMLElement {
         this._form.onOk = this.serverFormOk;
         this._form.onDelete = this.serverFormDelete;
 
-        this._appDialog = shadow.querySelector('app-dialog');
+        this._appDialog = shadow.querySelector('m2-dialog');
         this._appDialog.onClose = (event) => {
             event.preventDefault();
             event.stopPropagation();
@@ -49,15 +49,15 @@ class ServerDialog extends HTMLElement {
     }
 
     loadConf = () => {
-        SettingsService.getAll().then(conf => {
+        settingsService.getAll().then(conf => {
             this._conf = conf;
             this._list.load(conf);
-            this._list.value = FhirService.server?.serverCode;
+            this._list.value = context.server?.serverCode;
         });
     }
 
     setupOk = () => {
-        SettingsService.setAll(this._conf);
+        settingsService.setAll(this._conf);
         this.editMode = false;
         this.loadConf();
     }
@@ -118,7 +118,7 @@ class ServerDialog extends HTMLElement {
         if (current) {
             delete this._conf[current];
         } else if (this._conf[serverCode]) {
-            SnackbarsService.show('this configuration already exists',
+            snackbarService.show('this configuration already exists',
                 undefined,
                 undefined,
                 'error'

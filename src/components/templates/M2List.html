@@ -1,0 +1,29 @@
+<style>
+    @import url(/assets/material.css);
+
+    main {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    m2-list-filter {
+        box-shadow: 0 3px 4px var(--border-color);
+    }
+
+    main>section {
+        overflow: auto;
+        flex: 1 1 auto;
+        height: 0;
+    }
+
+    main>section>* {
+        cursor: pointer;
+    }
+</style>
+<main>
+    <m2-list-filter></m2-list-filter>
+    <section id="list">
+        <slot></slot>
+    </section>
+</main>

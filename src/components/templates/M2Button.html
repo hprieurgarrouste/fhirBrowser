@@ -1,0 +1,27 @@
+<style>
+    button {
+        background: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        font: inherit;
+        padding: 5px 16px;
+        text-transform: uppercase;
+    }
+
+    button:not([disabled]) {
+        color: var(--primary-color);
+        cursor: pointer;
+    }
+
+    button:not([disabled]):hover {
+        background-color: var(--hover-color);
+        cursor: pointer;
+    }
+
+    button[disabled] {
+        color: var(--text-color-disabled);
+    }
+</style>
+<button type="button">
+    <slot></slot>
+</button>

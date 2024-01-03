@@ -65,14 +65,6 @@
         flex-grow: 1;
     }
 
-    footer span>* {
-        display: inline-block;
-    }
-
-    #total {
-        line-height: 40px;
-    }
-
     footer span:not(:last-child) {
         border-right: 1px solid var(--border-color);
         padding-right: 0.5em;
@@ -94,17 +86,18 @@
 <div id="wrapper">
     <div id="bundleCnt">
         <header>
-            <app-bar>
-                <round-button id="help" title="Help" data-icon="help" slot="left"></round-button>
+            <m2-app-bar>
+                <m2-round-button id="help" title="Help" data-icon="help" slot="left"></m2-round-button>
                 <h3 slot="middle" id="title">Bundle</h3>
                 <div class="toolbar" slot="right">
-                    <round-button id="settingsDialogToggle" title="Settings" data-icon="view_column"></round-button>
-                    <round-button id="searchToggle" title="Search" data-icon="search"></round-button>
+                    <m2-round-button id="settingsDialogToggle" title="Settings"
+                        data-icon="view_column"></m2-round-button>
+                    <m2-round-button id="searchToggle" title="Search" data-icon="search"></m2-round-button>
                 </div>
-            </app-bar>
+            </m2-app-bar>
         </header>
         <main>
-            <data-table id="table"></data-table>
+            <m2-data-table id="table"></m2-data-table>
         </main>
         <footer>
             <section></section>
@@ -112,15 +105,17 @@
             <section>
                 <span id="total"></span>
                 <span>
-                    <round-button id="paginationFirst" title="first" data-icon="first_page" disabled></round-button>
-                    <round-button id="paginationPrevious" title="previous" data-icon="chevron_left"
-                        disabled></round-button>
-                    <round-button id="paginationNext" title="next" data-icon="chevron_right" disabled></round-button>
-                    <round-button id="paginationLast" title="last" data-icon="last_page" disabled />
+                    <m2-round-button id="paginationFirst" title="first" data-icon="first_page"
+                        disabled></m2-round-button>
+                    <m2-round-button id="paginationPrevious" title="previous" data-icon="chevron_left"
+                        disabled></m2-round-button>
+                    <m2-round-button id="paginationNext" title="next" data-icon="chevron_right"
+                        disabled></m2-round-button>
+                    <m2-round-button id="paginationLast" title="last" data-icon="last_page" disabled />
                 </span>
                 <span>
-                    <round-button id="copy" title="Copy to clipboard" data-icon="content_copy"></round-button>
-                    <round-button id="download" title="Download" data-icon="download"></round-button>
+                    <m2-round-button id="copy" title="Copy to clipboard" data-icon="content_copy"></m2-round-button>
+                    <m2-round-button id="download" title="Download" data-icon="download"></m2-round-button>
                 </span>
             </section>
         </footer>

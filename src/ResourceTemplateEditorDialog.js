@@ -5,11 +5,11 @@ class ResourceTemplateEditorDialog extends HTMLElement {
         super();
         this._shadow = this.attachShadow({ mode: 'closed' });
         this._shadow.innerHTML = template;
-        this._shadow.querySelector('app-dialog').onClose = this.dialogOnClose;
+        this._shadow.querySelector('m2-dialog').onClose = this.dialogOnClose;
         this._shadow.getElementById("cancel").onclick = this.dialogOnClose;
         this._shadow.getElementById("save").onclick = this.onSave;
         this._editor = this._shadow.querySelector('resource-template-editor');
-        this._dialog = this._shadow.querySelector('app-dialog');
+        this._dialog = this._shadow.querySelector('m2-dialog');
     }
 
     _onClose = () => { }
