@@ -1,5 +1,6 @@
 import template from "./templates/AboutDialog.html";
 
+import { version } from '../package.json';
 
 class AboutDialog extends HTMLElement {
     constructor() {
@@ -14,6 +15,8 @@ class AboutDialog extends HTMLElement {
             event.stopPropagation();
             this.appDialogClose();
         };
+
+        shadow.getElementById('version').innerText = version;
     }
 
     appDialogClose = () => this.hidden = true;

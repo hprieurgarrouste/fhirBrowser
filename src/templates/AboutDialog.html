@@ -2,26 +2,45 @@
     @import url(/assets/material.css);
 
     main {
-        padding: 1em;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
 
-    a {
+    main>section {
+        padding: 1em;
+        flex: 1 1 auto;
+    }
+
+    main>section a {
         color: var(--primary-color);
+    }
+
+    main>footer {
+        padding: 1em;
+        text-align: right;
+        font-size: small;
     }
 </style>
 <m2-dialog id="aboutDialog" data-title="About FHIR Browser">
     <m2-round-button id="closeButton" slot="appBarLeft" title="close" data-icon="close"></m2-round-button>
     <main>
-        <p>
-            FHIR Browser is and <a target="_blank" href="https://github.com/hprieurgarrouste/fhirBrowser.git">open
-                source</a> utility developed by and intended for FHIR developers<br />and all IT professionals who work
-            with
-            a FHIR server.
-            <br />Its purpose is to help users analyze FHIR servers and learn about their content.
-        </p>
-        <p>
-            All content on the website is published under Creative Commons License <a target="_blank"
-                href="https://github.com/hprieurgarrouste/fhirBrowser/blob/master/licence.md">CC-BY-NC-ND 4.0</a>
-        </p>
+        <section>
+            <p>
+                FHIR Browser is and <a target="_blank" href="https://github.com/hprieurgarrouste/fhirBrowser.git">open
+                    source</a> utility developed by and intended for FHIR developers<br />and all IT professionals who
+                work
+                with
+                a FHIR server.
+                <br />Its purpose is to help users analyze FHIR servers and learn about their content.
+            </p>
+            <p>
+                All content on the website is published under Creative Commons License <a target="_blank"
+                    href="https://github.com/hprieurgarrouste/fhirBrowser/blob/master/licence.md">CC-BY-NC-ND 4.0</a>
+            </p>
+        </section>
+        <footer>
+            <span>Version:&nbsp;<span id="version"></span></span>
+        </footer>
     </main>
 </m2-dialog>
