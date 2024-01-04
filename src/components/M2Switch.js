@@ -2,12 +2,15 @@ import template from "./templates/M2Switch.html"
 
 class M2Switch extends HTMLElement {
 
+    /** @type {HTMLElement} */
+    #main;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' })
         shadow.innerHTML = template;
-        shadow.addEventListener('click', this.clickHandler);
-        this._main = shadow.querySelector('main');
+        shadow.addEventListener('click', this.#clickHandler);
+        this.#main = shadow.querySelector('main');
     }
 
     static get observedAttributes() { return ['data-checked']; }
@@ -15,14 +18,14 @@ class M2Switch extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         if ('data-checked' == name) {
             if (null === newValue) {
-                this._main.classList.remove('checked');
+                this.#main.classList.remove('checked');
             } else {
-                this._main.classList.add('checked');
+                this.#main.classList.add('checked');
             }
         }
     }
 
-    clickHandler = (event) => {
+    #clickHandler = (event) => {
         if (this.hasAttribute('data-checked')) {
             this.removeAttribute('data-checked');
         } else {

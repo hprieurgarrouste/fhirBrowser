@@ -1,14 +1,21 @@
 import template from "./templates/M2Card.html"
 
 class M2Card extends HTMLElement {
+    /** @type {HTMLElement}*/
+    #headerIcon;
+    /** @type {HTMLSpanElement} */
+    #headerPrimary;
+    /** @type {HTMLSpanElement} */
+    #headerSecondary;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        this._headerIcon = shadow.querySelector('header>i');
-        this._headerPrimary = shadow.getElementById('primary');
-        this._headerSecondary = shadow.getElementById('secondary');
+        this.#headerIcon = shadow.querySelector('header>i');
+        this.#headerPrimary = shadow.getElementById('primary');
+        this.#headerSecondary = shadow.getElementById('secondary');
     }
 
     static get observedAttributes() { return ["data-primary", "data-secondary", "data-icon"]; }
@@ -16,13 +23,13 @@ class M2Card extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         switch (name) {
             case "data-icon":
-                this._headerIcon.innerText = newValue;
+                this.#headerIcon.innerText = newValue;
                 break;
             case "data-primary":
-                this._headerPrimary.innerText = newValue;
+                this.#headerPrimary.innerText = newValue;
                 break;
             case "data-secondary":
-                this._headerSecondary.innerText = newValue;
+                this.#headerSecondary.innerText = newValue;
                 break;
             default:
                 break;

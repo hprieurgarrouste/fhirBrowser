@@ -3,44 +3,49 @@ import template from "./templates/M2List.html"
 import "./M2ListFilter";
 
 class M2List extends HTMLElement {
+    /** @type {M2ListFilter} */
+    #filter;
+    /** @type {HTMLElement} */
+    #list;
+    /** @type {HTMLSlotElement} */
+    #slot;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
-        this._list = shadow.getElementById('list');
-        this._slot = shadow.querySelector('slot');
-        this._slot.addEventListener('slotchange', this.slotChange);
-        this._filter = shadow.querySelector('m2-list-filter');
-        this._filter.onChange = this.filterChange;
+        this.#list = shadow.getElementById('list');
+        this.#slot = shadow.querySelector('slot');
+        this.#slot.addEventListener('slotchange', this.#slotChange);
+        this.#filter = shadow.querySelector('m2-list-filter');
+        this.#filter.onChange = this.#filterChange;
     }
 
     connectedCallback() {
-        this._filter.hidden = (this._slot.children.length <= 10);
+        this.#filter.hidden = (this.#slot.children.length <= 10);
     }
 
-    _onFilter = (value) => { }
+    #onFilter = (value) => { }
     get onFilter() {
-        return this._onFilter;
+        return this.#onFilter;
     }
     set onFilter(filterFct) {
-        this._onFilter = filterFct;
+        this.#onFilter = filterFct;
     }
-    filterChange = (value) => {
-        if (value == '') this._list.scrollTop = 0;
-        this._onFilter(value);
+    #filterChange = (value) => {
+        if (value == '') this.#list.scrollTop = 0;
+        this.#onFilter(value);
     }
 
-    slotChange = () => {
-        this._filter.hidden = (('function' !== typeof this._onFilter) || this._slot.assignedNodes().length <= 10);
+    #slotChange = () => {
+        this.#filter.hidden = (('function' !== typeof this.#onFilter) || this.#slot.assignedNodes().length <= 10);
     }
 
     clear = () => {
-        this._slot.assignedNodes().forEach(e => this.removeChild(e));
-        this._filter.clear();
-        this._list.scrollTop = 0;
+        this.#slot.assignedNodes().forEach(e => this.removeChild(e));
+        this.#filter.clear();
+        this.#list.scrollTop = 0;
     }
-
-
 
 };
 

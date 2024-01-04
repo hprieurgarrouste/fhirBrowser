@@ -5,18 +5,21 @@ import "./M2AppBar"
 
 
 class M2SidePanel extends HTMLElement {
+    /** @type {HTMLHeadingElement} */
+    #title;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
-        this._title = shadow.getElementById('title');
+        this.#title = shadow.getElementById('title');
     }
 
     static get observedAttributes() { return ['data-title']; }
 
     attributeChangedCallback(name, oldValue, newValue) {
         if ('data-title' == name) {
-            this._title.innerText = newValue;
+            this.#title.innerText = newValue;
         }
     }
 

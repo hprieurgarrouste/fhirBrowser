@@ -3,28 +3,31 @@ import template from "./templates/M2ColorScheme.html"
 import preferencesService from "../services/Preferences"
 
 class M2ColorScheme extends HTMLElement {
+    /** @type {M2RoundButton} */
+    #themeButton;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' })
         shadow.innerHTML = template;
-        shadow.addEventListener('click', this.onClick);
-        this._themeButton = shadow.querySelector("m2-round-button");
+        shadow.addEventListener('click', this.#onClick);
+        this.#themeButton = shadow.querySelector("m2-round-button");
     }
 
     connectedCallback() {
-        this.setColorScheme(preferencesService.get("colorScheme", "auto"));
+        this.#setColorScheme(preferencesService.get("colorScheme", "auto"));
     }
 
-    onClick = (event) => {
+    #onClick = (event) => {
         const schemes = ["light", "dark", "auto"];
         let colorScheme = preferencesService.get("colorScheme", "auto");
         let i = schemes.findIndex((elm) => elm === colorScheme) + 1;
         colorScheme = schemes[i % 3];
         preferencesService.set("colorScheme", colorScheme);
-        this.setColorScheme(colorScheme);
+        this.#setColorScheme(colorScheme);
     }
 
-    setColorScheme = (colorScheme) => {
+    #setColorScheme = (colorScheme) => {
         let colorSchemeIcon = "";
         let scheme = colorScheme;
         switch (colorScheme) {
@@ -46,8 +49,8 @@ class M2ColorScheme extends HTMLElement {
                 colorSchemeIcon = "brightness_auto";
                 break;
         }
-        this._themeButton.setAttribute("data-icon", colorSchemeIcon);
-        this._themeButton.title = `Theme ${colorScheme}`;
+        this.#themeButton.setAttribute("data-icon", colorSchemeIcon);
+        this.#themeButton.title = `Theme ${colorScheme}`;
         document.body.setAttribute("color-scheme", scheme);
     }
 

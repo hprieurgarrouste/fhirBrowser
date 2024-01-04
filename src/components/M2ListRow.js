@@ -1,11 +1,14 @@
 import template from "./templates/M2ListRow.html"
 
 class M2ListRow extends HTMLElement {
+    /** @type {HTMLElement} */
+    #main;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
-        this._main = shadow.querySelector('main');
+        this.#main = shadow.querySelector('main');
     }
 
     static get observedAttributes() { return ["selected"]; }
@@ -13,9 +16,9 @@ class M2ListRow extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         if ('selected' === name) {
             if (null === newValue) {
-                this._main.removeAttribute('selected');
+                this.#main.removeAttribute('selected');
             } else {
-                this._main.setAttribute('selected', '');
+                this.#main.setAttribute('selected', '');
             }
         }
     }

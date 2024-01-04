@@ -1,23 +1,26 @@
 import template from "./templates/M2Button.html"
 
 class M2Button extends HTMLElement {
+    /** @type {HTMLButtonElement} */
+    #input;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' })
         shadow.innerHTML = template;
-        this._input = shadow.querySelector('button');
+        this.#input = shadow.querySelector('button');
     }
 
     static get observedAttributes() { return ['value', 'disabled']; }
 
     attributeChangedCallback(name, oldValue, newValue) {
         if (name == 'value') {
-            this._input.innerText = newValue;
+            this.#input.innerText = newValue;
         } else if (name == 'disabled') {
             if (null === newValue) {
-                this._input.removeAttribute('disabled');
+                this.#input.removeAttribute('disabled');
             } else {
-                this._input.setAttribute('disabled', '');
+                this.#input.setAttribute('disabled', '');
             }
         }
     }

@@ -1,6 +1,11 @@
 import template from "./templates/M2Tabs.html"
 
 class M2Tabs extends HTMLElement {
+    /** @type {HTMLElement} */
+    #header;
+    /** @type {HTMLSlotElement} */
+    #slot;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
@@ -10,33 +15,33 @@ class M2Tabs extends HTMLElement {
             event.stopPropagation();
         }
 
-        this._header = shadow.querySelector('header');
-        this._header.onclick = this.headerClick;
+        this.#header = shadow.querySelector('header');
+        this.#header.onclick = this.#headerClick;
 
-        this._slot = shadow.querySelector('slot');
-        this._slot.addEventListener('slotchange', this.slotChanged);
+        this.#slot = shadow.querySelector('slot');
+        this.#slot.addEventListener('slotchange', this.#slotChanged);
     }
 
-    clear = () => {
-        while (this._header.firstChild) this._header.removeChild(this._header.lastChild);
+    #clear = () => {
+        while (this.#header.firstChild) this.#header.removeChild(this.#header.lastChild);
     }
 
-    slotChanged = () => {
-        this.clear();
-        this._slot.assignedElements()
+    #slotChanged = () => {
+        this.#clear();
+        this.#slot.assignedElements()
             .forEach((slotted) => {
                 slotted.hidden = true;
                 const appTab = document.createElement('section');
                 appTab.dataset.caption = slotted.dataset.caption;
                 appTab.innerText = slotted.dataset.caption;
-                this._header.appendChild(appTab);
+                this.#header.appendChild(appTab);
             });
         if (!this.value) {
-            this.value = this._header.querySelector(`section:nth-child(1)`)?.dataset.caption;
+            this.value = this.#header.querySelector(`section:nth-child(1)`)?.dataset.caption;
         }
     }
 
-    headerClick = ({ target }) => {
+    #headerClick = ({ target }) => {
         this.value = target.dataset.caption;
         this.dispatchEvent(new CustomEvent("select", {
             bubbles: false,
@@ -48,15 +53,15 @@ class M2Tabs extends HTMLElement {
     }
 
     get value() {
-        return this._header.querySelector('section[selected]')?.dataset?.caption;
+        return this.#header.querySelector('section[selected]')?.dataset?.caption;
     }
 
     set value(caption) {
-        this._header.querySelector('section[selected]')?.removeAttribute('selected');
-        this._slot.assignedElements().forEach((slotted, index) => {
+        this.#header.querySelector('section[selected]')?.removeAttribute('selected');
+        this.#slot.assignedElements().forEach((slotted, index) => {
             if (slotted.dataset.caption == caption) {
                 slotted.hidden = false;
-                this._header.querySelector(`section:nth-child(${index + 1})`)?.setAttribute('selected', '');
+                this.#header.querySelector(`section:nth-child(${index + 1})`)?.setAttribute('selected', '');
             } else {
                 slotted.hidden = true;
             }

@@ -1,28 +1,33 @@
 import template from "./templates/M2Badge.html"
 
 class M2Badge extends HTMLElement {
+    /** @type {HTMLElement} */
+    #content = null;
+    /** @type {number} */
+    #value = null;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' })
         shadow.innerHTML = template;
-        this._content = shadow.querySelector("main");
-        this._value = null;
+        this.#content = shadow.querySelector("main");
+        this.#value = null;
     }
 
     connectedCallback() {
-        this.render();
+        this.#render();
     }
 
-    render = () => {
-        if (!this._content) return;
-        if (this._value == null || this._value == undefined || this._value.length == 0) {
-            this._content.innerText = '?';
-            this.title = this._value;
+    #render = () => {
+        if (!this.#content) return;
+        if (this.#value == null || this.#value == undefined || this.#value.length == 0) {
+            this.#content.innerText = '?';
+            this.title = this.#value;
             return;
         }
-        const formatted = formatNumber(this._value);
-        this._content.innerText = formatted;
-        this.title = (this._value != formatted) ? this._value : '';
+        const formatted = formatNumber(this.#value);
+        this.#content.innerText = formatted;
+        this.title = (this.#value != formatted) ? this.#value : '';
 
         function formatNumber(num, precision = 0) {
             const map = [
@@ -43,11 +48,14 @@ class M2Badge extends HTMLElement {
     }
 
     get value() {
-        return this._value;
+        return this.#value;
     }
+    /**
+     * @param {number} value
+     */
     set value(value) {
-        this._value = value;
-        this.render();
+        this.#value = value;
+        this.#render();
     }
 }
 window.customElements.define('m2-badge', M2Badge);

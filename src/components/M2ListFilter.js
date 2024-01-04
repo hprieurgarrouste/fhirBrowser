@@ -1,40 +1,43 @@
 import template from "./templates/M2ListFilter.html"
 
 class M2ListFilter extends HTMLElement {
+    /** @type {HTMLInputElement} */
+    #text;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        this._text = shadow.getElementById("text");
-        this._text.addEventListener("input", () => {
-            this._onChange(this._text.value)
+        this.#text = shadow.getElementById("text");
+        this.#text.addEventListener("input", () => {
+            this.#onChange(this.#text.value)
         });
 
         shadow.querySelector("main").addEventListener('mousedown', (event) => {
-            this._text.focus();
+            this.#text.focus();
         });
 
-        shadow.getElementById("clear").onclick = this.clearClick;
+        shadow.getElementById("clear").onclick = this.#clearClick;
     }
 
-    clearClick = () => {
-        if (this._text.value) {
-            this._text.value = '';
-            this._onChange(this._text.value);
+    #clearClick = () => {
+        if (this.#text.value) {
+            this.#text.value = '';
+            this.#onChange(this.#text.value);
         }
     }
 
     clear() {
-        this.clearClick();
+        this.#clearClick();
     }
 
-    _onChange = () => { };
+    #onChange = () => { };
     get onChange() {
-        return this._onChange;
+        return this.#onChange;
     }
     set onChange(changeFct) {
-        this._onChange = changeFct;
+        this.#onChange = changeFct;
     }
 };
 

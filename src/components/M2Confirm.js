@@ -1,45 +1,50 @@
 import template from "./templates/M2Confirm.html"
 
 class M2Confirm extends HTMLElement {
+    /** @type {HTMLHeadingElement} */
+    #title;
+    /** @type {M2Button} */
+    #btnOk;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        shadow.querySelector('main').onclick = this.onClose;
+        shadow.querySelector('main').onclick = this.#onClose;
         shadow.querySelector('.surface').onclick = (event) => event.stopPropagation();
 
-        this._title = shadow.querySelector('h2');
+        this.#title = shadow.querySelector('h2');
 
-        this._btnOk = shadow.getElementById('btnOk');
-        this._btnOk.onclick = this.validateClick;
+        this.#btnOk = shadow.getElementById('btnOk');
+        this.#btnOk.onclick = this.#validateClick;
 
-        shadow.getElementById('btnCancel').onclick = this.onClose;
+        shadow.getElementById('btnCancel').onclick = this.#onClose;
     }
 
-    onClose = (event) => {
+    #onClose = (event) => {
         this.hidden = true;
     }
 
-    validateClick = (event) => {
+    #validateClick = (event) => {
         this.onValidate(event);
         this.hidden = true;
     }
-    _onValidate = (event) => { }
+    #onValidate = (event) => { }
     get onValidate() {
-        return this._onValidate;
+        return this.#onValidate;
     }
     set onValidate(validateFct) {
-        this._onValidate = validateFct;
+        this.#onValidate = validateFct;
     }
 
     static get observedAttributes() { return ['data-title', 'data-ok-text']; }
 
     attributeChangedCallback(name, oldValue, newValue) {
         if ('data-title' === name) {
-            this._title.innerText = newValue;
+            this.#title.innerText = newValue;
         } else if ('data-ok-text' === name) {
-            this._btnOk.setAttribute('value', newValue);
+            this.#btnOk.setAttribute('value', newValue);
         }
     }
 };

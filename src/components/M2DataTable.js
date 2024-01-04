@@ -1,29 +1,34 @@
 import template from "./templates/M2DataTable.html"
 
 class M2DataTable extends HTMLElement {
+    /** @type {HTMLTableRowElement} */
+    #header;
+    /** @type {HTMLTableSectionElement} */
+    #body;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'open' });
         shadow.innerHTML = template;
 
-        this._header = shadow.getElementById("header");
-        this._header.ondragstart = this.onDragStart;
-        this._header.ondragover = this.onDragOver;
-        this._header.ondragenter = this.onDragEnter;
-        this._header.ondragleave = this.onDragLeave;
-        this._header.ondragend = this.onDragEnd;
-        this._header.ondrop = this.onDragDrop;
+        this.#header = shadow.getElementById("header");
+        this.#header.ondragstart = this.#onDragStart;
+        this.#header.ondragover = this.#onDragOver;
+        this.#header.ondragenter = this.#onDragEnter;
+        this.#header.ondragleave = this.#onDragLeave;
+        this.#header.ondragend = this.#onDragEnd;
+        this.#header.ondrop = this.#onDragDrop;
 
-        this._body = shadow.getElementById("body");
-        this._body.onclick = this.bodyClick;
+        this.#body = shadow.getElementById("body");
+        this.#body.onclick = this.#bodyClick;
     }
 
-    _onColumnReorder = () => { };
+    #onColumnReorder = () => { };
     get onColumnReorder() {
-        return this._onColumnReorder;
+        return this.#onColumnReorder;
     }
     set onColumnReorder(callback) {
-        this._onColumnReorder = callback;
+        this.#onColumnReorder = callback;
     }
 
     addColumn = (title) => {
@@ -32,7 +37,7 @@ class M2DataTable extends HTMLElement {
         cell.setAttribute('draggable', 'true');
         cell.appendChild(document.createTextNode(title));
 
-        this._header.appendChild(cell);
+        this.#header.appendChild(cell);
     }
 
     addRow = (id, columns) => {
@@ -41,15 +46,15 @@ class M2DataTable extends HTMLElement {
         Object.entries(columns).forEach(([, value]) => {
             row.insertAdjacentHTML('beforeend', `<td>${value}</td>`);
         })
-        this._body.appendChild(row);
+        this.#body.appendChild(row);
     }
 
-    bodyClick = (event) => {
+    #bodyClick = (event) => {
         event.preventDefault();
         event.stopPropagation();
         const row = event.target.closest("tr");
         if (row) {
-            this._body.querySelector("tr[class~=selected]")?.classList.remove("selected");
+            this.#body.querySelector("tr[class~=selected]")?.classList.remove("selected");
             row.classList.add('selected');
             this.dispatchEvent(new CustomEvent("rowclick", {
                 bubbles: false,
@@ -62,31 +67,27 @@ class M2DataTable extends HTMLElement {
     }
 
     clear = () => {
-        while (this._header.firstChild) this._header.removeChild(this._header.lastChild);
-        this.removeAll();
+        while (this.#header.firstChild) this.#header.removeChild(this.#header.lastChild);
+        while (this.#body.firstChild) this.#body.removeChild(this.#body.lastChild);
     }
 
-    removeAll = () => {
-        while (this._body.firstChild) this._body.removeChild(this._body.lastChild);
-    }
-
-    onDragStart = (event) => {
+    #onDragStart = (event) => {
         const target = event.target.closest('th');
         target.style.opacity = '0.4';
 
-        this._header.classList.add('drag');
+        this.#header.classList.add('drag');
         this.dragSrcEl = target;
     }
 
-    onDragEnter = (event) => {
+    #onDragEnter = (event) => {
         event.target.closest('th')?.classList.add('over');
     }
 
-    onDragLeave = (event) => {
+    #onDragLeave = (event) => {
         event.target.closest('th')?.classList.remove('over');
     }
 
-    onDragOver = (event) => {
+    #onDragOver = (event) => {
         event.preventDefault();
         const target = event.target.closest('th');
         if (this.dragSrcEl == target) {
@@ -97,30 +98,30 @@ class M2DataTable extends HTMLElement {
         return false;
     }
 
-    onDragDrop = (event) => {
+    #onDragDrop = (event) => {
         event.stopPropagation();
         let target = event.target.closest('th');
         if (this.dragSrcEl != target) {
-            const thArr = Array.from(this._header.childNodes);
+            const thArr = Array.from(this.#header.childNodes);
             const srcIdx = thArr.findIndex(th => th == this.dragSrcEl);
             const tgtIdx = thArr.findIndex(th => th == target);
 
             if (srcIdx < tgtIdx) {
                 target = target.nextSibling;
             }
-            this._header.insertBefore(this.dragSrcEl, target);
+            this.#header.insertBefore(this.dragSrcEl, target);
             this.dragSrcEl = null;
 
-            this._onColumnReorder(Array.from(this._header.childNodes).map(th => th.dataset.id));
+            this.#onColumnReorder(Array.from(this.#header.childNodes).map(th => th.dataset.id));
         }
 
         return false;
     }
 
-    onDragEnd = (event) => {
+    #onDragEnd = (event) => {
         event.target.closest('th').style.opacity = '1';
-        this._header.classList.remove('drag');
-        this._header.childNodes.forEach(item => item.classList.remove('over'));
+        this.#header.classList.remove('drag');
+        this.#header.childNodes.forEach(item => item.classList.remove('over'));
     }
 
 
