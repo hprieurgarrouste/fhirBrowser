@@ -1,14 +1,14 @@
 import context from "./Context"
 
 class FhirService {
-    server_url = "https://hl7.org/fhir";
+    #server_url = "https://hl7.org/fhir";
     /**
      * Get resource type help url
      * @param {string} resourceType
      * @returns {string}
      */
     helpUrl(resourceType) {
-        return `${this.server_url}/${context.server.release}/${resourceType.toLowerCase()}.html`;
+        return `${this.#server_url}/${context.server.release}/${resourceType.toLowerCase()}.html`;
     }
 
     /**
@@ -16,7 +16,7 @@ class FhirService {
      * @returns {string}
      */
     historyUrl() {
-        return `${this.server_url}/${context.server.release}//http.html#history.html`;
+        return `${this.#server_url}/${context.server.release}//http.html#history.html`;
     }
 
     /**
@@ -25,7 +25,7 @@ class FhirService {
      * @returns {object}
      */
     async structureDefinition(resourceType) {
-        const url = new URL(`${this.server_url}/${context.server.release}/${resourceType.toLowerCase()}.profile.json`);
+        const url = new URL(`${this.#server_url}/${context.server.release}/${resourceType.toLowerCase()}.profile.json`);
         const response = await fetch(url, {
             "cache": "force-cache"
         });

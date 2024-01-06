@@ -1,6 +1,6 @@
 import template from "./templates/M2Badge.html"
 
-class M2Badge extends HTMLElement {
+export default class M2Badge extends HTMLElement {
     /** @type {HTMLElement} */
     #content = null;
     /** @type {number} */

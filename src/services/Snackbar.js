@@ -1,11 +1,13 @@
-import "../components/M2Snackbar"
-
 import context from "./Context"
+import M2Snackbar from "../components/M2Snackbar"
 
 class SnackbarService {
 
     // TODO : Add message queuing
 
+    /**
+     * @param {String} message
+     */
     error(message) {
         this.show(message, undefined, undefined, 'error');
     }
@@ -15,7 +17,7 @@ class SnackbarService {
     }
 
     show(message, action, delay = 4000, type = 'info') {
-        let bar = document.createElement("m2-snackbar");
+        let bar = new M2Snackbar();
         bar.type = type;
         bar.appendChild(document.createTextNode(message));
         if (action) {

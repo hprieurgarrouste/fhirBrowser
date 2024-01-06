@@ -1,77 +1,90 @@
 import template from "./templates/ResourceJsonView.html";
 
-import "./components/M2Switch"
-import "./ResourceTemplateView"
+import ResourceTemplateView from "./ResourceTemplateView"
 
 import context from "./services/Context"
 import preferencesService from "./services/Preferences"
 import snackbarService from "./services/Snackbar"
 
-class ResourceJsonView extends HTMLElement {
+export default class ResourceJsonView extends HTMLElement {
+    /** @type {Fhir.resource} */
+    #resource;
+    /** @type {HTMLElement} */
+    #content;
+    /** @type {M2RoundButton} */
+    #sortToggle;
+    /** @type {M2RoundButton} */
+    #templateToggle;
+    /** @type {ResourceTemplateView} */
+    #templateView;
+    /** @type {Boolean} */
+    #templateMode;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        this._resource = null;
+        this.#resource = null;
 
-        this._content = shadow.getElementById("content");
-        this._content.onclick = this.contentClick;
+        this.#content = shadow.getElementById("content");
+        this.#content.onclick = this.#contentClick;
 
         this._preferences = preferencesService.get('jsonView', { 'sorted': false, 'template': false });
 
         this._sort = this._preferences.sorted;
-        this._sortToggle = shadow.getElementById('sort-toggle');
-        this._sortToggle.onclick = this.sortToggleClick;
+        this.#sortToggle = shadow.getElementById('sort-toggle');
+        this.#sortToggle.onclick = this.#sortToggleClick;
 
-        this._templateToggle = shadow.getElementById('template-toggle');
+        this.#templateToggle = shadow.getElementById('template-toggle');
         if (true || window.matchMedia("(max-width: 480px)").matches) { //WIP not available yet
-            this._template = false;
-            this._templateToggle.hidden = true;
+            this.#templateMode = false;
+            this.#templateToggle.hidden = true;
         } else {
-            this._template = this._preferences.template;
-            this._templateToggle.onclick = this.templateToggleClick;
+            this.#templateMode = this._preferences.template;
+            this.#templateToggle.onclick = this.#templateToggleClick;
         }
-        this._templateView = shadow.querySelector('resource-template-view');
 
-        shadow.getElementById('download').onclick = this.downloadClick;
-        shadow.getElementById('copy').onclick = this.copyClick;
-        shadow.getElementById('share').onclick = this.shareClick;
+        this.#templateView = shadow.querySelector('resource-template-view');
+
+        shadow.getElementById('download').onclick = this.#downloadClick;
+        shadow.getElementById('copy').onclick = this.#copyClick;
+        shadow.getElementById('share').onclick = this.#shareClick;
     }
 
     connectedCallback() {
-        this.sortChange();
-        this.showTemplate();
+        this.#sortChange();
+        this.#showTemplate();
     }
 
-    sortToggleClick = () => {
+    #sortToggleClick = () => {
         this._sort = !this._sort;
         this._preferences.sorted = this._sort;
         preferencesService.set('jsonView', this._preferences);
-        this.sortChange();
+        this.#sortChange();
     }
 
-    sortChange = () => {
-        this._sortToggle.style.color = this._sort ? 'var(--primary-color)' : 'unset';
-        if (this._resource) this.source = this._resource;
+    #sortChange = () => {
+        this.#sortToggle.style.color = this._sort ? 'var(--primary-color)' : 'unset';
+        if (this.#resource) this.source = this.#resource;
     }
 
-    templateToggleClick = () => {
-        this._template = !this._template;
-        this._preferences.template = this._template;
+    #templateToggleClick = () => {
+        this.#templateMode = !this.#templateMode;
+        this._preferences.template = this.#templateMode;
         preferencesService.set('jsonView', this._preferences);
 
-        this.showTemplate();
+        this.#showTemplate();
     }
 
-    showTemplate = () => {
-        this._templateToggle.style.color = this._template ? 'var(--primary-color)' : 'unset';
-        this._templateView.hidden = !this._template;
-        this._content.hidden = this._template;
-        this._sortToggle.style.visibility = this._template ? 'hidden' : 'visible';
+    #showTemplate = () => {
+        this.#templateToggle.style.color = this.#templateMode ? 'var(--primary-color)' : 'unset';
+        this.#content.hidden = this.#templateMode;
+        this.#sortToggle.hidden = this.#templateMode;
+        this.#templateView.hidden = !this.#templateMode;
     }
 
-    contentClick = ({ target, offsetX, offsetY, ctrlKey }) => {
+    #contentClick = ({ target, offsetX, offsetY, ctrlKey }) => {
         if (target.classList.contains("array") || target.classList.contains("object")) {
             const key = target.childNodes[0];
             if (key && offsetX < key.offsetLeft && offsetY < key.offsetHeight) {
@@ -94,37 +107,35 @@ class ResourceJsonView extends HTMLElement {
     };
 
     clear = () => {
-        this._content.scrollTo(0, 0);
-        this._content.innerHTML = "Loading...";
-        this._content.style.cursor = "wait";
-        this._resource = null;
+        this.#content.scrollTo(0, 0);
+        this.#content.innerHTML = "Loading...";
+        this.#content.style.cursor = "wait";
+        this.#resource = null;
     }
 
     get resourceType() {
-        return this._resource.resourceType;
+        return this.#resource.resourceType;
     }
     get resourceId() {
-        return this._resource.id;
+        return this.#resource.id;
     }
     get source() {
-        return this._resource;
+        return this.#resource;
     }
 
-    /**
-     * @param {object} resource
-     */
+    /** @param {object} resource */
     set source(resource) {
-        this._content.scrollTo(0, 0);
-        this._content.innerHTML = "";
-        this._content.appendChild(document.createTextNode("{"));
-        this._content.appendChild(this.parse(resource));
-        this._content.appendChild(document.createTextNode("}"));
-        this._content.style.cursor = "default";
-        this._resource = resource;
-        this._templateView.source = resource;
+        this.#content.scrollTo(0, 0);
+        this.#content.innerHTML = "";
+        this.#content.appendChild(document.createTextNode("{"));
+        this.#content.appendChild(this.#parse(resource));
+        this.#content.appendChild(document.createTextNode("}"));
+        this.#content.style.cursor = "default";
+        this.#resource = resource;
+        this.#templateView.source = resource;
     }
 
-    parse = (obj) => {
+    #parse = (obj) => {
         let dl = document.createElement('dl');
 
         let entries = Object.entries(obj);
@@ -155,7 +166,7 @@ class ResourceJsonView extends HTMLElement {
                 }
             } else if ("object" === typeof (value)) {
                 dt.classList.add(Array.isArray(value) ? "array" : "object");
-                valueElm.appendChild(this.parse(value));
+                valueElm.appendChild(this.#parse(value));
             } else {
                 valueElm.innerText = value;
             }
@@ -166,8 +177,8 @@ class ResourceJsonView extends HTMLElement {
         return dl;
     }
 
-    downloadClick = () => {
-        const content = JSON.stringify(this._resource);
+    #downloadClick = () => {
+        const content = JSON.stringify(this.#resource);
         const file = new File([content], this.resourceId, {
             'type': 'data:text/json;charset=utf-8'
         });
@@ -180,8 +191,8 @@ class ResourceJsonView extends HTMLElement {
         window.URL.revokeObjectURL(url);
     };
 
-    copyClick = () => {
-        const content = JSON.stringify(this._resource);
+    #copyClick = () => {
+        const content = JSON.stringify(this.#resource);
         navigator.clipboard.writeText(content).then(function () {
             snackbarService.show("Copying to clipboard was successful");
         }, function (err) {
@@ -189,8 +200,8 @@ class ResourceJsonView extends HTMLElement {
         });
     };
 
-    shareClick = () => {
-        const content = JSON.stringify(this._resource);
+    #shareClick = () => {
+        const content = JSON.stringify(this.#resource);
         const fileName = `${this.resourceType}.${this.resourceId}.txt`;
         const file = new File([content], fileName, { type: 'text/plain' });
         navigator.share({
@@ -200,4 +211,5 @@ class ResourceJsonView extends HTMLElement {
     };
 
 };
+
 customElements.define('resource-json-view', ResourceJsonView);

@@ -1,20 +1,26 @@
 import template from "./templates/ServerList.html";
 
-import "./components/M2List"
-import "./components/M2ListRow"
-import "./components/M2ListItem"
+import M2List from "./components/M2List";
+import M2ListItem from "./components/M2ListItem";
+import M2ListRow from "./components/M2ListRow";
 
-class ServerList extends HTMLElement {
+export default class ServerList extends HTMLElement {
+    /** @type {M2List} */
+    #list;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        this._list = shadow.querySelector('m2-list');
-        this._list.onclick = this.appListClick;
+        this.#list = shadow.querySelector('m2-list');
+        this.#list.onclick = this.#appListClick;
     }
 
-    appListClick = (event) => {
+    /**
+     * @param {PointerEvent} event
+     */
+    #appListClick = (event) => {
         event.preventDefault();
         event.stopPropagation();
         const row = event.target.closest('m2-list-row');
@@ -31,27 +37,27 @@ class ServerList extends HTMLElement {
     }
 
     load(values) {
-        this._list.clear();
+        this.#list.clear();
         Object.keys(values)
             .sort((k1, k2) => k1.localeCompare(k2))
             .forEach(key => {
-                const item = document.createElement('m2-list-item');
+                const item = new M2ListItem();
                 item.setAttribute('data-primary', key);
                 item.setAttribute('data-secondary', values[key].url);
-                const row = document.createElement('m2-list-row');
+                const row = new M2ListRow();
                 row.setAttribute('data-id', key);
                 row.appendChild(item);
-                this._list.appendChild(row);
+                this.#list.appendChild(row);
             })
     }
 
     get value() {
-        return this._list.querySelector('m2-list-row[selected]')?.dataset.id;
+        return this.#list.querySelector('m2-list-row[selected]')?.dataset.id;
     }
 
     set value(serverKey) {
-        this._list.querySelector('m2-list-row[selected]')?.removeAttribute('selected');
-        const row = this._list.querySelector(`m2-list-row[data-id="${serverKey}"]`);
+        this.#list.querySelector('m2-list-row[selected]')?.removeAttribute('selected');
+        const row = this.#list.querySelector(`m2-list-row[data-id="${serverKey}"]`);
         if (row) {
             row.setAttribute('selected', 'true');
             row.scrollIntoView();

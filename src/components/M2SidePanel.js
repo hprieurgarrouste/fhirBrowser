@@ -4,7 +4,7 @@ import "./M2RoundButton"
 import "./M2AppBar"
 
 
-class M2SidePanel extends HTMLElement {
+export default class M2SidePanel extends HTMLElement {
     /** @type {HTMLHeadingElement} */
     #title;
 

@@ -1,7 +1,7 @@
 import template from "./templates/M2Snackbar.html"
 
 
-class M2Snackbar extends HTMLElement {
+export default class M2Snackbar extends HTMLElement {
 
     /** @type {HTMLElement} */
     #main;

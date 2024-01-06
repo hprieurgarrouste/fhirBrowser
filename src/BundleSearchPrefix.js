@@ -1,18 +1,21 @@
 import template from "./templates/BundleSearchPrefix.html";
 
-class BundleSearchPrefix extends HTMLElement {
+export default class BundleSearchPrefix extends HTMLElement {
+    /** @type {HTMLInputElement} */
+    #input;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' })
         shadow.innerHTML = template;
-        this._input = shadow.querySelector('input');
+        this.#input = shadow.querySelector('input');
     }
 
     get value() {
-        return this._input.value;
+        return this.#input.value;
     }
     set value(newValue) {
-        this._input.value = newValue;
+        this.#input.value = newValue;
     }
 };
 customElements.define('bundle-search-prefix', BundleSearchPrefix);

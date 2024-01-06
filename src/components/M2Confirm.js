@@ -1,6 +1,6 @@
 import template from "./templates/M2Confirm.html"
 
-class M2Confirm extends HTMLElement {
+export default class M2Confirm extends HTMLElement {
     /** @type {HTMLHeadingElement} */
     #title;
     /** @type {M2Button} */

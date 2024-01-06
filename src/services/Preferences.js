@@ -1,8 +1,8 @@
 class PreferencesService {
-    KEY = 'preferences';
+    #KEY = 'preferences';
 
     get(key, defaultValue = null) {
-        const lsp = localStorage.getItem(this.KEY);
+        const lsp = localStorage.getItem(this.#KEY);
         let preferences = null;
         if (lsp !== null) {
             preferences = JSON.parse(lsp);
@@ -13,7 +13,7 @@ class PreferencesService {
     }
 
     set(key, value) {
-        const lsp = localStorage.getItem(this.KEY);
+        const lsp = localStorage.getItem(this.#KEY);
         let preferences = null;
         if (lsp !== null) {
             preferences = JSON.parse(lsp);
@@ -21,7 +21,7 @@ class PreferencesService {
             preferences = {};
         }
         preferences[key] = value;
-        localStorage.setItem(this.KEY, JSON.stringify(preferences));
+        localStorage.setItem(this.#KEY, JSON.stringify(preferences));
     }
 }
 

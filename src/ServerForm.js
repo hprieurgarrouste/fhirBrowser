@@ -1,59 +1,104 @@
 import template from "./templates/ServerForm.html"
 
 import "./components/M2Button"
-import "./components/M2Confirm"
-import "./components/M2TextField"
+import M2Dialog from "./components/M2Dialog"
+import M2Confirm from "./components/M2Confirm"
+import M2RoundButton from "./components/M2RoundButton"
+import M2TextField from "./components/M2TextField"
 
-class ServerForm extends HTMLElement {
+export default class ServerForm extends HTMLElement {
+    /** @type {M2Dialog} */
+    #appDialog;
+    /** @type {HTMLElement} */
+    #content;
+    /** @type {M2TextField} */
+    #key;
+    /** @type {M2TextField} */
+    #url;
+    /** @type {HTMLInputElement} */
+    #authNo;
+    /** @type {HTMLInputElement} */
+    #authApi;
+    /** @type {HTMLInputElement} */
+    #authBasic;
+    /** @type {HTMLInputElement} */
+    #authOauth;
+    /** @type {HTMLElement} */
+    #apiSection;
+    /** @type {M2TextField} */
+    #apiKey;
+    /** @type {M2TextField} */
+    #apiValue;
+    /** @type {HTMLElement} */
+    #basicSection;
+    /** @type {M2TextField} */
+    #basicUsername;
+    /** @type {M2TextField} */
+    #basicPassword;
+    /** @type {HTMLElement} */
+    #oauthSection;
+    /** @type {M2TextField} */
+    #oauthTokenurl;
+    /** @type {M2TextField} */
+    #oauthClientid;
+    /** @type {M2TextField} */
+    #oauthClientsecret;
+    /** @type {M2TextField} */
+    #oauthGranttype;
+    /** @type {M2Confirm} */
+    #appConfirm;
+    /** @type {M2RoundButton} */
+    #formDelete;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        this._appDialog = shadow.querySelector('m2-dialog');
-        this._appDialog.onClose = this.appDialogClose;
-        this._content = shadow.getElementById('content');
+        this.#appDialog = shadow.querySelector('m2-dialog');
+        this.#appDialog.onClose = this.appDialogClose;
+        this.#content = shadow.getElementById('content');
 
         shadow.querySelectorAll('input[name="authMethod"]').forEach((input) => { input.addEventListener("change", this.authMethodChange) });
 
         shadow.querySelector('main').onkeydown = this.mainKeyDown;
 
-        this._key = shadow.getElementById('key');
-        this._url = shadow.getElementById('url');
+        this.#key = shadow.getElementById('key');
+        this.#url = shadow.getElementById('url');
 
-        this._authNo = shadow.getElementById("authNo");
-        this._authApi = shadow.getElementById("authApi");
-        this._authBasic = shadow.getElementById("authBasic");
-        this._authOauth = shadow.getElementById("authOauth");
+        this.#authNo = shadow.getElementById("authNo");
+        this.#authApi = shadow.getElementById("authApi");
+        this.#authBasic = shadow.getElementById("authBasic");
+        this.#authOauth = shadow.getElementById("authOauth");
 
-        this._apiSection = shadow.getElementById("apiSection");
-        this._apiKey = shadow.getElementById('apiKey');
-        this._apiValue = shadow.getElementById('apiValue');
+        this.#apiSection = shadow.getElementById("apiSection");
+        this.#apiKey = shadow.getElementById('apiKey');
+        this.#apiValue = shadow.getElementById('apiValue');
 
-        this._basicSection = shadow.getElementById('basicSection');
-        this._basicUsername = shadow.getElementById('basicUsername');
-        this._basicPassword = shadow.getElementById('basicPassword');
+        this.#basicSection = shadow.getElementById('basicSection');
+        this.#basicUsername = shadow.getElementById('basicUsername');
+        this.#basicPassword = shadow.getElementById('basicPassword');
 
-        this._oauthSection = shadow.getElementById('oauthSection');
-        this._oauthTokenurl = shadow.getElementById('oauthTokenurl');
-        this._oauthClientid = shadow.getElementById('oauthClientid');
-        this._oauthClientsecret = shadow.getElementById('oauthClientsecret');
-        this._oauthGranttype = shadow.getElementById('oauthGranttype');
+        this.#oauthSection = shadow.getElementById('oauthSection');
+        this.#oauthTokenurl = shadow.getElementById('oauthTokenurl');
+        this.#oauthClientid = shadow.getElementById('oauthClientid');
+        this.#oauthClientsecret = shadow.getElementById('oauthClientsecret');
+        this.#oauthGranttype = shadow.getElementById('oauthGranttype');
 
-        this._appConfirm = shadow.querySelector('m2-confirm');
-        this._appConfirm.onValidate = this.deleteConfirm;
+        this.#appConfirm = shadow.querySelector('m2-confirm');
+        this.#appConfirm.onValidate = this.deleteConfirm;
 
         shadow.getElementById('formOk').onclick = this.formOkClick;
         shadow.getElementById('formCancel').onclick = this.formCancelClick;
-        this._formDelete = shadow.getElementById('formDelete');
-        this._formDelete.onclick = this.formDeleteClick;
+        this.#formDelete = shadow.getElementById('formDelete');
+        this.#formDelete.onclick = this.formDeleteClick;
     }
 
     static get observedAttributes() { return ["data-title"]; }
 
     attributeChangedCallback(name, oldValue, newValue) {
         if ("data-title" == name) {
-            this._appDialog.setAttribute("data-title", newValue);
+            this.#appDialog.setAttribute("data-title", newValue);
         }
     }
 
@@ -74,7 +119,7 @@ class ServerForm extends HTMLElement {
     }
 
     formDeleteClick = () => {
-        this._appConfirm.hidden = false;
+        this.#appConfirm.hidden = false;
     }
 
     deleteConfirm = (event) => {
@@ -89,54 +134,54 @@ class ServerForm extends HTMLElement {
     }
 
     authMethodChange = () => {
-        const value = this._content.querySelector("input[name='authMethod']:checked").value;
-        this._apiSection.hidden = ("API Key" !== value);
-        this._basicSection.hidden = ("Basic" !== value);
-        this._oauthSection.hidden = ("OAuth 2" !== value);
+        const value = this.#content.querySelector("input[name='authMethod']:checked").value;
+        this.#apiSection.hidden = ("API Key" !== value);
+        this.#basicSection.hidden = ("Basic" !== value);
+        this.#oauthSection.hidden = ("OAuth 2" !== value);
     }
 
-    _onOk = (event) => {
+    #onOk = (event) => {
         this.hidden = true;
     }
     get onOk() {
-        return this._onOk;
+        return this.#onOk;
     }
     set onOk(okFct) {
-        this._onOk = okFct;
+        this.#onOk = okFct;
     }
 
-    _onCancel = (event) => {
+    #onCancel = (event) => {
         this.hidden = true;
     }
     get onCancel() {
-        return this._onCancel;
+        return this.#onCancel;
     }
     set onCancel(cancelFct) {
-        this._onCancel = cancelFct;
+        this.#onCancel = cancelFct;
     }
 
-    _onDelete = () => {
+    #onDelete = () => {
         this.hidden = true;
     }
     get onDelete() {
-        return this._onDelete;
+        return this.#onDelete;
     }
     set onDelete(deleteFct) {
-        this._onDelete = deleteFct;
+        this.#onDelete = deleteFct;
     }
 
-    checkValidity = function () {
-        if (check(this._key) && check(this._url)) {
-            const method = this._content.querySelector("input[name='authMethod']:checked");
+    checkValidity = () => {
+        if (check(this.#key) && check(this.#url)) {
+            const method = this.#content.querySelector("input[name='authMethod']:checked");
             switch (method) {
-                case this._authNo:
+                case this.#authNo:
                     return true;
-                case this._authApi:
-                    return check(this._apiKey) && check(this._apiValue);
-                case this._authBasic:
-                    return check(this._basicUsername) && check(this._basicPassword);
-                case this._authOauth:
-                    return check(this._oauthTokenurl) && check(this._oauthClientid) && check(this._oauthClientsecret) && check(this._oauthGranttype);
+                case this.#authApi:
+                    return check(this.#apiKey) && check(this.#apiValue);
+                case this.#authBasic:
+                    return check(this.#basicUsername) && check(this.#basicPassword);
+                case this.#authOauth:
+                    return check(this.#oauthTokenurl) && check(this.#oauthClientid) && check(this.#oauthClientsecret) && check(this.#oauthGranttype);
                 default:
                     break;
             }
@@ -154,32 +199,32 @@ class ServerForm extends HTMLElement {
     }
 
     get value() {
-        const method = this._content.querySelector("input[name='authMethod']:checked");
+        const method = this.#content.querySelector("input[name='authMethod']:checked");
         let server = {
-            serverCode: this._key.value,
-            url: this._url.value,
+            serverCode: this.#key.value,
+            url: this.#url.value,
             auth: {
                 method: "noauth",
                 setup: {}
             }
         };
         switch (method) {
-            case this._authApi:
+            case this.#authApi:
                 server.auth.method = "apikey";
-                server.auth.setup.key = this._apiKey.value;
-                server.auth.setup.value = this._apiValue.value;
+                server.auth.setup.key = this.#apiKey.value;
+                server.auth.setup.value = this.#apiValue.value;
                 break;
-            case this._authBasic:
+            case this.#authBasic:
                 server.auth.method = "basic";
-                server.auth.setup.username = this._basicUsername.value;
-                server.auth.setup.password = this._basicPassword.value;
+                server.auth.setup.username = this.#basicUsername.value;
+                server.auth.setup.password = this.#basicPassword.value;
                 break;
-            case this._authOauth:
+            case this.#authOauth:
                 server.auth.method = "oauth2";
-                server.auth.setup.access_token_url = this._oauthTokenurl.value;
-                server.auth.setup.client_id = this._oauthClientid.value;
-                server.auth.setup.client_secret = this._oauthClientsecret.value;
-                server.auth.setup.grant_type = this._oauthGranttype.value;
+                server.auth.setup.access_token_url = this.#oauthTokenurl.value;
+                server.auth.setup.client_id = this.#oauthClientid.value;
+                server.auth.setup.client_secret = this.#oauthClientsecret.value;
+                server.auth.setup.grant_type = this.#oauthGranttype.value;
                 break;
             default:
                 break;
@@ -189,45 +234,45 @@ class ServerForm extends HTMLElement {
 
     set value({ serverCode, server }) {
         if (serverCode) {
-            this._appDialog.setAttribute("data-title", serverCode);
-            this._formDelete.hidden = false;
+            this.#appDialog.setAttribute("data-title", serverCode);
+            this.#formDelete.hidden = false;
         } else {
-            this._appDialog.setAttribute("data-title", "New");
-            this._formDelete.hidden = true;
+            this.#appDialog.setAttribute("data-title", "New");
+            this.#formDelete.hidden = true;
         }
         this.clear();
-        this._key.value = serverCode;
-        this._url.value = server.url;
+        this.#key.value = serverCode;
+        this.#url.value = server.url;
         switch (server?.auth?.method) {
             case "apikey":
-                this._authApi.checked = true;
-                this._apiKey.value = server.auth.setup.key;
-                this._apiValue.value = server.auth.setup.value;
+                this.#authApi.checked = true;
+                this.#apiKey.value = server.auth.setup.key;
+                this.#apiValue.value = server.auth.setup.value;
                 break;
             case "basic":
-                this._authBasic.checked = true;
-                this._basicUsername.value = server.auth.setup.username;
-                this._basicPassword.value = server.auth.setup.password;
+                this.#authBasic.checked = true;
+                this.#basicUsername.value = server.auth.setup.username;
+                this.#basicPassword.value = server.auth.setup.password;
                 break;
             case "oauth2":
-                this._authOauth.checked = true;
-                this._oauthTokenurl.value = server.auth.setup.access_token_url;
-                this._oauthClientid.value = server.auth.setup.client_id;
-                this._oauthClientsecret.value = server.auth.setup.client_secret;
-                this._oauthGranttype.value = server.auth.setup.grant_type;
+                this.#authOauth.checked = true;
+                this.#oauthTokenurl.value = server.auth.setup.access_token_url;
+                this.#oauthClientid.value = server.auth.setup.client_id;
+                this.#oauthClientsecret.value = server.auth.setup.client_secret;
+                this.#oauthGranttype.value = server.auth.setup.grant_type;
                 break;
             default:
-                this._authNo.checked = true;
+                this.#authNo.checked = true;
                 break;
         }
         this.authMethodChange();
     }
 
     clear() {
-        const fields = this._content.querySelectorAll("m2-textfield");
+        const fields = this.#content.querySelectorAll("m2-textfield");
         fields.forEach(field => field.value = '');
         // only grant type allowed
-        this._oauthGranttype.value = "client_credentials";
+        this.#oauthGranttype.value = "client_credentials";
     }
 
 };

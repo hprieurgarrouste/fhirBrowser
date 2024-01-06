@@ -1,6 +1,6 @@
 import template from "./templates/M2Switch.html"
 
-class M2Switch extends HTMLElement {
+export default class M2Switch extends HTMLElement {
 
     /** @type {HTMLElement} */
     #main;

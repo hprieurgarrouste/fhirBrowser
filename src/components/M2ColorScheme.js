@@ -2,7 +2,7 @@ import template from "./templates/M2ColorScheme.html"
 
 import preferencesService from "../services/Preferences"
 
-class M2ColorScheme extends HTMLElement {
+export default class M2ColorScheme extends HTMLElement {
     /** @type {M2RoundButton} */
     #themeButton;
 

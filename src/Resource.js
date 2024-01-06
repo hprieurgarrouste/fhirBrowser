@@ -1,65 +1,86 @@
 import template from "./templates/Resource.html";
 
 import "./components/M2AppBar"
-import "./components/M2RoundButton"
-import "./components/M2SidePanel"
+import M2RoundButton from "./components/M2RoundButton"
 import "./components/M2Tabs"
 
-import "./ResourceHistory"
-import "./ResourceReferences"
-import "./ResourceJsonView"
-import "./ResourceTtlView"
-import "./ResourceXmlView"
+import ResourceHistory from "./ResourceHistory"
+import ResourceReferences from "./ResourceReferences"
+import ResourceJsonView from "./ResourceJsonView"
+import ResourceTtlView from "./ResourceTtlView"
+import ResourceXmlView from "./ResourceXmlView"
 
 import context from "./services/Context"
 import fhirService from "./services/Fhir"
 
-class Resource extends HTMLElement {
+export default class Resource extends HTMLElement {
+    /** @type {M2RoundButton} */
+    #referencesToggle;
+    /** @type {ResourceReferences} */
+    #referencesPanel;
+    /** @type {M2RoundButton} */
+    #historyToggle;
+    /** @type {ResourceHistory} */
+    #historyPanel;
+    /** @type {M2Tabs} */
+    #tabs;
+    /** @type {HTMLHeadingElement} */
+    #title;
+
+    /** @type {any} */
+    #resourceType;
+    /** @type {String} */
+    #resourceId;
+    /** @type {any} */
+    #views;
+    /** @type {Boolean} */
+    #historyDisabled;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        shadow.getElementById("help").onclick = this.helpClick;
+        shadow.getElementById("help").onclick = this.#helpClick;
 
-        this._referencesToggle = shadow.getElementById('referencesToggle');
-        this._referencesToggle.onclick = this.referenceToggleClick;
-        this._referencesPanel = shadow.querySelector('resource-references');
+        this.#referencesToggle = shadow.getElementById('referencesToggle');
+        this.#referencesToggle.onclick = this.#referenceToggleClick;
+        this.#referencesPanel = shadow.querySelector('resource-references');
 
-        this._historyDisabled = null;
-        this._historyToggle = shadow.getElementById('historyToggle');
-        this._historyToggle.onclick = this.historyToggleClick;
-        this._historyPanel = shadow.querySelector('resource-history');
+        this.#historyDisabled = null;
+        this.#historyToggle = shadow.getElementById('historyToggle');
+        this.#historyToggle.onclick = this.#historyToggleClick;
+        this.#historyPanel = shadow.querySelector('resource-history');
 
-        this._tabs = shadow.querySelector("m2-tabs");
-        this._tabs.addEventListener('select', this.tabSelect);
+        this.#tabs = shadow.querySelector("m2-tabs");
+        this.#tabs.addEventListener('select', this.#tabSelect);
 
-        this._title = shadow.getElementById('title');
+        this.#title = shadow.getElementById('title');
 
-        this._resourceType = null;
-        this._resourceId = null;
-        this._views = {};
+        this.#resourceType = null;
+        this.#resourceId = null;
+        this.#views = {};
     }
 
     connectedCallback() {
-        context.addListener(this.serverChanged);
-        new MutationObserver(this.panelHiddenObserver).observe(this._referencesPanel, { attributes: true });
-        new MutationObserver(this.panelHiddenObserver).observe(this._historyPanel, { attributes: true });
+        context.addListener(this.#serverChanged);
+        new MutationObserver(this.#panelHiddenObserver).observe(this.#referencesPanel, { attributes: true });
+        new MutationObserver(this.#panelHiddenObserver).observe(this.#historyPanel, { attributes: true });
     }
 
-    panelHiddenObserver = (mutationList) => {
+    #panelHiddenObserver = (mutationList) => {
         mutationList.forEach(({ type, attributeName, target }) => {
             if ('attributes' == type && 'hidden' == attributeName) {
-                if (target == this._historyPanel) {
-                    this._historyToggle.hidden = this._historyDisabled || !target.hidden
-                } else if (target == this._referencesPanel) {
-                    this._referencesToggle.hidden = !target.hidden
+                if (target == this.#historyPanel) {
+                    this.#historyToggle.hidden = this.#historyDisabled || !target.hidden
+                } else if (target == this.#referencesPanel) {
+                    this.#referencesToggle.hidden = !target.hidden
                 }
             }
         })
     }
 
-    tabSelect = ({ detail }) => {
+    #tabSelect = ({ detail }) => {
         const format = detail.caption;
         const hashSearchParams = location.hash.match(/\?([^?]+)$/);
         if (hashSearchParams?.length > 0) {
@@ -71,57 +92,57 @@ class Resource extends HTMLElement {
         }
     }
 
-    referenceToggleClick = () => {
-        if (this._referencesPanel.hidden) {
-            this._historyPanel.hidden = true;
-            this._referencesPanel.load(this._resourceType, this._resourceId);
+    #referenceToggleClick = () => {
+        if (this.#referencesPanel.hidden) {
+            this.#historyPanel.hidden = true;
+            this.#referencesPanel.load(this.#resourceType, this.#resourceId);
         }
-        this._referencesPanel.hidden = !this._referencesPanel.hidden;
+        this.#referencesPanel.hidden = !this.#referencesPanel.hidden;
     };
 
-    historyToggleClick = () => {
-        if (this._historyPanel.hidden) {
-            this._referencesPanel.hidden = true;
-            this._historyPanel.load(this._resourceType, this._resourceId);
+    #historyToggleClick = () => {
+        if (this.#historyPanel.hidden) {
+            this.#referencesPanel.hidden = true;
+            this.#historyPanel.load(this.#resourceType, this.#resourceId);
         }
-        this._historyPanel.hidden = !this._historyPanel.hidden;
+        this.#historyPanel.hidden = !this.#historyPanel.hidden;
     };
 
-    helpClick = () => {
-        window.open(`${fhirService.helpUrl(this._resourceType.type)}#resource`, "FhirBrowserHelp");
+    #helpClick = () => {
+        window.open(`${fhirService.helpUrl(this.#resourceType.type)}#resource`, "FhirBrowserHelp");
     };
 
-    serverChanged = () => {
-        while (this._tabs.firstChild) this._tabs.removeChild(this._tabs.lastChild);
+    #serverChanged = () => {
+        while (this.#tabs.firstChild) this.#tabs.removeChild(this.#tabs.lastChild);
 
-        this._views = {};
+        this.#views = {};
         const server = context.server;
 
         if (server.isFormatEnable('json')) {
-            const view = document.createElement('resource-json-view');
+            const view = new ResourceJsonView();
             const section = document.createElement('section');
             section.dataset.caption = 'json';
             section.appendChild(view);
-            this._tabs.appendChild(section);
-            this._views.json = view;
+            this.#tabs.appendChild(section);
+            this.#views.json = view;
         }
 
         if (server.isFormatEnable('xml')) {
-            const view = document.createElement('resource-xml-view');
+            const view = new ResourceXmlView();
             const section = document.createElement('section');
             section.dataset.caption = 'xml';
             section.appendChild(view);
-            this._tabs.appendChild(section);
-            this._views.xml = view;
+            this.#tabs.appendChild(section);
+            this.#views.xml = view;
         }
 
         if (server.isFormatEnable('ttl')) {
-            const view = document.createElement('resource-ttl-view');
+            const view = new ResourceTtlView();
             const section = document.createElement('section');
             section.dataset.caption = 'ttl';
             section.appendChild(view);
-            this._tabs.appendChild(section);
-            this._views.ttl = view;
+            this.#tabs.appendChild(section);
+            this.#views.ttl = view;
         }
     }
 
@@ -138,39 +159,40 @@ class Resource extends HTMLElement {
             format = 'ttl';
         }
         if (format) {
-            const view = this._views[format];
+            const view = this.#views[format];
             view.source = resource;
             let resourceType = view.resourceType;
-            this._title.innerText = resourceType;
+            this.#title.innerText = resourceType;
             const resourceId = view.resourceId;
 
-            if (resourceId != this._resourceId || resourceType != this._resourceType?.type) {
-                this._resourceType = context.server.capabilities.rest[0].resource.find(res => res.type === resourceType);
-                this._resourceId = resourceId;
-                Object.entries(this._views).filter(([key,]) => key != format).forEach(([, value]) => value.clear());
+            if (resourceId != this.#resourceId || resourceType != this.#resourceType?.type) {
+                this.#resourceType = context.server.capabilities.rest[0].resource.find(res => res.type === resourceType);
+                this.#resourceId = resourceId;
+                Object.entries(this.#views).filter(([key,]) => key != format).forEach(([, value]) => value.clear());
             }
-            this._tabs.value = format;
+            this.#tabs.value = format;
         }
 
         if (window.matchMedia("(max-width: 480px)").matches) {
-            this._referencesPanel.hidden = true;
-            this._historyPanel.hidden = true;
+            this.#referencesPanel.hidden = true;
+            this.#historyPanel.hidden = true;
         }
 
-        this._historyDisabled = this._resourceType?.interaction.find(({ code }) => 'vread' == code) == undefined;
-        if (this._historyDisabled) {
-            this._historyPanel.hidden = true;
-            this._historyToggle.hidden = true;
+        this.#historyDisabled = this.#resourceType?.interaction.find(({ code }) => 'vread' == code) == undefined;
+        if (this.#historyDisabled) {
+            this.#historyPanel.hidden = true;
+            this.#historyToggle.hidden = true;
         } else {
-            this._historyToggle.hidden = !this._historyPanel.hidden;
+            this.#historyToggle.hidden = !this.#historyPanel.hidden;
         }
 
-        if (!this._historyPanel.hidden) this._historyPanel.load(this._resourceType, this._resourceId);
-        if (!this._referencesPanel.hidden) this._referencesPanel.load(this._resourceType, this._resourceId);
+        if (!this.#historyPanel.hidden) this.#historyPanel.load(this.#resourceType, this.#resourceId);
+        if (!this.#referencesPanel.hidden) this.#referencesPanel.load(this.#resourceType, this.#resourceId);
     }
 
+    /** @returns {String} */
     get resourceType() {
-        return this._resourceType;
+        return this.#resourceType.type;
     }
 };
 

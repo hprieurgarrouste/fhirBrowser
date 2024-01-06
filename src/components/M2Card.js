@@ -1,6 +1,6 @@
 import template from "./templates/M2Card.html"
 
-class M2Card extends HTMLElement {
+export default class M2Card extends HTMLElement {
     /** @type {HTMLElement}*/
     #headerIcon;
     /** @type {HTMLSpanElement} */

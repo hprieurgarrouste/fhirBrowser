@@ -1,39 +1,39 @@
 class Context {
-    _server = null;
-    _serverChangeListener = [];
-    _appContainer = null;
+    #server = null;
+    #serverChangeListener = [];
+    #appContainer = null;
 
-    _dispatchServerChange = () => {
-        this._serverChangeListener.forEach(callback => {
+    #dispatchServerChange = () => {
+        this.#serverChangeListener.forEach(callback => {
             callback.call();
         })
     }
 
     addListener = (callback) => {
-        this._serverChangeListener.push(callback);
+        this.#serverChangeListener.push(callback);
     }
 
     /**
      * @returns {Server} Current server
      */
     get server() {
-        return this._server;
+        return this.#server;
     }
     /**
      * @param {Server} srv - Current server
      */
     set server(srv) {
-        if (srv != this._server) {
-            this._server = srv;
-            this._dispatchServerChange();
+        if (srv != this.#server) {
+            this.#server = srv;
+            this.#dispatchServerChange();
         }
     }
 
     get appContainer() {
-        return this._appContainer;
+        return this.#appContainer;
     }
     set appContainer(node) {
-        this._appContainer = node;
+        this.#appContainer = node;
     }
 }
 

@@ -2,7 +2,7 @@ import template from "./templates/M2List.html"
 
 import "./M2ListFilter";
 
-class M2List extends HTMLElement {
+export default class M2List extends HTMLElement {
     /** @type {M2ListFilter} */
     #filter;
     /** @type {HTMLElement} */

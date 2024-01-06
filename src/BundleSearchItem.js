@@ -1,19 +1,22 @@
 import template from "./templates/BundleSearchItem.html";
 
-import "./BundleSearchDate"
-import "./BundleSearchModifier"
-import "./BundleSearchPrefix"
-import "./BundleSearchText"
+import BundleSearchDate from "./BundleSearchDate"
+import BundleSearchModifier from "./BundleSearchModifier"
+import BundleSearchPrefix from "./BundleSearchPrefix"
+import BundleSearchText from "./BundleSearchText"
 
-class BundleSearchItem extends HTMLElement {
+export default class BundleSearchItem extends HTMLElement {
+    #shadow;
+    /** @type {()} */
+    #searchItem;
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' })
-        this._shadow.innerHTML = template;
+        this.#shadow = this.attachShadow({ mode: 'closed' })
+        this.#shadow.innerHTML = template;
     }
 
     clear() {
-        const fields = this._shadow.querySelectorAll("bundle-search-text, bundle-search-date, bundle-search-modifier, bundle-search-prefix");
+        const fields = this.#shadow.querySelectorAll("bundle-search-text, bundle-search-date, bundle-search-modifier, bundle-search-prefix");
         fields.forEach(field => field.value = "");
     }
 
@@ -21,11 +24,11 @@ class BundleSearchItem extends HTMLElement {
         let field;
         const aValue = oValue.value.split('|');
         const aName = oValue.name.split(':');
-        switch (this._search.type) {
+        switch (this.#searchItem.type) {
             case "token":
-                field = this._shadow.querySelector('bundle-search-text:not([data-type])');
+                field = this.#shadow.querySelector('bundle-search-text:not([data-type])');
                 if (aValue[1]) {
-                    const system = this._shadow.querySelector('bundle-search-text[data-type="system"]');
+                    const system = this.#shadow.querySelector('bundle-search-text[data-type="system"]');
                     system.value = aValue[0];
                     field.value = aValue[1];
                 } else {
@@ -35,10 +38,10 @@ class BundleSearchItem extends HTMLElement {
             case "string":
             case "reference":
                 if (aName[1]) {
-                    const modifier = this._shadow.querySelector('bundle-search-modifier');
+                    const modifier = this.#shadow.querySelector('bundle-search-modifier');
                     modifier.value = aName[1];
                 }
-                field = this._shadow.querySelector('bundle-search-text');
+                field = this.#shadow.querySelector('bundle-search-text');
                 field.value = oValue.value;
                 break;
             case "date":
@@ -51,24 +54,24 @@ class BundleSearchItem extends HTMLElement {
 
     get value() {
         let field;
-        switch (this._search.type) {
+        switch (this.#searchItem.type) {
             case "token":
                 let value = '';
-                const system = this._shadow.querySelector('bundle-search-text[data-type="system"]');
+                const system = this.#shadow.querySelector('bundle-search-text[data-type="system"]');
                 if (system?.value) value = `${system.value}|`;
-                field = this._shadow.querySelector('bundle-search-text:not([data-type])');
+                field = this.#shadow.querySelector('bundle-search-text:not([data-type])');
                 if (field?.value) value += field.value;
                 if (!value) return null;
                 return {
-                    "name": this._search.name,
+                    "name": this.#searchItem.name,
                     "value": value
                 };
             case "string":
             case "reference":
-                field = this._shadow.querySelector('bundle-search-text');
+                field = this.#shadow.querySelector('bundle-search-text');
                 if (field?.value) {
-                    let name = this._search.name;
-                    const modifier = this._shadow.querySelector('bundle-search-modifier');
+                    let name = this.#searchItem.name;
+                    const modifier = this.#shadow.querySelector('bundle-search-modifier');
                     if (modifier?.value) name += `:${modifier.value}`;
                     return {
                         "name": name,
@@ -78,13 +81,13 @@ class BundleSearchItem extends HTMLElement {
                 break;
             case "date":
             case "datetime":
-                field = this._shadow.querySelector('bundle-search-date');
+                field = this.#shadow.querySelector('bundle-search-date');
                 if (field?.value) {
                     let value = field.value;
-                    const prefix = this._shadow.querySelector('bundle-search-prefix');
+                    const prefix = this.#shadow.querySelector('bundle-search-prefix');
                     if (prefix?.value) value = prefix.value + value;
                     return {
-                        "name": this._search.name,
+                        "name": this.#searchItem.name,
                         "value": value
                     };
                 }
@@ -96,24 +99,24 @@ class BundleSearchItem extends HTMLElement {
     }
 
     get name() {
-        return this._search.name;
+        return this.#searchItem.name;
     }
 
     init(search) {
         function addModifier(search) {
-            let field = document.createElement("bundle-search-modifier");
+            let field = new BundleSearchModifier();
             field.setAttribute("data-name", search.name);
             content.appendChild(field);
         }
         function addSystem(search) {
-            let field = document.createElement("bundle-search-text");
+            let field = new BundleSearchText();
             field.setAttribute("placeholder", 'System');
             field.setAttribute("data-type", 'system');
             field.setAttribute("name", search.name);
             content.appendChild(field);
         }
         function addText(search, placeholder) {
-            let field = document.createElement("bundle-search-text");
+            let field = new BundleSearchText();
             field.setAttribute("name", search.name);
             if (placeholder) field.setAttribute("placeholder", placeholder);
             content.appendChild(field);
@@ -121,10 +124,10 @@ class BundleSearchItem extends HTMLElement {
         //remove format selector, only json supported
         if ("_format" === search.name) return false;
 
-        this._search = search;
-        this._shadow.querySelector("legend").innerText = search.name;
-        this._shadow.querySelector("span").innerText = search.documentation || '';
-        const content = this._shadow.querySelector("fieldset");
+        this.#searchItem = search;
+        this.#shadow.querySelector("legend").innerText = search.name;
+        this.#shadow.querySelector("span").innerText = search.documentation || '';
+        const content = this.#shadow.querySelector("fieldset");
 
         let field;
         if ('_id' == search.name) {
@@ -144,11 +147,11 @@ class BundleSearchItem extends HTMLElement {
                     break;
                 case "date":
                 case "datetime":
-                    field = document.createElement("bundle-search-prefix");
+                    field = new BundleSearchPrefix();
                     field.setAttribute("data-name", search.name);
                     content.appendChild(field);
 
-                    field = document.createElement("bundle-search-date");
+                    field = new BundleSearchDate();
                     field.setAttribute("name", search.name);
                     content.appendChild(field);
                     break;

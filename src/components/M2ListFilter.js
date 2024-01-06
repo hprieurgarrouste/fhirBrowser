@@ -1,6 +1,6 @@
 import template from "./templates/M2ListFilter.html"
 
-class M2ListFilter extends HTMLElement {
+export default class M2ListFilter extends HTMLElement {
     /** @type {HTMLInputElement} */
     #text;
 

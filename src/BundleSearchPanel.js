@@ -2,12 +2,14 @@ import template from "./templates/BundleSearchPanel.html";
 
 import "./components/M2RoundButton"
 
-import "./BundleSearchItem"
+import BundleSearchItem from "./BundleSearchItem"
 
 import context from "./services/Context"
 import fhirService from "./services/Fhir"
 
-class BundleSearchPanel extends HTMLElement {
+export default class BundleSearchPanel extends HTMLElement {
+    /** @type {HTMLElement} */
+    #main;
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
@@ -21,8 +23,8 @@ class BundleSearchPanel extends HTMLElement {
 
         shadow.getElementById('apply').onclick = this.applyClick;
 
-        this._main = shadow.querySelector('main');
-        this._main.addEventListener('keydown', this.mainKeyDown);
+        this.#main = shadow.querySelector('main');
+        this.#main.addEventListener('keydown', this.mainKeyDown);
 
         this._resourceType = null;
     }
@@ -46,7 +48,7 @@ class BundleSearchPanel extends HTMLElement {
             this.classList.add("hidden");
         }
         const hash = [];
-        const fields = this._main.querySelectorAll("bundle-search-item");
+        const fields = this.#main.querySelectorAll("bundle-search-item");
         fields.forEach(({ value }) => {
             if (value) {
                 hash.push(`${value.name}=${encodeURIComponent(value.value)}`);
@@ -93,7 +95,7 @@ class BundleSearchPanel extends HTMLElement {
             const searchParams = new URLSearchParams(hash.replace(/^[^?]+\?/, ''));
             Array.from(searchParams).forEach(([name, value]) => {
                 const fieldName = name.split(':')[0];
-                const field = this._main.querySelector(`bundle-search-item[data-name="${fieldName}"`);
+                const field = this.#main.querySelector(`bundle-search-item[data-name="${fieldName}"`);
                 if (field) field.value = {
                     'name': name,
                     'value': value
@@ -109,7 +111,7 @@ class BundleSearchPanel extends HTMLElement {
     }
 
     clear() {
-        const fields = this._main.querySelectorAll("bundle-search-item");
+        const fields = this.#main.querySelectorAll("bundle-search-item");
         fields.forEach(field => field.clear());
     }
 
@@ -117,15 +119,15 @@ class BundleSearchPanel extends HTMLElement {
      * @param {any} resourceType
      */
     set metadata(resourceType) {
-        this._main.scrollTop = 0;
-        while (this._main.firstChild) this._main.removeChild(this._main.lastChild);
+        this.#main.scrollTop = 0;
+        while (this.#main.firstChild) this.#main.removeChild(this.#main.lastChild);
         resourceType?.searchParam
             .sort((s1, s2) => s1.name.localeCompare(s2.name))
             .forEach(search => {
-                const item = document.createElement("bundle-search-item");
+                const item = new BundleSearchItem();
                 if (item.init(search)) {
                     item.setAttribute('data-name', search.name);
-                    this._main.appendChild(item);
+                    this.#main.appendChild(item);
                 }
             });
 

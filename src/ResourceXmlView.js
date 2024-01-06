@@ -4,48 +4,56 @@ import "./components/M2Switch"
 
 import context from "./services/Context"
 import preferencesService from "./services/Preferences"
-import snackbarService from "./services/Snackbar"
+import M2RoundButton from "./components/M2RoundButton";
 
-class ResourceXmlView extends HTMLElement {
+export default class ResourceXmlView extends HTMLElement {
+    /** @type {Fhir.resource} */
+    #resource;
+    /** @type {HTMLElement} */
+    #content;
+    /** @type {M2RoundButton} */
+    #sortToggle;
+    /** @type {Boolean} */
+    #sort;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        this._resource = null;
+        this.#resource = null;
 
-        this._content = shadow.getElementById('content');
-        this._content.onclick = this.contentClick;
+        this.#content = shadow.getElementById('content');
+        this.#content.onclick = this.#contentClick;
 
-        this._preferences = preferencesService.get('xmlView', { 'sorted': false });
+        this.#sort = preferencesService.get('xmlView', { 'sorted': false }).sorted;
 
-        this._sort = this._preferences.sorted;
-        this._sortToggle = shadow.getElementById('sort-toggle');
-        this._sortToggle.onclick = this.sortToggleClick;
+        this.#sortToggle = shadow.getElementById('sort-toggle');
+        this.#sortToggle.onclick = this.#sortToggleClick;
 
-        shadow.getElementById('download').onclick = this.downloadClick;
+        shadow.getElementById('download').onclick = this.#downloadClick;
 
-        shadow.getElementById('copy').onclick = this.copyClick;
+        shadow.getElementById('copy').onclick = this.#copyClick;
 
-        shadow.getElementById('share').onclick = this.shareClick;
+        shadow.getElementById('share').onclick = this.#shareClick;
 
     }
 
     connectedCallback() {
-        this.sortChange();
+        this.#sortChange();
     }
 
-    sortToggleClick = () => {
-        this._sort = !this._sort;
-        preferencesService.set('xmlView', { 'sorted': this._sort });
-        this.sortChange();
+    #sortToggleClick = () => {
+        this.#sort = !this.#sort;
+        preferencesService.set('xmlView', { 'sorted': this.#sort });
+        this.#sortChange();
     }
-    sortChange = () => {
-        this._sortToggle.style.color = this._sort ? 'var(--primary-color)' : 'unset';
-        if (this._resource) this.source = this._resource;
+    #sortChange = () => {
+        this.#sortToggle.style.color = this.#sort ? 'var(--primary-color)' : 'unset';
+        if (this.#resource) this.source = this.#resource;
     }
 
-    contentClick = ({ target, offsetX, offsetY, ctrlKey }) => {
+    #contentClick = ({ target, offsetX, offsetY, ctrlKey }) => {
         if (target.classList.contains("object")) {
             const key = target.childNodes[0];
             if (key && offsetX < key.offsetLeft && offsetY < key.offsetHeight) {
@@ -66,36 +74,44 @@ class ResourceXmlView extends HTMLElement {
         }
     };
 
+    /** @returns {void} */
     clear = () => {
-        this._content.scrollTo(0, 0);
-        this._content.innerHTML = "Loading...";
-        this._content.style.cursor = "wait";
-        this._resource = null;
+        this.#content.scrollTo(0, 0);
+        this.#content.innerHTML = "Loading...";
+        this.#content.style.cursor = "wait";
+        this.#resource = null;
     }
 
+    /** @returns {String} */
     get resourceType() {
-        return this._resource?.documentElement?.nodeName;
+        return this.#resource?.documentElement?.nodeName;
     }
+
+    /** @returns {String} */
     get resourceId() {
-        return this._resource?.documentElement?.querySelector('id[value]')?.getAttribute('value');
+        return this.#resource?.documentElement?.querySelector('id[value]')?.getAttribute('value');
     }
+
+    /** @returns {Fhir.Resource} */
     get source() {
-        return this._resource;
+        return this.#resource;
     }
+
     /**
-     * @param {object} resource
+     * @param {Fhir.resource} resource
+     * @returns {void}
      */
     set source(resource) {
-        this._content.scrollTo(0, 0);
-        this._content.innerHTML = this.parse(resource).outerHTML;
-        this._content.style.cursor = "default";
-        this._resource = resource;
+        this.#content.scrollTo(0, 0);
+        this.#content.innerHTML = this.#parse(resource).outerHTML;
+        this.#content.style.cursor = 'default';
+        this.#resource = resource;
     }
 
-    parse = (obj) => {
+    #parse = (obj) => {
         let dl = document.createElement('dl');
         let entries = Array.from(obj.children);
-        if (this._sort) entries.sort((n1, n2) => {
+        if (this.#sort) entries.sort((n1, n2) => {
             return n1.nodeName.localeCompare(n2.nodeName);
         });
         entries.forEach(e => {
@@ -132,7 +148,7 @@ class ResourceXmlView extends HTMLElement {
             valueElm.classList.add("value");
             if (e.children.length) {
                 dt.classList.add("object");
-                valueElm.innerHTML = this.parse(e).outerHTML;
+                valueElm.innerHTML = this.#parse(e).outerHTML;
                 dt.appendChild(valueElm);
 
                 keyElm = document.createElement('span');
@@ -148,8 +164,8 @@ class ResourceXmlView extends HTMLElement {
         return dl;
     }
 
-    downloadClick = () => {
-        const content = new XMLSerializer().serializeToString(this._resource);
+    #downloadClick = () => {
+        const content = new XMLSerializer().serializeToString(this.#resource);
         const file = new File([content], this.resourceId, {
             'type': 'data:text/xml;charset=utf-8'
         });
@@ -162,8 +178,8 @@ class ResourceXmlView extends HTMLElement {
         window.URL.revokeObjectURL(url);
     };
 
-    copyClick = () => {
-        const content = new XMLSerializer().serializeToString(this._resource);
+    #copyClick = () => {
+        const content = new XMLSerializer().serializeToString(this.#resource);
         navigator.clipboard.writeText(content).then(function () {
             SnackbarService.show("Copying to clipboard was successful");
         }, function (err) {
@@ -171,8 +187,8 @@ class ResourceXmlView extends HTMLElement {
         });
     };
 
-    shareClick = () => {
-        const content = new XMLSerializer().serializeToString(this._resource);
+    #shareClick = () => {
+        const content = new XMLSerializer().serializeToString(this.#resource);
         const fileName = `${this.resourceType}.${this.resourceId}.txt`;
         const file = new File([content], fileName, { type: 'text/plain' });
         navigator.share({

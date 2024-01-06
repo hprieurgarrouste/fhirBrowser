@@ -1,6 +1,6 @@
 import template from "./templates/M2ListItem.html"
 
-class M2ListItem extends HTMLElement {
+export default class M2ListItem extends HTMLElement {
     /** @type {HTMLSpanElement} */
     #icon;
     /** @type {HTMLSpanElement} */

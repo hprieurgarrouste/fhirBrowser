@@ -1,48 +1,57 @@
 import template from "./templates/ResourceTemplateEditorDialog.html"
 
-class ResourceTemplateEditorDialog extends HTMLElement {
+import M2Dialog from "./components/M2Dialog"
+import ResourceTemplateEditor from "./ResourceTemplateEditor"
+
+export default class ResourceTemplateEditorDialog extends HTMLElement {
+    /** @type {M2Dialog} */
+    #dialog;
+    /** @type {ResourceTemplateEditor} */
+    #editor;
+
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._shadow.querySelector('m2-dialog').onClose = this.dialogOnClose;
-        this._shadow.getElementById("cancel").onclick = this.dialogOnClose;
-        this._shadow.getElementById("save").onclick = this.onSave;
-        this._editor = this._shadow.querySelector('resource-template-editor');
-        this._dialog = this._shadow.querySelector('m2-dialog');
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+        shadow.querySelector('m2-dialog').onClose = this.#dialogOnClose;
+        shadow.getElementById("cancel").onclick = this.#dialogOnClose;
+        shadow.getElementById("save").onclick = this.#onSave;
+
+        this.#editor = shadow.querySelector('resource-template-editor');
+        this.#dialog = shadow.querySelector('m2-dialog');
     }
 
-    _onClose = () => { }
+    #onClose = () => { }
     get onClose() {
-        return this._onClose;
+        return this.#onClose;
     }
     set onClose(closeFct) {
-        this._onClose = closeFct;
+        this.#onClose = closeFct;
     }
 
-    dialogOnClose = (event) => {
+    #dialogOnClose = (event) => {
         event.preventDefault();
         event.stopPropagation();
         this.remove();
     }
 
-    onSave = () => {
+    #onSave = () => {
         const templates = JSON.parse(localStorage.getItem('templates') || '{}');
-        const resourceType = this._editor.source.resourceType;
-        templates[resourceType] = this._editor.template;
+        const resourceType = this.#editor.source.resourceType;
+        templates[resourceType] = this.#editor.template;
         localStorage.setItem('templates', JSON.stringify(templates));
         this.remove();
-        this._onClose();
+        this.#onClose();
     }
 
     /**
-     * @param {any} resource
+     * @param {Fhir.Resource} resource
      */
     set source(resource) {
         const templates = JSON.parse(localStorage.getItem('templates') || '{}');
-        this._editor.template = templates[resource.resourceType];
-        this._editor.source = resource;
-        this._dialog.dataset.title = `${resource.resourceType} template`;
+        this.#editor.template = templates[resource.resourceType];
+        this.#editor.source = resource;
+        this.#dialog.dataset.title = `${resource.resourceType} template`;
     }
 
 };

@@ -1,6 +1,6 @@
 import template from "./templates/M2CircularProgress.html"
 
-class M2CircularProgress extends HTMLElement {
+export default class M2CircularProgress extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'closed' }).innerHTML = template;

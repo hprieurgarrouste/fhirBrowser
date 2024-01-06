@@ -1,16 +1,16 @@
 import template from "./templates/App.html"
 
-import "./components/M2AppBar"
-import "./components/M2Dialog"
 import "./components/M2ColorScheme"
 import "./components/M2CircularProgress"
+import "./components/M2LinearProgress"
+import M2Button from "./components/M2Button"
 
-import "./AboutDialog"
-import "./Bundle"
-import "./ServerPanel"
-import "./Resource"
-import "./ServerDialog"
-import "./OperationOutcome"
+import AboutDialog from "./AboutDialog"
+import Bundle from "./Bundle"
+import OperationOutcome from "./OperationOutcome"
+import Resource from "./Resource"
+import ServerDialog from "./ServerDialog"
+import ServerPanel from "./ServerPanel"
 
 import context from "./services/Context"
 import preferencesService from "./services/Preferences"
@@ -25,7 +25,26 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./service-worker.js');
 }
 
-class App extends HTMLElement {
+export default class App extends HTMLElement {
+
+    /** @type {ServerDialog} */
+    #serverDialog;
+    /** @type {AboutDialog} */
+    #aboutDialog;
+    /** @type {OperationOutcome} */
+    #operationOutcomeView;
+    /** @type {M2Button} */
+    #navigationToggle;
+    /** @type {ServerPanel} */
+    #serverPanel;
+    /** @type {Bundle} */
+    #bundleView;
+    /** @type {Resource} */
+    #resourceView;
+    /** @type {HTMLElement} */
+    #body;
+    /** @type {HTMLElement} */
+    #waiting;
 
     constructor() {
         super();
@@ -34,46 +53,43 @@ class App extends HTMLElement {
         shadow.innerHTML = template;
         context.appContainer = shadow;
 
-        this._shadow = shadow;
+        this.#serverPanel = shadow.querySelector('server-panel');
+        this.#body = shadow.getElementById("bdy");
 
-        this._serverPanel = shadow.querySelector('server-panel');
-        this._body = shadow.getElementById("bdy");
+        this.#navigationToggle = shadow.getElementById('navigation');
+        this.#navigationToggle.onclick = () => this.#serverPanel.classList.toggle('hidden');
 
-        this._navigationToggle = shadow.getElementById('navigation');
-        this._navigationToggle.onclick = () => this._serverPanel.classList.toggle('hidden');
+        this.#waiting = shadow.getElementById('waiting');
 
-        this._waiting = shadow.getElementById('waiting');
-
-        this._serverDialog = shadow.querySelector('server-dialog');
-        this._serverDialog.onSelect = this.connect;
+        this.#serverDialog = shadow.querySelector('server-dialog');
+        this.#serverDialog.onSelect = this.#connect;
 
         shadow.getElementById('serverDialogToggle').onclick = () => {
-            this._serverDialog.value = context.server.serverCode;
-            this._serverDialog.hidden = false;
+            this.#serverDialog.value = context.server.serverCode;
+            this.#serverDialog.hidden = false;
         }
 
-        shadow.getElementById('aboutDialogToggle').onclick = this.aboutDialogToggleClick;
+        shadow.getElementById('aboutDialogToggle').onclick = this.#aboutDialogToggleClick;
 
-        this._bundleView = shadow.querySelector("fhir-bundle");
-        this._resourceView = shadow.querySelector("fhir-resource");
-        this._operationOutcomeView = shadow.querySelector("fhir-operation-outcome");
+        this.#bundleView = shadow.querySelector("fhir-bundle");
+        this.#resourceView = shadow.querySelector("fhir-resource");
+        this.#operationOutcomeView = shadow.querySelector("fhir-operation-outcome");
     }
 
-    aboutDialogToggleClick = () => {
-        let aboutDialog = this._shadow.querySelector('about-dialog');
-        if (aboutDialog) {
-            aboutDialog.hidden = false;
+    #aboutDialogToggleClick = () => {
+        if (this.#aboutDialog) {
+            this.#aboutDialog.hidden = false;
         } else {
-            aboutDialog = document.createElement('about-dialog');
-            this._shadow.appendChild(aboutDialog);
+            this.#aboutDialog = new AboutDialog();
+            context.appContainer.appendChild(this.#aboutDialog);
         }
     }
 
-    fetchHash = async (hash) => {
+    #fetchHash = async (hash) => {
         snackbarService.clear();
         const url = new URL(`${context.server.url}${hash}`);
         const timeoutId = setTimeout(() => {
-            this._waiting.style.visibility = 'visible';
+            this.#waiting.style.visibility = 'visible';
         }, 500);
 
         try {
@@ -83,7 +99,7 @@ class App extends HTMLElement {
             if (!response.ok) {
                 snackbarService.error(`${response.status} ${response.statusText}`);
             }
-            this._body.style.visibility = "visible";
+            this.#body.style.visibility = "visible";
             const contentType = response.headers.get("Content-Type");
             let sourceType;
             let source;
@@ -100,22 +116,22 @@ class App extends HTMLElement {
             }
             if (sourceType) {
                 if ('OperationOutcome' == sourceType) {
-                    this._bundleView.hidden = true;
-                    this._resourceView.hidden = true;
-                    this._operationOutcomeView.hidden = false;
-                    this._operationOutcomeView.source = source;
+                    this.#bundleView.hidden = true;
+                    this.#resourceView.hidden = true;
+                    this.#operationOutcomeView.hidden = false;
+                    this.#operationOutcomeView.source = source;
                 } else if ('Bundle' == sourceType) {
-                    this._bundleView.hidden = false;
-                    this._resourceView.hidden = true;
-                    this._operationOutcomeView.hidden = true;
-                    this._bundleView.source = source;
-                    this._serverPanel.value = this._bundleView.resourceType.type;
+                    this.#bundleView.hidden = false;
+                    this.#resourceView.hidden = true;
+                    this.#operationOutcomeView.hidden = true;
+                    this.#bundleView.source = source;
+                    this.#serverPanel.value = this.#bundleView.resourceType;
                 } else {
-                    this._bundleView.hidden = true;
-                    this._resourceView.hidden = false;
-                    this._operationOutcomeView.hidden = true;
-                    this._resourceView.source = source;
-                    this._serverPanel.value = this._resourceView.resourceType.type;
+                    this.#bundleView.hidden = true;
+                    this.#resourceView.hidden = false;
+                    this.#operationOutcomeView.hidden = true;
+                    this.#resourceView.source = source;
+                    this.#serverPanel.value = this.#resourceView.resourceType;
                 }
             } else {
                 throw new Error('Unknown response format');
@@ -124,58 +140,59 @@ class App extends HTMLElement {
             snackbarService.show(error, undefined, undefined, 'error');
         } finally {
             clearTimeout(timeoutId);
-            this._waiting.style.visibility = 'hidden'
+            this.#waiting.style.visibility = 'hidden'
         }
     }
 
-    locationHandler = () => {
+    #locationHandler = () => {
         let hash = window.location.hash.replace('#', '').trim();
         if (hash.length) {
             if (window.matchMedia("(max-width: 480px)").matches) {
-                this._serverPanel.classList.add("hidden");
+                this.#serverPanel.classList.add("hidden");
             }
-            this.fetchHash(hash);
+            this.#fetchHash(hash);
         } else {
-            this._body.style.visibility = "hidden";
-            this._serverPanel.classList.remove("hidden");
+            this.#serverPanel.value = '';
+            this.#body.style.visibility = "hidden";
+            this.#serverPanel.classList.remove("hidden");
         }
     }
 
     connectedCallback() {
-        window.addEventListener("hashchange", this.locationHandler);
+        window.addEventListener("hashchange", this.#locationHandler);
 
         const preferedServer = preferencesService.get("server");
         if (preferedServer) {
             settingsService.get(preferedServer).then((configuration) => {
-                this.connect({
+                this.#connect({
                     "code": preferedServer,
                     "configuration": configuration
                 });
             });
         } else {
-            this._serverDialog.hidden = false;
+            this.#serverDialog.hidden = false;
         }
     }
 
-    connect = ({ code, configuration }) => {
-        this._waiting.style.visibility = 'visible';
+    #connect = ({ code, configuration }) => {
+        this.#waiting.style.visibility = 'visible';
         const serverConfiguration = new ServerConfiguration(configuration);
         const server = new Server(code, serverConfiguration);
         server.connect().then(() => {
             context.server = server;
             snackbarService.show(`Connected to "${code}" server.`);
             preferencesService.set("server", code);
-            this._navigationToggle.hidden = false;
+            this.#navigationToggle.hidden = false;
             if (location.hash) {
                 location.hash = '';
             } else {
-                this.locationHandler();
+                this.#locationHandler();
             }
         }).catch(error => {
             snackbarService.error(`An error occurred while connecting to the server "${code}"`);
             console.log(error);
         }).finally(() => {
-            this._waiting.style.visibility = 'hidden';
+            this.#waiting.style.visibility = 'hidden';
         });
     }
 

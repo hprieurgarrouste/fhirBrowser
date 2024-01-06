@@ -1,35 +1,37 @@
 import template from "./templates/ServerCapabilities.html";
 
-import "./components/M2List"
-import "./components/M2ListItem"
-import "./components/M2ListRow"
-
 import context from "./services/Context"
+import M2List from "./components/M2List"
+import M2ListItem from "./components/M2ListItem"
+import M2ListRow from "./components/M2ListRow"
 
-class ServerCapabilities extends HTMLElement {
+export default class ServerCapabilities extends HTMLElement {
+    /** @type {M2List} */
+    #list;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
-        this._list = shadow.querySelector('m2-list');
+        this.#list = shadow.querySelector('m2-list');
     }
 
     /**
-     * @param {object} capabilityStatement
+     * @param {Fhir.CapabilityStatement} capabilityStatement
      */
     load = (capabilityStatement) => {
         const make = (name, value) => {
             if (typeof value === 'undefined') return;
 
-            const item = document.createElement('m2-list-item');
+            const item = new M2ListItem;
             item.setAttribute('data-primary', name);
-            const row = document.createElement('m2-list-row');
             item.setAttribute('data-secondary', value);
+            const row = new M2ListRow();
             row.appendChild(item);
-            this._list.appendChild(row);
+            this.#list.appendChild(row);
         }
 
-        this._list.clear();
+        this.#list.clear();
 
         make('copyright', capabilityStatement.copyright);
         make('description', capabilityStatement.description);

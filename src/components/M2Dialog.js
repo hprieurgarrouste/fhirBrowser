@@ -1,6 +1,6 @@
 import template from "./templates/M2Dialog.html"
 
-class M2Dialog extends HTMLElement {
+export default class M2Dialog extends HTMLElement {
     /** @type {HTMLDivElement} */
     #surface;
     /** @type {HTMLHeadingElement} */

@@ -1,59 +1,72 @@
 import template from "./templates/ResourceTemplateEditor.html"
 
-import "./components/M2List"
 import "./components/M2SidePanel"
 import "./components/M2TextField"
 
 import fhirService from "./services/Fhir"
+import M2List from "./components/M2List"
+import M2ListItem from "./components/M2ListItem"
+import M2ListRow from "./components/M2ListRow"
+import M2TextField from "./components/M2TextField"
 
-class ResourceTemplateEditor extends HTMLElement {
+export default class ResourceTemplateEditor extends HTMLElement {
+    /** @type {ShadowRoot} */
+    #shadow;
+    /** @type {M2List} */
+    #list;
+    /** @type {HTMLElement} */
+    #dragSrcEl;
+    /** @type {HTMLElement} */
+    #template;
+    /** @type {Fhir.Resource} */
+    #resource;
+
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._resource = null;
-        this._dragSrcEl = null;
-        this._template = this._shadow.getElementById('template');
+        this.#shadow = this.attachShadow({ mode: 'closed' });
+        this.#shadow.innerHTML = template;
 
-        const dragZone = this._shadow.querySelector('main');
-        dragZone.ondragstart = this.onDragStart;
-        dragZone.ondragover = this.onDragOver;
-        dragZone.ondragenter = this.onDragEnter;
-        dragZone.ondragleave = this.onDragLeave;
-        dragZone.ondragend = this.onDragEnd;
-        dragZone.ondrop = this.onDragDrop;
+        this.#template = this.#shadow.getElementById('template');
 
-        this._list = this._shadow.querySelector('m2-list');
-        this._list.onFilter = this.dataListFilter;
+        this.#list = this.#shadow.querySelector('m2-list');
+        this.#list.onFilter = this.#dataListFilter;
+
+        const dragZone = this.#shadow.querySelector('main');
+        dragZone.ondragstart = this.#onDragStart;
+        dragZone.ondragover = this.#onDragOver;
+        dragZone.ondragenter = this.#onDragEnter;
+        dragZone.ondragleave = this.#onDragLeave;
+        dragZone.ondragend = this.#onDragEnd;
+        dragZone.ondrop = this.#onDragDrop;
     }
 
-    dataListFilter = (value) => {
+    #dataListFilter = (value) => {
         const filter = value.toLowerCase();
-        this._list.childNodes.forEach(row => {
+        this.#list.childNodes.forEach(row => {
             row.hidden = !row.dataset.id.toLowerCase().includes(filter);
         });
     }
 
-    clear = () => {
-        while (this._template.firstChild) this._template.removeChild(this._template.lastChild);
+    #clear = () => {
+        while (this.#template.firstChild) this.#template.removeChild(this.#template.lastChild);
     }
 
-    buildTemplate = (template) => {
-        this.clear();
+    #buildTemplate = (template) => {
+        this.#clear();
         template.forEach(section => {
-            const fieldset = this.createFieldset(section.label);
+            const fieldset = this.#createFieldset(section.label);
             section.row.forEach(row => {
-                const section = this.createSection();
+                const section = this.#createSection();
                 row.forEach(field => {
-                    section.appendChild(this.createField(field.name, field.placeholder));
+                    section.appendChild(this.#createField(field.name, field.placeholder));
                 })
                 fieldset.appendChild(section);
             });
-            this._template.appendChild(fieldset);
+            this.#template.appendChild(fieldset);
         });
     }
 
-    createFieldset = (name = 'unamed') => {
+    #createFieldset = (name = 'unamed') => {
         const fieldset = document.createElement('fieldset');
         fieldset.setAttribute('draggable', 'true');
         const label = document.createElement('input');
@@ -65,14 +78,14 @@ class ResourceTemplateEditor extends HTMLElement {
         return fieldset;
     }
 
-    createSection = () => {
+    #createSection = () => {
         const section = document.createElement('section');
         section.setAttribute('draggable', 'true');
         return section
     }
 
-    createField = (name, placeholder) => {
-        const textField = document.createElement('m2-textfield');
+    #createField = (name, placeholder) => {
+        const textField = new M2TextField();
         textField.id = name;
         textField.setAttribute("placeholder", placeholder);
         textField.setAttribute("readonly", "");
@@ -80,18 +93,18 @@ class ResourceTemplateEditor extends HTMLElement {
         return textField;
     }
 
-    setValues = (resource) => {
-        const fields = Array.from(this._shadow.querySelectorAll("m2-textfield"));
+    #setValues = (resource) => {
+        const fields = Array.from(this.#shadow.querySelectorAll("m2-textfield"));
         fields.forEach(field => {
             let value = '';
             if (field.id) {
-                value = this.calcValue(resource, field.id)
+                value = this.#calcValue(resource, field.id)
             }
             field.setAttribute("value", value);
         })
     }
 
-    calcValue = (resource, id) => {
+    #calcValue = (resource, id) => {
         let value = resource;
         const path = id.split('.');
         path.every((expr, idx) => {
@@ -111,28 +124,28 @@ class ResourceTemplateEditor extends HTMLElement {
 
 
     get source() {
-        return this._resource;
+        return this.#resource;
     }
     /**
-     * @param {object} resource
+     * @param {Fhir.Resource} resource
      */
     set source(resource) {
-        this._resource = resource;
-        this.loadData(this._resource.resourceType);
-        this.setValues(this._resource);
+        this.#resource = resource;
+        this.#loadData(resource.resourceType);
+        this.#setValues(resource);
     }
 
     set template(tpl) {
         if (tpl) {
-            this.buildTemplate(tpl);
-            this.cleanEmpty();
+            this.#buildTemplate(tpl);
+            this.#cleanEmpty();
         } else {
-            this.clear();
+            this.#clear();
         }
     }
     get template() {
         let ret = [];
-        Array.from(this._template.childNodes)
+        Array.from(this.#template.childNodes)
             .filter(node => 'fieldset' == node.localName)
             .forEach(fieldset => ret.push(parseFieldset(fieldset)));
         return ret;
@@ -166,72 +179,74 @@ class ResourceTemplateEditor extends HTMLElement {
         }
     }
 
-    loadData = (resourceType) => {
-        this._list.clear();
+    #loadData = (resourceType) => {
+        this.#list.clear();
 
-        this._shadow.querySelector('m2-linear-progress').hidden = false;
-        sdParse(resourceType, '').then((elements) => {
-            elements.sort((e1, e2) => e1.path.localeCompare(e2.path));
-            elements.forEach(element => {
-                const item = document.createElement('m2-list-item');
-                item.setAttribute("data-icon", 'drag_indicator');
-                item.setAttribute("data-primary", element.path);
-                item.setAttribute("data-secondary", element.short);
-                const row = document.createElement('m2-list-row');
-                row.setAttribute('draggable', 'true');
-                row.setAttribute("data-id", element.id);
-                row.appendChild(item);
-                this._list.appendChild(row);
-            });
-            this._shadow.querySelector('m2-linear-progress').hidden = true;
+        this.#shadow.querySelector('m2-linear-progress').hidden = false;
+        this.#sdParse(resourceType, '').then((elements) => {
+            elements
+                .sort((e1, e2) => e1.path.localeCompare(e2.path))
+                .forEach(element => this.#list.appendChild(this.#makeRow(element)));
+            this.#shadow.querySelector('m2-linear-progress').hidden = true;
         });
+    }
 
-        function sdParse(resourceType, path) {
-            return new Promise((resolve) => {
-                const elements = [];
-                fhirService.structureDefinition(resourceType).then((structureDefinition) => {
-                    const subPromises = [];
-                    structureDefinition.snapshot.element
-                        .filter(e => e.type)
-                        .forEach((element) => {
-                            const elementName = element.path.substr(element.path.indexOf(".") + 1);
-                            //avoid infinite loops
-                            if (!path.includes(`${elementName}.`)) {
-                                const newPath = (path ? `${path}.` : '') + elementName;
-                                const type = element.type[0].code;
-                                const isClass = type.match(/^([A-Z][a-z]+)+$/);
-                                if (isClass) {
-                                    subPromises.push(sdParse(type, newPath));
-                                } else {
-                                    elements.push({
-                                        'id': newPath,
-                                        'path': newPath,
-                                        'short': element.short,
-                                        'type': type
-                                    });
-                                }
+    #makeRow = (element) => {
+        const item = new M2ListItem();
+        item.setAttribute("data-icon", 'drag_indicator');
+        item.setAttribute("data-primary", element.path);
+        item.setAttribute("data-secondary", element.short);
+        const row = new M2ListRow();
+        row.setAttribute('draggable', 'true');
+        row.setAttribute("data-id", element.id);
+        row.appendChild(item);
+        return row;
+    }
+
+    #sdParse = (resourceType, path) => {
+        return new Promise((resolve) => {
+            const elements = [];
+            fhirService.structureDefinition(resourceType).then((structureDefinition) => {
+                const subPromises = [];
+                structureDefinition.snapshot.element
+                    .filter(e => e.type)
+                    .forEach((element) => {
+                        const elementName = element.path.substr(element.path.indexOf(".") + 1);
+                        //avoid infinite loops
+                        if (!path.includes(`${elementName}.`)) {
+                            const newPath = (path ? `${path}.` : '') + elementName;
+                            const type = element.type[0].code;
+                            const isClass = type.match(/^([A-Z][a-z]+)+$/);
+                            if (isClass) {
+                                subPromises.push(this.#sdParse(type, newPath));
+                            } else {
+                                elements.push({
+                                    'id': newPath,
+                                    'path': newPath,
+                                    'short': element.short,
+                                    'type': type
+                                });
                             }
-                        });
-                    if (subPromises.length > 0) {
-                        Promise.all(subPromises).then((values) => {
-                            values.forEach(value => elements.push(...value));
-                            resolve(elements);
-                        });
-                    } else {
+                        }
+                    });
+                if (subPromises.length > 0) {
+                    Promise.all(subPromises).then((values) => {
+                        values.forEach(value => elements.push(...value));
                         resolve(elements);
-                    }
-                });
+                    });
+                } else {
+                    resolve(elements);
+                }
             });
-        }
-
+        });
     }
 
-    cleanEmpty = () => {
-        Array.from(this._template.querySelectorAll('section:not(:has(m2-textfield))')).forEach(e => e.remove());
-        Array.from(this._template.querySelectorAll('fieldset:not(:has(section))')).forEach(e => e.remove());
+    #cleanEmpty = () => {
+        Array.from(this.#template.querySelectorAll('section:not(:has(m2-textfield))')).forEach(e => e.remove());
+        Array.from(this.#template.querySelectorAll('fieldset:not(:has(section))')).forEach(e => e.remove());
     }
 
-    isDropAvailable = (src, target) => {
+    #isDropAvailable = (src, target) => {
         return (src != target) &&
             (
                 (target.id == 'template') ||
@@ -260,23 +275,23 @@ class ResourceTemplateEditor extends HTMLElement {
             );
     }
 
-    onDragStart = (event) => {
-        this._template.classList.add('drag');
-        this._dragSrcEl = event.target;
-        this._dragSrcEl.style.opacity = '0.4';
+    #onDragStart = (event) => {
+        this.#template.classList.add('drag');
+        this.#dragSrcEl = event.target;
+        this.#dragSrcEl.style.opacity = '0.4';
     }
 
-    onDragEnter = (event) => {
+    #onDragEnter = (event) => {
         event.target?.classList.add('over');
     }
 
-    onDragLeave = (event) => {
+    #onDragLeave = (event) => {
         event.target?.classList.remove('over');
     }
 
-    onDragOver = (event) => {
+    #onDragOver = (event) => {
         event.preventDefault();
-        if (this.isDropAvailable(this._dragSrcEl, event.target)) {
+        if (this.#isDropAvailable(this.#dragSrcEl, event.target)) {
             event.dataTransfer.dropEffect = 'move';
         } else {
             event.dataTransfer.dropEffect = 'none';
@@ -284,17 +299,17 @@ class ResourceTemplateEditor extends HTMLElement {
         return false;
     }
 
-    onDragDrop = (event) => {
+    #onDragDrop = (event) => {
         event.stopPropagation();
         let target = event.target;
-        let src = this._dragSrcEl;
-        if (this.isDropAvailable(this._dragSrcEl, target)) {
+        let src = this.#dragSrcEl;
+        if (this.#isDropAvailable(this.#dragSrcEl, target)) {
             if (target.closest('#template') == null) {
-                this._dragSrcEl.remove();
+                this.#dragSrcEl.remove();
             } else {
-                if (this._dragSrcEl.parentNode == target.parentNode) {
+                if (this.#dragSrcEl.parentNode == target.parentNode) {
                     const thArr = Array.from(target.parentNode.childNodes);
-                    const srcIdx = thArr.findIndex(th => th == this._dragSrcEl);
+                    const srcIdx = thArr.findIndex(th => th == this.#dragSrcEl);
                     const tgtIdx = thArr.findIndex(th => th == target);
 
                     if (srcIdx < tgtIdx) {
@@ -303,17 +318,17 @@ class ResourceTemplateEditor extends HTMLElement {
                 }
 
                 if ('m2-list-row' == src.localName) {
-                    const id = this._dragSrcEl.dataset.id;
-                    src = this.createField(id, id.split(".").pop());
-                    src.setAttribute('value', this.calcValue(this._resource, id));
+                    const id = this.#dragSrcEl.dataset.id;
+                    src = this.#createField(id, id.split(".").pop());
+                    src.setAttribute('value', this.#calcValue(this.#resource, id));
                     if ('template' == target.id) {
-                        const section = this.createSection();
+                        const section = this.#createSection();
                         section.appendChild(src);
-                        const fieldset = this.createFieldset();
+                        const fieldset = this.#createFieldset();
                         fieldset.appendChild(section);
                         target.appendChild(fieldset);
                     } else if ('fieldset' == target.localName) {
-                        const section = this.createSection();
+                        const section = this.#createSection();
                         section.appendChild(src);
                         target.appendChild(section);
                     } else if ('section' == target.localName) {
@@ -329,7 +344,7 @@ class ResourceTemplateEditor extends HTMLElement {
                     }
                 } else if ('section' == src.localName) {
                     if ('template' == target.id) {
-                        const fieldset = this.createFieldset();
+                        const fieldset = this.#createFieldset();
                         fieldset.appendChild(src);
                         target.appendChild(fieldset);
                     } else if ('fieldset' == target.localName) {
@@ -339,13 +354,13 @@ class ResourceTemplateEditor extends HTMLElement {
                     }
                 } else if ('m2-textfield' == src.localName) {
                     if ('template' == target.id) {
-                        const section = this.createSection();
+                        const section = this.#createSection();
                         section.appendChild(src);
-                        const fieldset = this.createFieldset();
+                        const fieldset = this.#createFieldset();
                         fieldset.appendChild(section);
                         target.appendChild(fieldset);
                     } else if ('fieldset' == target.localName) {
-                        const section = this.createSection();
+                        const section = this.#createSection();
                         section.appendChild(src);
                         target.appendChild(section);
                     } else if ('section' == target.localName) {
@@ -355,17 +370,17 @@ class ResourceTemplateEditor extends HTMLElement {
                     }
                 }
             }
-            this.cleanEmpty();
+            this.#cleanEmpty();
         }
 
         return false;
     }
 
-    onDragEnd = (event) => {
-        this._dragSrcEl.style.opacity = '1';
-        this._dragSrcEl = null;
-        this._template.classList.remove('drag');
-        this._template.querySelectorAll('[class~="over"]').forEach(e => e.classList.remove('over'));
+    #onDragEnd = (event) => {
+        this.#dragSrcEl.style.opacity = '1';
+        this.#dragSrcEl = null;
+        this.#template.classList.remove('drag');
+        this.#template.querySelectorAll('[class~="over"]').forEach(e => e.classList.remove('over'));
     }
 
 };

@@ -1,6 +1,6 @@
 import template from "./templates/M2Button.html"
 
-class M2Button extends HTMLElement {
+export default class M2Button extends HTMLElement {
     /** @type {HTMLButtonElement} */
     #input;
 

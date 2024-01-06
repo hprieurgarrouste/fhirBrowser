@@ -1,6 +1,6 @@
 import template from "./templates/M2Tabs.html"
 
-class M2Tabs extends HTMLElement {
+export default class M2Tabs extends HTMLElement {
     /** @type {HTMLElement} */
     #header;
     /** @type {HTMLSlotElement} */

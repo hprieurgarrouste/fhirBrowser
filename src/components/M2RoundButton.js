@@ -1,6 +1,6 @@
 import template from "./templates/M2RoundButton.html"
 
-class M2RoundButton extends HTMLElement {
+export default class M2RoundButton extends HTMLElement {
     /** @type {HTMLButtonElement} */
     #main;
 

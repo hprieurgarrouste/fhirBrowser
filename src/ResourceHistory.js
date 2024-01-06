@@ -1,66 +1,86 @@
 import template from "./templates/ResourceHistory.html";
 
+import M2LinearProgress from "./components/M2LinearProgress"
+import M2List from "./components/M2List"
+import M2ListRow from "./components/M2ListRow"
+import M2ListItem from "./components/M2ListItem"
+
 import context from "./services/Context"
 import fhirService from "./services/Fhir"
 
-class ResourceHistory extends HTMLElement {
+export default class ResourceHistory extends HTMLElement {
+    /** @type {M2List} */
+    #list;
+    /** @type {M2LinearProgress} */
+    #progress;
+
+    /** @Type {String} */
+    #resourceType;
+    /** @Type {String} */
+    #resourceId;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        shadow.getElementById('help').onclick = this.helpClick;
+        shadow.getElementById('help').onclick = this.#helpClick;
 
-        this._list = shadow.querySelector('m2-list');
-        this._list.onclick = this.appListClick;
+        this.#list = shadow.querySelector('m2-list');
+        this.#list.onclick = this.#appListClick;
 
-        this._progress = shadow.querySelector('m2-linear-progress');
+        this.#progress = shadow.querySelector('m2-linear-progress');
 
-        shadow.getElementById('close').onclick = this.sidePanelClose;
+        shadow.getElementById('close').onclick = this.#sidePanelClose;
 
-        this._resourceType = null;
-        this._resourceId = null;
+        this.#resourceType = null;
+        this.#resourceId = null;
     }
 
-    appListClick = (event) => {
+    #appListClick = (event) => {
         event.preventDefault();
         event.stopPropagation();
         const item = event.target.closest("m2-list-row");
         if (item) {
             if (item.hasAttribute('selected')) return;
-            this._list.querySelector("m2-list-row[selected]")?.removeAttribute("selected");
+            this.#list.querySelector("m2-list-row[selected]")?.removeAttribute("selected");
             item.setAttribute("selected", "")
-            location.hash = `#/${this._resourceType}/${this._resourceId}/_history/${item.dataset.versionid}`;
+            location.hash = `#/${this.#resourceType}/${this.#resourceId}/_history/${item.dataset.versionid}`;
         } else {
             event.preventDefault();
             event.stopPropagation();
         }
     }
 
-    helpClick = (event) => {
+    #helpClick = (event) => {
         window.open(fhirService.historyUrl, "FhirBrowserHelp");
         event.preventDefault();
         event.stopPropagation();
     }
 
-    sidePanelClose = (event) => {
+    #sidePanelClose = (event) => {
         this.hidden = true;
         event.preventDefault();
         event.stopPropagation();
     }
 
+    /**
+     * @param {any} resourceType
+     * @param {String} resourceId
+     * @returns {void}
+     */
     load(resourceType, resourceId) {
         if (!resourceType.interaction.find(({ code }) => 'vread' == code)) return;
-        if (resourceType.type == this._resourceType && resourceId == this._resourceId) return
+        if (resourceType.type == this.#resourceType && resourceId == this.#resourceId) return
 
-        this._progress.hidden = false;
-        this._list.clear();
+        this.#progress.hidden = false;
+        this.#list.clear();
 
-        this._readResource(resourceType.type, resourceId).then(resource => {
-            this._resourceType = resourceType.type;
-            this._resourceId = resource.id;
+        this.#readResource(resourceType.type, resourceId).then(resource => {
+            this.#resourceType = resourceType.type;
+            this.#resourceId = resource.id;
             const resourceVersionId = resource.meta?.versionId;
-            this._readHistory(resourceType.type, resource.id).then(response => {
+            this.#readHistory(resourceType.type, resource.id).then(response => {
                 if ('Bundle' == response.resourceType && 'history' == response.type && response.total > 0) {
                     response.entry
                         .filter(element => element?.resource?.meta)
@@ -69,13 +89,13 @@ class ResourceHistory extends HTMLElement {
                             const d2 = new Date(e2.resource.meta.lastUpdated);
                             return d2 - d1;
                         }).forEach(element => {
-                            const row = document.createElement('m2-list-row');
+                            const row = new M2ListRow();
                             row.setAttribute("data-versionid", element.resource.meta.versionId);
                             if (resourceVersionId == element.resource.meta.versionId) {
                                 row.setAttribute("selected", "");
                             }
                             const date = new Date(element.resource.meta.lastUpdated);
-                            const item = document.createElement('m2-list-item');
+                            const item = new M2ListItem();
                             item.setAttribute("data-icon", "history");
                             item.setAttribute("data-primary", `${date.toLocaleString(undefined, {
                                 year: "numeric",
@@ -89,21 +109,21 @@ class ResourceHistory extends HTMLElement {
                                 timeZoneName: "short"
                             })}`);
                             row.appendChild(item);
-                            this._list.appendChild(row);
+                            this.#list.appendChild(row);
                         });
                 }
-                this._progress.hidden = true;
+                this.#progress.hidden = true;
             });
         });
     }
 
-    _readResource = async (type, id) => {
+    #readResource = async (type, id) => {
         return await context.server.fetch(`/${type}/${id}`, {
             _format: 'json'
         });
     }
 
-    _readHistory = async (type, id) => {
+    #readHistory = async (type, id) => {
         return await context.server.fetch(`/${type}/${id}/_history`, {
             _format: 'json',
             _summary: 'text'

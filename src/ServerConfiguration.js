@@ -1,15 +1,15 @@
 export default class ServerConfiguration {
-    _url = '';
-    _method = ServerConfiguration.None;
-    _headers = {};
-    _apiKey = null;
-    _apiValue = null;
-    _basicUsername = null;
-    _basicPassword = null;
-    _oauthTokenurl = null;
-    _oauthclientid = null;
-    _oauthClientsecret = null;
-    _oauthGranttype = null;
+    #url = '';
+    #method = ServerConfiguration.None;
+    #headers = {};
+    #apiKey = null;
+    #apiValue = null;
+    #basicUsername = null;
+    #basicPassword = null;
+    #oauthTokenurl = null;
+    #oauthclientid = null;
+    #oauthClientsecret = null;
+    #oauthGranttype = null;
 
     static METHODS = {
         'None': 'noauth',
@@ -24,7 +24,7 @@ export default class ServerConfiguration {
         this.url = conf.url;
         this.method = conf.auth?.method || ServerConfiguration.METHODS.None;
         this.headers = conf.headers;
-        switch (this._method) {
+        switch (this.#method) {
             case ServerConfiguration.METHODS.APIKey:
                 this.apiKey = conf.auth.setup?.key;
                 this.apiValue = conf.auth.setup?.value;
@@ -47,26 +47,26 @@ export default class ServerConfiguration {
 
     toString = () => {
         const ret = {
-            "url": this._url,
+            "url": this.#url,
             "auth": {
-                "method": this._method,
+                "method": this.#method,
                 "setup": {}
             }
         }
-        switch (this._method) {
+        switch (this.#method) {
             case ServerConfiguration.METHODS.APIKey:
-                ret.auth.setup['key'] = this._apiKey;
-                ret.auth.setup['value'] = this._apiValue;
+                ret.auth.setup['key'] = this.#apiKey;
+                ret.auth.setup['value'] = this.#apiValue;
                 break;
             case ServerConfiguration.METHODS.Basic:
-                ret.auth.setup['username'] = this._basicUsername;
-                ret.auth.setup['password'] = this._basicPassword;
+                ret.auth.setup['username'] = this.#basicUsername;
+                ret.auth.setup['password'] = this.#basicPassword;
                 break;
             case ServerConfiguration.METHODS.OAuth2:
-                ret.auth.setup['access_token_url'] = this._oauthTokenurl;
-                ret.auth.setup['client_id'] = this._oauthclientid;
-                ret.auth.setup['client_secret'] = this._oauthClientsecret;
-                ret.auth.setup['grant_type'] = this._oauthGranttype;
+                ret.auth.setup['access_token_url'] = this.#oauthTokenurl;
+                ret.auth.setup['client_id'] = this.#oauthclientid;
+                ret.auth.setup['client_secret'] = this.#oauthClientsecret;
+                ret.auth.setup['grant_type'] = this.#oauthGranttype;
                 break;
             case ServerConfiguration.METHODS.None:
             default:
@@ -77,18 +77,18 @@ export default class ServerConfiguration {
 
 
     get url() {
-        return this._url
+        return this.#url
     }
     /**
      * @param {url} value
      */
     set url(value) {
         const url = new URL(value);
-        this._url = value
+        this.#url = value
     }
 
     get method() {
-        return this._method
+        return this.#method
     }
     /**
      * @param {ServerConfiguration.METHODS} value
@@ -97,97 +97,97 @@ export default class ServerConfiguration {
         if (!Object.entries(ServerConfiguration.METHODS).find(([, methodValue]) => methodValue == value)) {
             throw new Error(`authentication method '${value}' not supported`)
         }
-        this._method = value
+        this.#method = value
     }
 
     get headers() {
-        return this._headers;
+        return this.#headers;
     }
     /**
      * @param {object} value
      */
     set headers(value) {
-        this._headers = value;
+        this.#headers = value;
     }
 
     get apiKey() {
-        return this._apiKey
+        return this.#apiKey
     }
     /**
      * @param {string} value
      */
     set apiKey(value) {
-        this._apiKey = value
+        this.#apiKey = value
     }
 
     get apiValue() {
-        return this._apiValue
+        return this.#apiValue
     }
     /**
      * @param {string} value
      */
     set apiValue(value) {
-        this._apiValue = value
+        this.#apiValue = value
     }
 
     get basicUsername() {
-        return this._basicUsername
+        return this.#basicUsername
     }
     /**
      * @param {string} value
      */
     set basicUsername(value) {
-        this._basicUsername = value
+        this.#basicUsername = value
     }
 
     get basicPassword() {
-        return this._basicPassword
+        return this.#basicPassword
     }
     /**
      * @param {string} value
      */
     set basicPassword(value) {
-        this._basicPassword = value
+        this.#basicPassword = value
     }
 
     get oauthTokenUrl() {
-        return this._oauthTokenurl
+        return this.#oauthTokenurl
     }
     /**
      * @param {href} value
      */
     set oauthTokenUrl(value) {
-        this._oauthTokenurl = value
+        this.#oauthTokenurl = value
     }
 
     get oauthClientId() {
-        return this._oauthclientid
+        return this.#oauthclientid
     }
     /**
      * @param {string} value
      */
     set oauthClientId(value) {
-        this._oauthclientid = value
+        this.#oauthclientid = value
     }
 
     get oauthClientSecret() {
-        return this._oauthClientsecret
+        return this.#oauthClientsecret
     }
     /**
      * @param {string} value
      */
     set oauthClientSecret(value) {
-        this._oauthClientsecret = value
+        this.#oauthClientsecret = value
     }
 
     get oauthGrantType() {
-        return this._oauthGranttype
+        return this.#oauthGranttype
     }
     /**
      * @param {string} value
      */
     set oauthGrantType(value) {
-        this._oauthGranttype = value
+        this.#oauthGranttype = value
     }
 
 }

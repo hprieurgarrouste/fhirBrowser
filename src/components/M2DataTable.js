@@ -1,6 +1,6 @@
 import template from "./templates/M2DataTable.html"
 
-class M2DataTable extends HTMLElement {
+export default class M2DataTable extends HTMLElement {
     /** @type {HTMLTableRowElement} */
     #header;
     /** @type {HTMLTableSectionElement} */

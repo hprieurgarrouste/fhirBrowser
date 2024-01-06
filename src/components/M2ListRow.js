@@ -1,6 +1,6 @@
 import template from "./templates/M2ListRow.html"
 
-class M2ListRow extends HTMLElement {
+export default class M2ListRow extends HTMLElement {
     /** @type {HTMLElement} */
     #main;
 

@@ -1,6 +1,6 @@
 import template from "./templates/M2ListRowCheck.html"
 
-class M2ListRowCheck extends HTMLElement {
+export default class M2ListRowCheck extends HTMLElement {
     /** @param {HTMLInputElement} */
     #checkbox;
 

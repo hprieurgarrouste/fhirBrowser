@@ -2,52 +2,79 @@ import template from "./templates/ServerResources.html"
 
 import resourceIcon from "./assets/fhirIconSet"
 
-import "./components/M2List"
-import "./components/M2Badge"
-import "./components/M2ListItem"
-import "./components/M2ListRow"
+import M2List from "./components/M2List"
+import M2Badge from "./components/M2Badge"
+import M2ListItem from "./components/M2ListItem"
+import M2ListRow from "./components/M2ListRow"
 
 import context from "./services/Context"
 
-class ServerResources extends HTMLElement {
+export default class ServerResources extends HTMLElement {
+    /** @type {M2List} */
+    #list;
+    /** @type {Set} */
+    #recent;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        this._list = shadow.querySelector('m2-list');
-        this._list.onFilter = this.appListFilter;
-        this._list.onclick = this.appListClick;
+        this.#list = shadow.querySelector('m2-list');
+        this.#list.onFilter = this.#appListFilter;
+        this.#list.onclick = this.#appListClick;
 
-        this._recent = new Set();
+        this.#recent = new Set();
     }
 
     /**
-     * @param {object} capabilityStatement
+     * @param {Fhir.CapabilityStatement} capabilityStatement
+     * @returns {void}
      */
     load = (capabilityStatement) => {
-        this._list.clear();
-        this._recent.clear();
+        this.#list.clear();
         capabilityStatement?.rest[0]?.resource
-            .filter(res => res.interaction.map(interaction => interaction.code).includes('search-type'))
-            .forEach(resource => {
-                const item = document.createElement('m2-list-item');
-                item.setAttribute("data-primary", resource.type);
-                item.setAttribute("data-icon", resourceIcon[resource.type.toLowerCase()]);
-                const row = document.createElement('m2-list-row');
-                row.setAttribute("data-type", resource.type);
-                row.appendChild(item);
-                this._list.appendChild(row);
-            });
+            .filter(res => res.interaction.find(({ code }) => 'search-type' == code))
+            .sort((r1, r2) => r1.type.toLowerCase().localeCompare(r2.type.toLowerCase()))
+            .forEach(resource => this.#list.appendChild(this.#makeListRow(resource.type)));
+        this.#recent.clear();
+    }
+
+    /**
+     * @returns {(String|null)}
+     */
+    get value() {
+        return this.#list.querySelector("m2-list-row[selected]").dataset.type;
+    }
+
+    /**
+     * @param {String} resourceType
+     */
+    set value(resourceType) {
+        this.#selectRow(this.#list.querySelector(`m2-list-row[data-type="${resourceType}"]`));
+    }
+
+    /**
+     * @param {String} resourceType
+     * @returns {M2ListRow}
+     */
+    #makeListRow = (resourceType) => {
+        const item = new M2ListItem();
+        item.setAttribute("data-primary", resourceType);
+        item.setAttribute("data-icon", resourceIcon[resourceType.toLowerCase()]);
+        const row = new M2ListRow()
+        row.setAttribute("data-type", resourceType);
+        row.appendChild(item);
+        return row;
     }
 
     /**
      * @param {event} event
      */
-    appListClick = ({ target }) => {
+    #appListClick = ({ target }) => {
         const row = target.closest("m2-list-row");
         if (row) {
-            this._list.querySelector('m2-list-row[selected]')?.removeAttribute('selected');
+            this.#list.querySelector('m2-list-row[selected]')?.removeAttribute('selected');
             row.setAttribute('selected', '');
             location.hash = `#/${row.dataset.type}?_summary=true&_format=json`;
         }
@@ -56,34 +83,20 @@ class ServerResources extends HTMLElement {
     /**
      * @param {string} value
      */
-    appListFilter = (value) => {
-        this._list.childNodes.forEach(row => row.hidden = !row.dataset.type.toLowerCase().includes(value.toLowerCase()));
-        this._list.querySelector("m2-list-row[selected]")?.scrollIntoView();
+    #appListFilter = (value) => {
+        this.#list.childNodes.forEach(row => row.hidden = !row.dataset.type.toLowerCase().includes(value.toLowerCase()));
+        this.#list.querySelector("m2-list-row[selected]")?.scrollIntoView();
     }
 
     /**
-     * @returns {(string|null)}
+     * @param {M2ListRow} row
      */
-    get value() {
-        return this._list.querySelector("m2-list-row[selected]").dataset.type;
-    }
-
-    /**
-     * @param {string} resourceType
-     */
-    set value(resourceType) {
-        this.selectRow(this._list.querySelector(`m2-list-row[data-type="${resourceType}"]`));
-    }
-
-    /**
-     * @param {ListRow} row
-     */
-    selectRow = (row) => {
-        const currentRow = this._list.querySelector('m2-list-row[selected]');
+    #selectRow = (row) => {
+        const currentRow = this.#list.querySelector('m2-list-row[selected]');
         //unselect
         if ('m2-list-row' != row?.localName) {
             currentRow?.removeAttribute('selected');
-            this._list.scrollTop = 0;
+            this.#list.scrollTop = 0;
             return;
         }
         //select
@@ -95,24 +108,24 @@ class ServerResources extends HTMLElement {
         //add badge
         const item = row.querySelector('m2-list-item');
         if (!item.querySelector('m2-badge[slot="trailling"]')) {
-            this.getCount(row.dataset.type).then(({ total }) => {
+            this.#getCount(row.dataset.type).then(({ total }) => {
                 //TODO avoid double badge
                 if (!item.querySelector('m2-badge[slot="trailling"]')) {
-                    item.appendChild(this.makeBadge(total))
+                    item.appendChild(this.#makeBadge(total))
                 }
             });
         }
         //recent
-        this._recent.add(row.dataset.type);
-        if (this._recent.size > 10) this._recent.delete(this._recent.values().next().value);
-        //console.log(this._recent);
+        this.#recent.add(row.dataset.type);
+        if (this.#recent.size > 10) this.#recent.delete(this.#recent.values().next().value);
+        //console.log(this.#recent);
     }
 
     /**
      * @param {string} resourceType
      * @returns {promise} response of count fetch
      */
-    getCount = async (resourceType) => {
+    #getCount = async (resourceType) => {
         const url = new URL(`${context.server.url}/${resourceType}`);
         url.searchParams.set("_summary", "count");
         url.searchParams.set("_format", "json");
@@ -124,12 +137,12 @@ class ServerResources extends HTMLElement {
 
     /**
      * @param {number} count
-     * @returns {AppBadge} Badge component
+     * @returns {M2Badge} Badge component
      */
-    makeBadge = (count) => {
-        const badge = document.createElement('m2-badge');
+    #makeBadge = (count) => {
+        const badge = new M2Badge();
         badge.slot = 'trailling';
-        badge.value = count == undefined ? '?' : count;
+        badge.value = (count == undefined) ? '?' : count;
         return badge;
     }
 

@@ -1,6 +1,6 @@
 import template from "./templates/M2LinearProgress.html"
 
-class M2LinearProgress extends HTMLElement {
+export default class M2LinearProgress extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'closed' }).innerHTML = template;

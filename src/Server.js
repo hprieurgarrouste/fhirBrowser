@@ -5,52 +5,52 @@ import ServerConfiguration from "./ServerConfiguration";
  */
 export default class Server {
 
-    _code = null;
-    /**
-     * @type ServerConfiguration
-     */
-    _serverConfiguration = null;
-    _capabilities = null;
-    _fhirReferences = null;
-    _headers = {};
+    /** @type {ServerConfiguration} */
+    #serverConfiguration = null;
+    #capabilities = null;
+    #fhirReferences = null;
+    #serverReferences = null;
+    #headers = {};
+    /** @type {String} */
+    #code;
 
     /**
-     * @param {code} code
+     * @param {String} code
      * @param {ServerConfiguration} serverConfiguration
      */
     constructor(code = '', serverConfiguration = null) {
         if (serverConfiguration == null) return;
-        this._code = code;
-        this._serverConfiguration = serverConfiguration;
-        Object.assign(this._headers, serverConfiguration.headers);
+        this.#code = code;
+        this.#serverConfiguration = serverConfiguration;
+        Object.assign(this.#headers, serverConfiguration.headers);
     }
 
     /**
      * @returns {string}
      */
     get serverCode() {
-        return this._code;
+        return this.#code;
     }
 
     /**
      * @returns {string}
      */
     get url() {
-        return this._serverConfiguration.url;
+        return this.#serverConfiguration.url;
     }
 
     /**
      * @returns {object}
      */
     get headers() {
-        return this._headers
+        return this.#headers
     }
 
     /**
      * @returns {object}
      */
     get capabilities() {
-        return this._capabilities
+        return this.#capabilities
     }
 
     /**
@@ -75,53 +75,53 @@ export default class Server {
             "3.0.1": "STU3",
             "3.0.0": "STU3"
         }
-        return release[this._capabilities.fhirVersion] || null;
+        return release[this.#capabilities.fhirVersion] || null;
     }
 
     connect = async () => {
-        switch (this._serverConfiguration.method) {
+        switch (this.#serverConfiguration.method) {
             case ServerConfiguration.METHODS.APIKey:
-                this._headers[this._serverConfiguration.apiKey] = this._serverConfiguration.apiValue;
+                this.#headers[this.#serverConfiguration.apiKey] = this.#serverConfiguration.apiValue;
                 break;
             case ServerConfiguration.METHODS.Basic:
-                let auth = btoa(`${this._serverConfiguration.basicUsername}:${this._serverConfiguration.basicPassword}`);
-                this._headers['Authorization'] = `Basic ${auth}`;
+                let auth = btoa(`${this.#serverConfiguration.basicUsername}:${this.#serverConfiguration.basicPassword}`);
+                this.#headers['Authorization'] = `Basic ${auth}`;
                 break;
             case ServerConfiguration.METHODS.OAuth2:
-                this._oauth2_getToken().then(response => {
-                    this._headers['Authorization'] = `${response.token_type} ${response.access_token}`;
+                this.#oauth2_getToken().then(response => {
+                    this.#headers['Authorization'] = `${response.token_type} ${response.access_token}`;
                 });
                 break;
             case ServerConfiguration.METHODS.None:
             default:
                 break;
         }
-        this._capabilities = await this._fetchCapabilities();
-        this._references = await this._parseReferences(this._capabilities);
+        this.#capabilities = await this.#fetchCapabilities();
+        this.#serverReferences = await this.#parseReferences(this.#capabilities);
     }
 
     fetch = async (href, searchParams = {}) => {
-        const url = new URL(`${this._serverConfiguration.url}${href}`);
+        const url = new URL(`${this.#serverConfiguration.url}${href}`);
         Object.entries(searchParams).forEach(([key, value]) => url.searchParams.set(key, value));
         const response = await fetch(url, {
-            "headers": this._headers
+            "headers": this.#headers
         });
         return response.json();
     }
 
-    _oauth2_getToken = async () => {
+    #oauth2_getToken = async () => {
         const headers = {
             'Content-type': 'application/x-www-form-urlencoded'
         }
-        if ('client_credentials' == this._serverConfiguration.oauthGrantType) {
-            const auth = btoa(`${this._serverConfiguration.oauthClientId}:${this._serverConfiguration.oauthClientSecret}`);
+        if ('client_credentials' == this.#serverConfiguration.oauthGrantType) {
+            const auth = btoa(`${this.#serverConfiguration.oauthClientId}:${this.#serverConfiguration.oauthClientSecret}`);
             headers['Authorization'] = `Basic ${auth}`;
         }
         const urlParams = {
-            "grant_type": this._serverConfiguration.oauthGrantType
+            "grant_type": this.#serverConfiguration.oauthGrantType
         }
 
-        const response = await fetch(this._serverConfiguration.oauthTokenUrl, {
+        const response = await fetch(this.#serverConfiguration.oauthTokenUrl, {
             "headers": headers,
             "method": "POST",
             "body": new URLSearchParams(urlParams).toString()
@@ -129,13 +129,13 @@ export default class Server {
         return response.json();
     }
 
-    _fetchCapabilities = async () => {
-        const url = new URL(`${this._serverConfiguration.url}/metadata`);
+    #fetchCapabilities = async () => {
+        const url = new URL(`${this.#serverConfiguration.url}/metadata`);
         url.searchParams.set("_format", "json");
         try {
             const response = await fetch(url, {
                 "cache": "reload",
-                "headers": this._headers
+                "headers": this.#headers
             });
             if (response.ok) {
                 return response.json();
@@ -153,13 +153,13 @@ export default class Server {
      * @returns
      */
     references = (resourceType) => {
-        return this._references[resourceType];
+        return this.#serverReferences[resourceType];
     }
 
-    _parseReferences = async (metadata) => {
+    #parseReferences = async (metadata) => {
         const serverReferences = {};
         const serverResources = metadata.rest[0].resource;
-        const fhirReferences = await this._fetchAllReferences();
+        const fhirReferences = await this.#fetchAllReferences();
         metadata.rest[0].resource.forEach((serverResource) => {
             const fhirReference = fhirReferences[this.release][serverResource.type];
             if (fhirReference) {
@@ -198,18 +198,17 @@ export default class Server {
         return serverReferences;
     }
 
-    _fetchAllReferences = async () => {
-        if (!this._fhirReferences) {
+    #fetchAllReferences = async () => {
+        if (!this.#fhirReferences) {
             const response = await fetch('./assets/references.json');
-            this._fhirReferences = await response.json();
+            this.#fhirReferences = await response.json();
         }
-        return this._fhirReferences;
+        return this.#fhirReferences;
     }
 
     /**
-     *
      * @param {('json'|'xml'|'ttl')} format
-     * @returns
+     * @returns {Boolean}
      */
     isFormatEnable(format) {
         let formats = [];
@@ -230,6 +229,6 @@ export default class Server {
                 formats.push("html/turtle");
                 break;
         }
-        return this._capabilities.format.some(format => formats.includes(format));
+        return this.#capabilities.format.some(format => formats.includes(format));
     }
 }

@@ -1,52 +1,61 @@
 import template from "./templates/ResourceTtlView.html";
 
-import snackbarService from "./services/Snackbar"
+export default class ResourceTtlView extends HTMLElement {
 
-class ResourceTtlView extends HTMLElement {
+    /** @type {HTMLPreElement} */
+    #content;
+    /** @type {Fhir.Resource} */
+    #resource
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        this._content = shadow.getElementById('content');
+        this.#content = shadow.getElementById('content');
 
-        shadow.getElementById('download').onclick = this.downloadClick;
+        shadow.getElementById('download').onclick = this.#downloadClick;
 
-        shadow.getElementById('copy').onclick = this.copyClick;
+        shadow.getElementById('copy').onclick = this.#copyClick;
 
-        shadow.getElementById('share').onclick = this.shareClick;
+        shadow.getElementById('share').onclick = this.#shareClick;
 
-        this._resource = null;
+        this.#resource = null;
     }
 
     clear = () => {
-        this._content.scrollTo(0, 0);
-        this._content.innerHTML = "Loading...";
-        this._content.style.cursor = "wait";
-        this._resource = null;
+        this.#content.scrollTo(0, 0);
+        this.#content.innerHTML = "Loading...";
+        this.#content.style.cursor = "wait";
+        this.#resource = null;
     }
 
+    /** @returns {String} */
     get resourceType() {
-        return this._resource.match(/rdf:type\s*fhir:(\w+)/)[1];
+        return this.#resource.match(/rdf:type\s*fhir:(\w+)/)[1];
     }
+
+    /** @returns {String} */
     get resourceId() {
-        return this._resource.match(/fhir:Resource.id\s*\[\s*fhir:value\s*"([^"]+)"\s*\]/)[1];
+        return this.#resource.match(/fhir:Resource.id\s*\[\s*fhir:value\s*"([^"]+)"\s*\]/)[1];
     }
+
+    /** @returns {Fhir.Resource} */
     get source() {
-        return this._resource;
+        return this.#resource;
     }
     /**
-     * @param {object} resource
+     * @param {Fhir.Resource} resource
      */
     set source(resource) {
-        this._content.scrollTo(0, 0);
-        this._content.innerText = resource;
-        this._content.style.cursor = "default";
-        this._resource = resource;
+        this.#content.scrollTo(0, 0);
+        this.#content.innerText = resource;
+        this.#content.style.cursor = "default";
+        this.#resource = resource;
     }
 
-    downloadClick = () => {
-        const content = this._resource;
+    #downloadClick = () => {
+        const content = this.#resource;
         const file = new File([content], this.resourceId, {
             'type': 'data:text/plain;charset=utf-8'
         });
@@ -59,8 +68,8 @@ class ResourceTtlView extends HTMLElement {
         window.URL.revokeObjectURL(url);
     };
 
-    copyClick = () => {
-        const content = this._resource;
+    #copyClick = () => {
+        const content = this.#resource;
         navigator.clipboard.writeText(content).then(function () {
             SnackbarService.show("Copying to clipboard was successful");
         }, function (err) {
@@ -68,8 +77,8 @@ class ResourceTtlView extends HTMLElement {
         });
     };
 
-    shareClick = () => {
-        const content = this._resource;
+    #shareClick = () => {
+        const content = this.#resource;
         const fileName = `${this.resourceType}.${this.resourceId}.txt`;
         const file = new File([content], fileName, { type: 'text/plain' });
         navigator.share({

@@ -1,6 +1,6 @@
 import template from "./templates/M2TextField.html"
 
-class M2TextField extends HTMLElement {
+export default class M2TextField extends HTMLElement {
     /** @type {HTMLLabelElement} */
     #label;
     /** @type {HTMLInputElement} */
@@ -52,10 +52,10 @@ class M2TextField extends HTMLElement {
     }
 
     checkValidity = function () {
-        return this._input.checkValidity();
+        return this.#input.checkValidity();
     }
     focus = function () {
-        this._input.focus();
+        this.#input.focus();
     }
 
     get value() {

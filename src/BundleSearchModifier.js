@@ -1,18 +1,21 @@
 import template from "./templates/BundleSearchModifier.html";
 
-class BundleSearchModifier extends HTMLElement {
+export default class BundleSearchModifier extends HTMLElement {
+    /** @type {HTMLInputElement} */
+    #input;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' })
         shadow.innerHTML = template;
-        this._input = shadow.querySelector('input');
+        this.#input = shadow.querySelector('input');
     }
 
     get value() {
-        return this._input.value;
+        return this.#input.value;
     }
     set value(newValue) {
-        this._input.value = newValue;
+        this.#input.value = newValue;
     }
 
 };

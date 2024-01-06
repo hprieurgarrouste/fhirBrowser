@@ -1,162 +1,165 @@
 import template from "./templates/ServerDialog.html";
 
-import "./components/M2Button"
-import "./components/M2Dialog"
-import "./components/M2RoundButton"
+import M2Dialog from "./components/M2Dialog"
 
-import "./ServerList"
-import "./ServerForm"
+import ServerForm from "./ServerForm"
+import ServerList from "./ServerList";
 
 import context from "./services/Context"
 import settingsService from "./services/Settings"
 import snackbarService from "./services/Snackbar"
 
-class ServerDialog extends HTMLElement {
+export default class ServerDialog extends HTMLElement {
+    /** @type {ServerList} */
+    #list;
+    /** @type {M2Dialog} */
+    #appDialog;
+    /** @type {ServerForm} */
+    #form;
+    /** @type {Boolean} */
+    #editMode;
+
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
 
-        this._editMode = false;
+        this.#editMode = false;
 
-        this._list = shadow.querySelector('server-list');
-        this._list.addEventListener('serverchanged', this.serverListClick);
+        this.#list = shadow.querySelector('server-list');
+        this.#list.addEventListener('serverchanged', this.#serverListClick);
 
-        this._form = shadow.querySelector("server-form");
-        this._form.onOk = this.serverFormOk;
-        this._form.onDelete = this.serverFormDelete;
+        this.#form = shadow.querySelector("server-form");
+        this.#form.onOk = this.#serverFormOk;
+        this.#form.onDelete = this.#serverFormDelete;
 
-        this._appDialog = shadow.querySelector('m2-dialog');
-        this._appDialog.onClose = (event) => {
+        this.#appDialog = shadow.querySelector('m2-dialog');
+        this.#appDialog.onClose = (event) => {
             event.preventDefault();
             event.stopPropagation();
-            this.appDialogClose();
+            this.#appDialogClose();
         };
 
-        shadow.getElementById("setupAdd").onclick = this.setupAddClick;
+        shadow.getElementById("setupAdd").onclick = this.#setupAddClick;
 
-        shadow.getElementById("setupCancel").onclick = this.setupCancel;
+        shadow.getElementById("setupCancel").onclick = this.#setupCancel;
 
-        shadow.getElementById("setupOk").onclick = this.setupOk;
-        shadow.getElementById("setupClose").onclick = this.appDialogClose;
+        shadow.getElementById("setupOk").onclick = this.#setupOk;
+        shadow.getElementById("setupClose").onclick = this.#appDialogClose;
 
         shadow.getElementById("setupToggle").onclick = () => { this.editMode = true };
     }
 
     connectedCallback() {
         this.editMode = false;
-        this.loadConf();
+        this.#loadConf();
     }
 
-    loadConf = () => {
+    #loadConf = () => {
         settingsService.getAll().then(conf => {
             this._conf = conf;
-            this._list.load(conf);
-            this._list.value = context.server?.serverCode;
+            this.#list.load(conf);
+            this.#list.value = context.server?.serverCode;
         });
     }
 
-    setupOk = () => {
+    #setupOk = () => {
         settingsService.setAll(this._conf);
         this.editMode = false;
-        this.loadConf();
+        this.#loadConf();
     }
 
-    setupCancel = () => {
+    #setupCancel = () => {
         this.editMode = false;
-        this.loadConf();
+        this.#loadConf();
     }
 
-    setupAddClick = () => {
+    #setupAddClick = () => {
         this.value = '';
-        this._form.value = {
+        this.#form.value = {
             "serverCode": "",
             "server": { "url": "" }
         };
-        this._form.hidden = false;
+        this.#form.hidden = false;
     }
 
-    serverListClick = (event) => {
+    #serverListClick = (event) => {
         const serverCode = event.detail.serverCode;
         const server = this._conf[serverCode];
         if (this.editMode) {
-            this._form.value = { "serverCode": serverCode, "server": server };
-            this._form.hidden = false;
+            this.#form.value = { "serverCode": serverCode, "server": server };
+            this.#form.hidden = false;
         } else {
             this.editMode = false;
             this.hidden = true;
             event.preventDefault();
             event.stopPropagation();
-            this._onSelect({
+            this.#onSelect({
                 'code': serverCode,
                 'configuration': server
             });
         }
     }
 
-    _onSelect = () => { }
+    #onSelect = () => { }
     get onSelect() {
-        return this._onSelect;
+        return this.#onSelect;
     }
     set onSelect(callback) {
-        this._onSelect = callback;
+        this.#onSelect = callback;
     }
 
-    serverFormDelete = () => {
-        const server = this._form.value;
+    #serverFormDelete = () => {
+        const server = this.#form.value;
         const serverCode = server.serverCode;
         delete this._conf[serverCode];
-        this._list.load(this._conf);
+        this.#list.load(this._conf);
         return true;
     }
 
-    serverFormOk = () => {
-        const server = this._form.value;
+    #serverFormOk = () => {
+        const server = this.#form.value;
         const current = this.value;
         const serverCode = server.serverCode;
         delete server['serverCode'];
         if (current) {
             delete this._conf[current];
         } else if (this._conf[serverCode]) {
-            snackbarService.show('this configuration already exists',
-                undefined,
-                undefined,
-                'error'
-            );
+            snackbarService.error('this configuration already exists');
             return false;
         }
         this._conf[serverCode] = server;
-        this._list.load(this._conf);
+        this.#list.load(this._conf);
         return true;
     }
 
-    appDialogClose = () => {
+    #appDialogClose = () => {
         this.editMode = false;
         this.hidden = true;
     }
 
     get value() {
-        return this._list.value;
+        return this.#list.value;
     }
     /**
      * @param {string} serverKey
      */
     set value(serverKey) {
-        this._list.value = serverKey;
+        this.#list.value = serverKey;
     }
 
     get editMode() {
-        return this._editMode;
+        return this.#editMode;
     }
     /**
      * @param {boolean} edit
      */
     set editMode(edit) {
-        this._editMode = edit;
+        this.#editMode = edit;
         if (edit) {
-            this._appDialog.classList.add("edit");
+            this.#appDialog.classList.add("edit");
         } else {
-            this._appDialog.classList.remove("edit");
+            this.#appDialog.classList.remove("edit");
         }
     }
 };

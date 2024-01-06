@@ -1,62 +1,67 @@
 import template from "./templates/BundleColumnsDialog.html";
 
-import "./components/M2Button"
-import "./components/M2Dialog"
-import "./components/M2List"
-import "./components/M2LinearProgress"
-import "./components/M2ListItem"
-import "./components/M2ListRowCheck"
+import M2List from "./components/M2List";
+import M2ListItem from "./components/M2ListItem";
+import M2ListRowCheck from "./components/M2ListRowCheck";
+import M2LinearProgress from "./components/M2LinearProgress";
 
 import context from "./services/Context"
 import fhirService from "./services/Fhir"
 
-class BundleColumnsDialog extends HTMLElement {
+export default class BundleColumnsDialog extends HTMLElement {
+    /** @type {M2LinearProgress} */
+    #progress;
+    /** @type {M2List} */
+    #list;
+    /** @type {String} */
+    #resourceType;
+    /** @type {String} */
+    #serverRelease;
+
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._resourceType = null;
-        this._release = null;
-        this._onValidate = () => { };
-        this._list = null;
-        this._shadow.querySelector('m2-dialog').onClose = this.appDialogClose;
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
 
-        this._list = this._shadow.querySelector('m2-list');
-        this._list.onFilter = this.appListFilter;
+        this.#progress = shadow.querySelector('m2-linear-progress');
+        this.#list = shadow.querySelector('m2-list');
+        this.#list.onFilter = this.#appListFilter;
 
-        this._shadow.getElementById('btnCancel').onclick = this.btnCancelClick;
-        this._shadow.getElementById('btnOk').onclick = this.btnOkClick;
+        shadow.querySelector('m2-dialog').onClose = this.#appDialogClose;
+        shadow.getElementById('btnCancel').onclick = this.#btnCancelClick;
+        shadow.getElementById('btnOk').onclick = this.#btnOkClick;
     }
 
-    btnOkClick = (event) => {
+    #btnOkClick = (event) => {
         event.preventDefault();
         event.stopPropagation();
         this.hidden = true;
-        const columns = Array.from(this._list.querySelectorAll('m2-list-row-check[selected]')).map(r => r.dataset.id);
-        this._onValidate(columns);
+        const columns = Array.from(this.#list.querySelectorAll('m2-list-row-check[selected]')).map(r => r.dataset.id);
+        this.#onValidate(columns);
     }
 
-    btnCancelClick = () => { this.hidden = true };
+    #btnCancelClick = () => { this.hidden = true };
 
-    appListFilter = (value) => {
+    #appListFilter = (value) => {
         const filter = value.toLowerCase();
-        this._list.childNodes.forEach(row => {
+        this.#list.childNodes.forEach(row => {
             row.hidden = !(row.dataset.id.toLowerCase().includes(filter));
         });
     }
 
-    appDialogClose = (event) => {
+    #appDialogClose = (event) => {
         this.hidden = true;
         event.preventDefault();
         event.stopPropagation();
     }
 
-    get onValidate() { return this._onValidate }
+    #onValidate = () => { }
+    get onValidate() { return this.#onValidate }
+    /** @returns {Promise} */
+    set onValidate(promise) { this.#onValidate = promise }
 
-    set onValidate(promise) { this._onValidate = promise }
-
-    checkValues = (values) => {
-        Array.from(this._list.querySelectorAll('m2-list-row-check')).forEach(row => {
+    #checkValues = (values) => {
+        Array.from(this.#list.querySelectorAll('m2-list-row-check')).forEach(row => {
             if (values.includes(row.dataset.id)) {
                 row.setAttribute('selected', '');
             } else {
@@ -66,73 +71,79 @@ class BundleColumnsDialog extends HTMLElement {
     }
 
     /**
-    * @param {string} resourceType
-    * @param {string[]} values
+    * @param {String} resourceType
+    * @param {Array.<String>} values
     */
     load = (resourceType, values) => {
-        if (resourceType === this._resourceType && context.server.release === this._release) {
-            this.checkValues(values);
+        if (resourceType === this.#resourceType && context.server.release === this.#serverRelease) {
+            this.#checkValues(values);
             return;
         }
-        this._resourceType = resourceType;
-        this._release = context.server.release;
+        this.#resourceType = resourceType;
+        this.#serverRelease = context.server.release;
 
-        this._list.clear();
+        this.#list.clear();
 
-        this._shadow.querySelector('m2-linear-progress').hidden = false;
-        sdParse(resourceType, '').then((elements) => {
-            elements.sort((e1, e2) => e1.path.localeCompare(e2.path));
-            elements.forEach(element => {
-                const item = document.createElement('m2-list-item');
-                item.setAttribute('data-primary', element.path);
-                item.setAttribute('data-secondary', element.short);
-                const row = document.createElement('m2-list-row-check');
-                row.setAttribute('data-id', element.id);
-                row.appendChild(item);
-                this._list.appendChild(row);
-            });
-            this._shadow.querySelector('m2-linear-progress').hidden = true;
-            this.checkValues(values);
+        this.#progress.hidden = false;
+        this.#sdParse(resourceType, '').then((elements) => {
+            elements
+                .sort((e1, e2) => e1.path.localeCompare(e2.path))
+                .forEach(element => {
+                    this.#list.appendChild(this.#makeRow(element));
+                });
+            this.#progress.hidden = true;
+            this.#checkValues(values);
         });
 
-        function sdParse(resourceType, path) {
-            return new Promise((resolve) => {
-                const elements = [];
-                fhirService.structureDefinition(resourceType).then((structureDefinition) => {
-                    const subPromises = [];
-                    structureDefinition.snapshot.element
-                        .filter(e => e.isSummary && e.type)
-                        .forEach((element) => {
-                            const elementName = element.path.substr(element.path.indexOf(".") + 1);
-                            //avoid infinite loops
-                            if (!path.includes(`${elementName}.`)) {
-                                const newPath = (path ? `${path}.` : '') + elementName;
-                                const type = element.type[0].code;
-                                const isClass = type.match(/^([A-Z][a-z]+)+$/);
-                                if (isClass) {
-                                    subPromises.push(sdParse(type, newPath));
-                                } else {
-                                    elements.push({
-                                        'id': newPath,
-                                        'path': newPath,
-                                        'short': element.short,
-                                        'type': type
-                                    });
-                                }
-                            }
-                        });
-                    if (subPromises.length > 0) {
-                        Promise.all(subPromises).then((values) => {
-                            values.forEach(value => elements.push(...value));
-                            resolve(elements);
-                        });
-                    } else {
-                        resolve(elements);
-                    }
-                });
-            });
-        }
-
     }
+
+    #makeRow = (element) => {
+        const item = new M2ListItem();
+        item.setAttribute('data-primary', element.path);
+        item.setAttribute('data-secondary', element.short);
+        const row = new M2ListRowCheck();
+        row.setAttribute('data-id', element.id);
+        row.appendChild(item);
+        return row;
+    }
+
+    #sdParse = (resourceType, path) => {
+        return new Promise((resolve) => {
+            const elements = [];
+            fhirService.structureDefinition(resourceType).then((structureDefinition) => {
+                const subPromises = [];
+                structureDefinition.snapshot.element
+                    .filter(e => e.isSummary && e.type)
+                    .forEach((element) => {
+                        const elementName = element.path.substr(element.path.indexOf(".") + 1);
+                        //avoid infinite loops
+                        if (!path.includes(`${elementName}.`)) {
+                            const newPath = (path ? `${path}.` : '') + elementName;
+                            const type = element.type[0].code;
+                            const isClass = type.match(/^([A-Z][a-z]+)+$/);
+                            if (isClass) {
+                                subPromises.push(this.#sdParse(type, newPath));
+                            } else {
+                                elements.push({
+                                    'id': newPath,
+                                    'path': newPath,
+                                    'short': element.short,
+                                    'type': type
+                                });
+                            }
+                        }
+                    });
+                if (subPromises.length > 0) {
+                    Promise.all(subPromises).then((values) => {
+                        values.forEach(value => elements.push(...value));
+                        resolve(elements);
+                    });
+                } else {
+                    resolve(elements);
+                }
+            });
+        });
+    }
+
 };
 customElements.define('bundle-columns-dialog', BundleColumnsDialog);

@@ -1,173 +1,212 @@
 import template from "./templates/Bundle.html";
 
-import "./components/M2AppBar"
-import "./components/M2DataTable"
-import "./components/M2LinearProgress"
+import M2DataTable from "./components/M2DataTable";
+import M2RoundButton from "./components/M2RoundButton";
 
-import "./BundleSearchPanel"
-import "./BundleColumnsDialog"
+import BundleColumnsDialog from "./BundleColumnsDialog";
+import BundleSearchPanel from "./BundleSearchPanel";
 
 import context from "./services/Context"
 import fhirService from "./services/Fhir"
 import preferencesService from "./services/Preferences"
 import snackbarService from "./services/Snackbar"
 
-class Bundle extends HTMLElement {
+export default class Bundle extends HTMLElement {
+
+    /** @type {M2DataTable} */
+    #table;
+    /** @type {M2RoundButton} */
+    #settingsDialogToggle;
+    /** @type {BundleColumnsDialog} */
+    #settingsDialog;
+    /** @type {String} */
+    #title;
+    /** @type {Object.<String, M2RoundButton>} */
+    #buttons = {};
+    /** @type {HTMLSpanElement} */
+    #total;
+    /** @type {M2RoundButton} */
+    #searchToggle;
+    /** @type {BundleSearchPanel} */
+    #searchPanel;
+    /** @type {Array.<String>} */
+    #columns;
+
+    /** @type {String} */
+    #resourceType;
+    /** @type {Fhir.Bundle} */
+    #source;
+
     constructor() {
         super();
-        this._shadow = this.attachShadow({ mode: 'closed' });
-        this._shadow.innerHTML = template;
-        this._resourceType = null;
-        this._columns = null;
-        this._filters = [];
-        this._dateOptions = {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit"
-        };
-        this._timeOptions = {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            timeZoneName: "short"
+        const shadow = this.attachShadow({ mode: 'closed' });
+        shadow.innerHTML = template;
+        this.#columns = [];
+
+        this.#title = shadow.getElementById('title');
+
+        shadow.getElementById('help').onclick = this.#helpClick;
+
+        this.#total = shadow.getElementById('total');
+
+        const pageFirst = shadow.getElementById('paginationFirst');
+        pageFirst.onclick = this.#paginationClick;
+
+        const pagePrevious = shadow.getElementById('paginationPrevious');
+        pagePrevious.onclick = this.#paginationClick;
+
+        const pageNext = shadow.getElementById('paginationNext');
+        pageNext.onclick = this.#paginationClick;
+
+        const pageLast = shadow.getElementById('paginationLast');
+        pageLast.onclick = this.#paginationClick;
+
+        this.#buttons = {
+            first: pageFirst,
+            previous: pagePrevious,
+            prev: pagePrevious, //prev is specific to firely server
+            next: pageNext,
+            last: pageLast
         }
-        this._columnsDialog = null;
-        this._source = null;
 
-        this._shadow.getElementById('help').onclick = this.helpClick;
+        this.#table = shadow.getElementById('table');
+        this.#table.addEventListener('rowclick', this.#onRowClick);
+        this.#table.onColumnReorder = this.#handleColumnChanged;
 
-        this._total = this._shadow.getElementById('total');
-        this._shadow.getElementById('paginationFirst').onclick = this.paginationClick;
-        this._shadow.getElementById('paginationPrevious').onclick = this.paginationClick;
-        this._shadow.getElementById('paginationNext').onclick = this.paginationClick;
-        this._shadow.getElementById('paginationLast').onclick = this.paginationClick;
+        shadow.getElementById('copy').onclick = this.#copyClick;
+        shadow.getElementById('download').onclick = this.#downloadClick;
 
-        const dataTable = this._shadow.getElementById('table');
-        dataTable.addEventListener('rowclick', this.onRowClick);
-        dataTable.onColumnReorder = this.handleColumnChanged;
+        this.#settingsDialog = shadow.querySelector('bundle-columns-dialog')
+        this.#settingsDialog.onValidate = this.#handleColumnSetup;
 
-        this._shadow.getElementById('copy').onclick = this.copyClick;
+        this.#settingsDialogToggle = shadow.getElementById('settingsDialogToggle')
+        this.#settingsDialogToggle.onclick = this.#settingsDialogToggleClick;
 
-        this._shadow.getElementById('download').onclick = this.downloadClick;
+        this.#searchToggle = shadow.getElementById('searchToggle');
+        this.#searchToggle.onclick = this.#searchToggleClick;
 
-        this._columnsDialog = this._shadow.querySelector('bundle-columns-dialog')
-        this._columnsDialog.onValidate = this.handleColumnSetup;
-
-        this._shadow.getElementById('settingsDialogToggle').onclick = this.settingsDialogToggleClick;
-
-        this._searchToggle = this._shadow.getElementById('searchToggle');
-        this._searchToggle.onclick = this.searchToggleClick;
-        this._searchPanel = this._shadow.getElementById('search');
+        this.#searchPanel = shadow.getElementById('search');
     }
 
     connectedCallback() {
-        new MutationObserver(this.searchHiddenObserver).observe(this._searchPanel, { attributes: true });
+        new MutationObserver(this.#searchHiddenObserver).observe(this.#searchPanel, { attributes: true });
     }
 
-    searchHiddenObserver = (mutationList) => {
+    #searchHiddenObserver = (mutationList) => {
         mutationList.forEach(({ type, attributeName, target }) => {
             if ('attributes' == type && 'class' == attributeName) {
-                this._searchToggle.hidden = !target.classList.contains('hidden');
+                this.#searchToggle.hidden = !target.classList.contains('hidden');
             }
         })
     }
 
-    searchToggleClick = () => {
-        this._searchPanel.classList.toggle("hidden");
+    #searchToggleClick = () => {
+        this.#searchPanel.classList.toggle("hidden");
     }
 
-    onRowClick = ({ detail }) => {
-        const entry = this._source.entry.find(({ resource }) => resource.id == detail.resourceId);
+    #onRowClick = ({ detail }) => {
+        const entry = this.#source.entry.find(({ resource }) => resource.id == detail.resourceId);
         if (entry) {
             const url = entry.fullUrl.replace(`${context.server.url}`, '');
             location.hash = `#${url}`;
         }
     }
 
-    handleColumnSetup = (columns) => {
+    #handleColumnSetup = (columns) => {
         //suppression des colonnes
-        let newColumns = this._columns.filter(c => columns.includes(c));
+        let newColumns = this.#columns.filter(c => columns.includes(c));
         //ajout des nvlles colonnes à la fin
         newColumns.push(...columns.filter(c => !newColumns.includes(c)));
-        this.handleColumnChanged(newColumns);
+        this.#handleColumnChanged(newColumns);
     }
 
-    handleColumnChanged = (columns) => {
-        this._columns = columns;
-        const dataTable = this._shadow.getElementById('table');
-        dataTable.clear();
-        this._columns.forEach(column => dataTable.addColumn(column));
-        this.parsePage(this._source);
+    #handleColumnChanged = (columns) => {
+        this.#columns = columns;
+        this.#table.clear();
+        this.#columns.forEach(column => this.#table.addColumn(column));
+        this.#parsePage(this.#source);
 
         const pref = preferencesService.get("columns", {});
-        pref[this._resourceType.type] = this._columns;
+        pref[this.#resourceType] = this.#columns;
         preferencesService.set("columns", pref);
     }
 
-    settingsDialogToggleClick = () => {
-        this._columnsDialog.load(this._resourceType.type, this._columns);
-        this._columnsDialog.hidden = false;
+    #settingsDialogToggleClick = () => {
+        this.#settingsDialog.load(this.#resourceType, this.#columns);
+        this.#settingsDialog.hidden = false;
     }
 
-    paginationClick = ({ target }) => {
+    #paginationClick = ({ target }) => {
         if ("m2-round-button" != target.localName) return;
         let url = target.dataset.url;
         url = url.replace(`${context.server.url}`, '');
         location.hash = `#${url}`;
     }
 
-    helpClick = () => {
-        window.open(fhirService.helpUrl(this._resourceType.type), "FhirBrowserHelp");
+    #helpClick = () => {
+        window.open(fhirService.helpUrl(this.#resourceType), "FhirBrowserHelp");
     }
 
-    copyClick = () => {
-        navigator.clipboard.writeText(JSON.stringify(this._source)).then(function () {
+    #copyClick = () => {
+        navigator.clipboard.writeText(JSON.stringify(this.#source)).then(function () {
             snackbarService.show("Copying to clipboard was successful");
         }, function (err) {
             console.error('Async: Could not copy text: ', err);
         });
     }
 
-    downloadClick = () => {
-        const fileName = this._resourceType.type;
-        const file = new File([JSON.stringify(this._source)], fileName, {
+    #downloadClick = () => {
+        const fileName = this.#resourceType;
+        const file = new File([JSON.stringify(this.#source)], fileName, {
             type: 'data:text/json;charset=utf-8',
         });
         const url = URL.createObjectURL(file);
         const link = document.createElement('a');
         link.href = url;
         link.download = `${fileName}.json`;
-        this._shadow.appendChild(link);
         link.click();
-        this._shadow.removeChild(link);
+        link.remove();
         window.URL.revokeObjectURL(url);
     }
 
+    /**
+     * @returns {String}
+     */
     get resourceType() {
-        return this._resourceType;
+        return this.#resourceType;
     }
 
-    beautifyDate(stringdate) {
+    #beautifyDate(stringdate) {
+        const dateOptions = {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        };
+        const timeOptions = {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            timeZoneName: "short"
+        }
         const date = new Date(stringdate);
         try {
-            return `${date.toLocaleString(undefined, this._dateOptions)}<br>${date.toLocaleString(undefined, this._timeOptions)}`;
+            return `${date.toLocaleString(undefined, dateOptions)}<br>${date.toLocaleString(undefined, timeOptions)}`;
         } catch (e) {
             return stringdate;
         }
     }
 
-    parsePage(data) {
-        this._total.hidden = true;
+    #parsePage(data) {
+        this.#total.hidden = true;
         if (data.total) {
-            this._total.hidden = false;
-            this._total.innerHTML = `Total:&nbsp;${data.total}`;
+            this.#total.hidden = false;
+            this.#total.innerHTML = `Total:&nbsp;${data.total}`;
         }
         if (data.entry) {
-            const dataTable = this._shadow.getElementById('table');
             data.entry
                 .forEach(entry => {
                     let row = {};
-                    this._columns.forEach(column => {
+                    this.#columns.forEach(column => {
                         let value = entry.resource;
                         let path = column.split('.');
                         path.every((expr, idx) => {
@@ -182,31 +221,22 @@ class Bundle extends HTMLElement {
                             }
                             return true;
                         })
-                        if (column === "meta.lastUpdated") value = this.beautifyDate(value);
+                        if (column === "meta.lastUpdated") value = this.#beautifyDate(value);
                         row[column] = value || '';
                     });
-                    dataTable.addRow(entry.resource.id, row);
+                    this.#table.addRow(entry.resource.id, row);
                 });
 
-            const buttons = {
-                "first": this._shadow.getElementById('paginationFirst'),
-                "previous": this._shadow.getElementById('paginationPrevious'),
-                //prev is specific to firely server
-                "prev": this._shadow.getElementById('paginationPrevious'),
-                "next": this._shadow.getElementById('paginationNext'),
-                "last": this._shadow.getElementById('paginationLast')
-            }
-
-            Object.entries(buttons).forEach(([, button]) => {
+            Object.entries(this.#buttons).forEach(([, button]) => {
                 button.setAttribute("disabled", '');
                 button.removeAttribute("data-relation");
                 button.removeAttribute("data-url");
             });
 
             data.link?.forEach(({ relation, url }) => {
-                buttons[relation]?.removeAttribute("disabled");
-                buttons[relation]?.setAttribute("data-relation", relation);
-                buttons[relation]?.setAttribute("data-url", url);
+                this.#buttons[relation]?.removeAttribute("disabled");
+                this.#buttons[relation]?.setAttribute("data-relation", relation);
+                this.#buttons[relation]?.setAttribute("data-url", url);
             });
         }
     }
@@ -232,31 +262,30 @@ class Bundle extends HTMLElement {
             resourceType = RegExp(/^\w+/).exec(hash)[0];
         }
 
-        this._resourceType = context.server.capabilities.rest[0].resource.find(res => res.type === resourceType);
+        this.#resourceType = resourceType;
 
         let title = resourceType;
 
         if (singleResourceType) {
             const pref = preferencesService.get('columns', {});
-            this._columns = pref[resourceType] || ['id', 'meta.lastUpdated'];
-            this._shadow.getElementById('settingsDialogToggle').hidden = false;
-            this._searchPanel.hidden = false;
+            this.#columns = pref[resourceType] || ['id', 'meta.lastUpdated'];
+            this.#settingsDialogToggle.hidden = false;
+            this.#searchPanel.hidden = false;
         } else {
-            this._shadow.getElementById('settingsDialogToggle').hidden = true;
-            this._searchPanel.hidden = true;
-            this._columns = ['resourceType', 'id'];
+            this.#settingsDialogToggle.hidden = true;
+            this.#searchPanel.hidden = true;
+            this.#columns = ['resourceType', 'id'];
             if ('Bundle' == resourceType) {
                 title = `${response.type} ${title.toLowerCase()}`;
             }
         }
-        this._shadow.getElementById('title').innerText = title;
+        this.#title.innerText = title;
 
-        const dataTable = this._shadow.getElementById('table');
-        dataTable.clear();
-        this._columns.forEach(column => dataTable.addColumn(column));
+        this.#table.clear();
+        this.#columns.forEach(column => this.#table.addColumn(column));
 
-        this._source = response;
-        this.parsePage(response);
+        this.#source = response;
+        this.#parsePage(response);
     }
 };
 customElements.define('fhir-bundle', Bundle);
