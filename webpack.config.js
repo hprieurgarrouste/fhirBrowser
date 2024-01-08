@@ -3,6 +3,7 @@ const path = require('path');
 module.exports = {
   mode: 'production',
   cache: false,
+  target: 'web',
   entry: {
     app: './src/App.js'
   },

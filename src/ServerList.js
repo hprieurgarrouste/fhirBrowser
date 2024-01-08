@@ -38,17 +38,14 @@ export default class ServerList extends HTMLElement {
 
     load(values) {
         this.#list.clear();
-        Object.keys(values)
+        this.#list.append(...Object.keys(values)
             .sort((k1, k2) => k1.localeCompare(k2))
-            .forEach(key => {
-                const item = new M2ListItem();
-                item.setAttribute('data-primary', key);
-                item.setAttribute('data-secondary', values[key].url);
+            .map(key => {
                 const row = new M2ListRow();
                 row.setAttribute('data-id', key);
-                row.appendChild(item);
-                this.#list.appendChild(row);
-            })
+                row.appendChild(new M2ListItem(undefined, key, values[key].url));
+                return row;
+            }));
     }
 
     get value() {

@@ -23,12 +23,9 @@ export default class ServerCapabilities extends HTMLElement {
         const make = (name, value) => {
             if (typeof value === 'undefined') return;
 
-            const item = new M2ListItem;
-            item.setAttribute('data-primary', name);
-            item.setAttribute('data-secondary', value);
             const row = new M2ListRow();
-            row.appendChild(item);
-            this.#list.appendChild(row);
+            row.append(new M2ListItem(undefined, name, value));
+            this.#list.append(row);
         }
 
         this.#list.clear();
@@ -38,11 +35,11 @@ export default class ServerCapabilities extends HTMLElement {
         make('fhirVersion', `${capabilityStatement.fhirVersion} (${context.server.release})`);
 
         const ul = document.createElement('UL');
-        capabilityStatement.format.forEach((f) => {
+        ul.append(...capabilityStatement.format.map(f => {
             const li = document.createElement('LI');
             li.innerText = f;
-            ul.appendChild(li);
-        });
+            return li;
+        }));
         make('format', ul.outerHTML);
 
         if (capabilityStatement.implementation) {

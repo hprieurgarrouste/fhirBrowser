@@ -60,16 +60,6 @@ export default class BundleColumnsDialog extends HTMLElement {
     /** @returns {Promise} */
     set onValidate(promise) { this.#onValidate = promise }
 
-    #checkValues = (values) => {
-        Array.from(this.#list.querySelectorAll('m2-list-row-check')).forEach(row => {
-            if (values.includes(row.dataset.id)) {
-                row.setAttribute('selected', '');
-            } else {
-                row.removeAttribute('selected');
-            }
-        });
-    }
-
     /**
     * @param {String} resourceType
     * @param {Array.<String>} values
@@ -82,28 +72,34 @@ export default class BundleColumnsDialog extends HTMLElement {
         this.#resourceType = resourceType;
         this.#serverRelease = context.server.release;
 
-        this.#list.clear();
 
         this.#progress.hidden = false;
-        this.#sdParse(resourceType, '').then((elements) => {
-            elements
+        this.#list.clear();
+        this.#sdParse(resourceType, '').then(elements => {
+            this.#list.append(...elements
                 .sort((e1, e2) => e1.path.localeCompare(e2.path))
-                .forEach(element => {
-                    this.#list.appendChild(this.#makeRow(element));
-                });
-            this.#progress.hidden = true;
+                .map(this.#makeRow)
+            );
             this.#checkValues(values);
+            this.#progress.hidden = true;
         });
 
     }
 
+    #checkValues = (values) => {
+        Array.from(this.#list.querySelectorAll('m2-list-row-check')).forEach(row => {
+            if (values.includes(row.dataset.id)) {
+                row.setAttribute('selected', '');
+            } else {
+                row.removeAttribute('selected');
+            }
+        });
+    }
+
     #makeRow = (element) => {
-        const item = new M2ListItem();
-        item.setAttribute('data-primary', element.path);
-        item.setAttribute('data-secondary', element.short);
         const row = new M2ListRowCheck();
         row.setAttribute('data-id', element.id);
-        row.appendChild(item);
+        row.append(new M2ListItem(undefined, element.path, element.short));
         return row;
     }
 
@@ -120,10 +116,11 @@ export default class BundleColumnsDialog extends HTMLElement {
                         if (!path.includes(`${elementName}.`)) {
                             const newPath = (path ? `${path}.` : '') + elementName;
                             const type = element.type[0].code;
-                            const isClass = type.match(/^([A-Z][a-z]+)+$/);
-                            if (isClass) {
+                            if (type.match(/^([A-Z][a-z]+)+$/)) {
+                                //object
                                 subPromises.push(this.#sdParse(type, newPath));
                             } else {
+                                //property
                                 elements.push({
                                     'id': newPath,
                                     'path': newPath,

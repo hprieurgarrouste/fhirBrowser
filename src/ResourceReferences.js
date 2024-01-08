@@ -63,17 +63,17 @@ export default class ResourceReferences extends HTMLElement {
         const references = context.server.references(resourceType.type);
         if (references) {
             Object.entries(references).forEach(([key, value]) => {
-                value.forEach(v => {
-                    const item = new M2ListItem();
-                    item.setAttribute("data-icon", resourceIcon[key.toLowerCase()]);
-                    item.setAttribute("data-primary", `${key}.${v.name}`);
-                    item.setAttribute("data-secondary", v.documentation.length > 100 ? `${v.documentation.substring(0, 100)}...` : v.documentation);
+                this.#list.append(...value.map(v => {
                     const row = new M2ListRow();
                     row.setAttribute("data-target", key);
                     row.setAttribute("data-search", v.name);
-                    row.appendChild(item);
-                    this.#list.appendChild(row);
-                })
+                    row.appendChild(new M2ListItem(
+                        resourceIcon[key.toLowerCase()],
+                        `${key}.${v.name}`,
+                        v.documentation.length > 100 ? `${v.documentation.substring(0, 100)}...` : v.documentation
+                    ));
+                    return row;
+                }))
             });
         }
         return this.#list.children.length > 0;

@@ -33,10 +33,11 @@ export default class ServerResources extends HTMLElement {
      */
     load = (capabilityStatement) => {
         this.#list.clear();
-        capabilityStatement?.rest[0]?.resource
-            .filter(res => res.interaction.find(({ code }) => 'search-type' == code))
-            .sort((r1, r2) => r1.type.toLowerCase().localeCompare(r2.type.toLowerCase()))
-            .forEach(resource => this.#list.appendChild(this.#makeListRow(resource.type)));
+        this.#list.append(...capabilityStatement?.rest[0]?.resource
+            .filter(res => res.interaction.some(({ code }) => 'search-type' == code))
+            .sort((r1, r2) => r1.type.localeCompare(r2.type, undefined, { sensitivity: 'base' }))
+            .map(r => this.#makeListRow(r.type))
+        );
         this.#recent.clear();
     }
 
@@ -59,12 +60,9 @@ export default class ServerResources extends HTMLElement {
      * @returns {M2ListRow}
      */
     #makeListRow = (resourceType) => {
-        const item = new M2ListItem();
-        item.setAttribute("data-primary", resourceType);
-        item.setAttribute("data-icon", resourceIcon[resourceType.toLowerCase()]);
         const row = new M2ListRow()
         row.setAttribute("data-type", resourceType);
-        row.appendChild(item);
+        row.append(new M2ListItem(resourceIcon[resourceType.toLowerCase()], resourceType));
         return row;
     }
 

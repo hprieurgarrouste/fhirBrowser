@@ -4,7 +4,8 @@
   "description": "FHIR Browser",
   "main": "index.html",
   "scripts": {
-    "dev": "webpack serve -open --mode=development",
+    "serve": "serve",
+    "dev": "webpack watch --mode=development",
     "build": "webpack"
   },
   "repository": {
