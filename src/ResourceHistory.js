@@ -53,7 +53,7 @@ export default class ResourceHistory extends HTMLElement {
     }
 
     #helpClick = (event) => {
-        window.open(fhirService.historyUrl, "FhirBrowserHelp");
+        window.open(context.server.historyHelpUrl(), "FhirBrowserHelp");
         event.preventDefault();
         event.stopPropagation();
     }

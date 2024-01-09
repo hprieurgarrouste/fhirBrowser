@@ -1,5 +1,7 @@
 import ServerConfiguration from "./ServerConfiguration";
 
+import fhirService from "./services/Fhir"
+
 /**
  * @class Server
  */
@@ -8,11 +10,12 @@ export default class Server {
     /** @type {ServerConfiguration} */
     #serverConfiguration = null;
     #capabilities = null;
-    #fhirReferences = null;
     #serverReferences = null;
     #headers = {};
     /** @type {String} */
     #code;
+    /** @type {Schema} */
+    #schema;
 
     /**
      * @param {String} code
@@ -52,30 +55,17 @@ export default class Server {
     get capabilities() {
         return this.#capabilities
     }
-
     /**
      * Returns Fhir release from server fhirVersion
      * http://hl7.org/fhir/directory.html
      * @returns {string} release or null
      */
     get release() {
-        const release = {
-            "5.0.0": "R5",
-            "4.6.0": "R5",
-            "4.5.0": "R5",
-            "4.4.0": "R5",
-            "4.3.0": "R4B",
-            "4.2.0": "R5",
-            "4.1.0": "R4B",
-            "4.0.1": "R4",
-            "3.5.0": "R4",
-            "3.3.0": "R4",
-            "3.2.0": "R4",
-            "3.0.2": "STU3",
-            "3.0.1": "STU3",
-            "3.0.0": "STU3"
-        }
-        return release[this.#capabilities.fhirVersion] || null;
+        return fhirService.release(this.#capabilities.fhirVersion) || null;
+    }
+
+    get schema() {
+        return this.#schema;
     }
 
     connect = async () => {
@@ -98,6 +88,7 @@ export default class Server {
         }
         this.#capabilities = await this.#fetchCapabilities();
         this.#serverReferences = await this.#parseReferences(this.#capabilities);
+        this.#schema = await fhirService.schema(this.release);
     }
 
     fetch = async (href, searchParams = {}) => {
@@ -159,7 +150,8 @@ export default class Server {
     #parseReferences = async (metadata) => {
         const serverReferences = {};
         const serverResources = metadata.rest[0].resource;
-        const fhirReferences = await this.#fetchAllReferences();
+        const fhirReferences = await fhirService.fetchAllReferences();
+
         metadata.rest[0].resource.forEach((serverResource) => {
             const fhirReference = fhirReferences[this.release][serverResource.type];
             if (fhirReference) {
@@ -198,14 +190,6 @@ export default class Server {
         return serverReferences;
     }
 
-    #fetchAllReferences = async () => {
-        if (!this.#fhirReferences) {
-            const response = await fetch('./assets/references.json');
-            this.#fhirReferences = await response.json();
-        }
-        return this.#fhirReferences;
-    }
-
     /**
      * @param {('json'|'xml'|'ttl')} format
      * @returns {Boolean}
@@ -231,4 +215,22 @@ export default class Server {
         }
         return this.#capabilities.format.some(format => formats.includes(format));
     }
+
+    /** @returns {String} Help url */
+    historyHelpUrl = () => {
+        return fhirService.historyHelpUrl(this.release);
+    }
+
+    /**
+     * @param {String} resourceType
+     * @returns {String} Help urls
+     */
+    resourceHelpUrl = (resourceType) => {
+        return fhirService.resourceHelpUrl(resourceType, this.release);
+    }
+
+    structureDefinition = async (resourceType) => {
+        return fhirService.structureDefinition(resourceType, this.release);
+    }
+
 }

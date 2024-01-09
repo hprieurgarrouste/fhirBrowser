@@ -1,9 +1,8 @@
 import template from "./templates/ResourceTemplateEditor.html"
 
 import "./components/M2SidePanel"
-import "./components/M2TextField"
 
-import fhirService from "./services/Fhir"
+import context from "./services/Context"
 import M2List from "./components/M2List"
 import M2ListItem from "./components/M2ListItem"
 import M2ListRow from "./components/M2ListRow"
@@ -206,7 +205,7 @@ export default class ResourceTemplateEditor extends HTMLElement {
     #sdParse = (resourceType, path) => {
         return new Promise((resolve) => {
             const elements = [];
-            fhirService.structureDefinition(resourceType).then((structureDefinition) => {
+            context.server.structureDefinition(resourceType).then((structureDefinition) => {
                 const subPromises = [];
                 structureDefinition.snapshot.element
                     .filter(e => e.type)

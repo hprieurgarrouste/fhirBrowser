@@ -58,7 +58,7 @@
     <main>
         <section id="content">
             <m2-textfield id="key" placeholder="Code" required></m2-textfield>
-            <m2-textfield id="url" placeholder="Url" required></m2-textfield>
+            <m2-textfield id="url" type="url" pattern="https?://.+" placeholder="Url" required></m2-textfield>
             <div class="authMethod">
                 <label for="authNo">No Auth
                     <input type="radio" id="authNo" name="authMethod" value="No Auth" checked />
@@ -82,7 +82,8 @@
                 <m2-textfield id="basicPassword" placeholder="Password" required></m2-textfield>
             </section>
             <section id="oauthSection" hidden>
-                <m2-textfield id="oauthTokenurl" placeholder="Access Token URL" required></m2-textfield>
+                <m2-textfield id="oauthTokenurl" type="url" pattern="https?://.+" placeholder="Access Token URL"
+                    required></m2-textfield>
                 <m2-textfield id="oauthClientid" placeholder="Client ID" required></m2-textfield>
                 <m2-textfield id="oauthClientsecret" placeholder="Client Secret" required></m2-textfield>
                 <m2-textfield id="oauthGranttype" placeholder="Grant Type" value="client_credentials" required

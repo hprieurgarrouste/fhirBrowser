@@ -105,13 +105,11 @@ export default class ServerResources extends HTMLElement {
         }
         //add badge
         const item = row.querySelector('m2-list-item');
-        if (!item.querySelector('m2-badge[slot="trailling"]')) {
-            this.#getCount(row.dataset.type).then(({ total }) => {
-                //TODO avoid double badge
-                if (!item.querySelector('m2-badge[slot="trailling"]')) {
-                    item.appendChild(this.#makeBadge(total))
-                }
-            });
+        let badge = item.querySelector('m2-badge[slot="trailling"]');
+        if (!badge) {
+            badge = this.#makeBadge('...');
+            item.append(badge);
+            this.#getCount(row.dataset.type).then(({ total }) => badge.value = total);
         }
         //recent
         this.#recent.add(row.dataset.type);

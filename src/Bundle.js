@@ -7,7 +7,6 @@ import BundleColumnsDialog from "./BundleColumnsDialog";
 import BundleSearchPanel from "./BundleSearchPanel";
 
 import context from "./services/Context"
-import fhirService from "./services/Fhir"
 import preferencesService from "./services/Preferences"
 import snackbarService from "./services/Snackbar"
 
@@ -144,7 +143,7 @@ export default class Bundle extends HTMLElement {
     }
 
     #helpClick = () => {
-        window.open(fhirService.helpUrl(this.#resourceType), "FhirBrowserHelp");
+        window.open(context.server.resourceHelpUrl(this.#resourceType), "FhirBrowserHelp");
     }
 
     #copyClick = () => {

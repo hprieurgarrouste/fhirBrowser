@@ -6,7 +6,6 @@ import M2ListRowCheck from "./components/M2ListRowCheck";
 import M2LinearProgress from "./components/M2LinearProgress";
 
 import context from "./services/Context"
-import fhirService from "./services/Fhir"
 
 export default class BundleColumnsDialog extends HTMLElement {
     /** @type {M2LinearProgress} */
@@ -106,16 +105,16 @@ export default class BundleColumnsDialog extends HTMLElement {
     #sdParse = (resourceType, path) => {
         return new Promise((resolve) => {
             const elements = [];
-            fhirService.structureDefinition(resourceType).then((structureDefinition) => {
+            context.server.structureDefinition(resourceType).then((structureDefinition) => {
                 const subPromises = [];
                 structureDefinition.snapshot.element
                     .filter(e => e.isSummary && e.type)
-                    .forEach((element) => {
-                        const elementName = element.path.substr(element.path.indexOf(".") + 1);
+                    .forEach(elementDefinition => {
+                        const elementName = elementDefinition.path.substr(elementDefinition.path.indexOf(".") + 1);
                         //avoid infinite loops
                         if (!path.includes(`${elementName}.`)) {
                             const newPath = (path ? `${path}.` : '') + elementName;
-                            const type = element.type[0].code;
+                            const type = elementDefinition.type[0].code;
                             if (type.match(/^([A-Z][a-z]+)+$/)) {
                                 //object
                                 subPromises.push(this.#sdParse(type, newPath));
@@ -124,7 +123,7 @@ export default class BundleColumnsDialog extends HTMLElement {
                                 elements.push({
                                     'id': newPath,
                                     'path': newPath,
-                                    'short': element.short,
+                                    'short': elementDefinition.short,
                                     'type': type
                                 });
                             }

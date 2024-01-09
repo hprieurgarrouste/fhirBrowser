@@ -25,5 +25,13 @@ export default class M2RoundButton extends HTMLElement {
         }
     }
 
+    get icon() {
+        return this.getAttribute('data-icon');
+    }
+    /** @param {String} name */
+    set icon(name) {
+        this.setAttribute('data-icon', name);
+    }
+
 }
 customElements.define('m2-round-button', M2RoundButton);

@@ -1,10 +1,9 @@
 import template from "./templates/OperationOutcome.html";
 
 import "./components/M2AppBar"
-import "./components/M2Card"
 import "./components/M2RoundButton"
 
-import fhirService from "./services/Fhir"
+import context from "./services/Context"
 import M2Card from "./components/M2Card";
 
 export default class OperationOutcome extends HTMLElement {
@@ -33,7 +32,7 @@ export default class OperationOutcome extends HTMLElement {
     }
 
     #helpClick = () => {
-        window.open(fhirService.helpUrl(this.#resource.resourceType), "FhirBrowserHelp");
+        window.open(context.server.resourceHelpUrl(this.#resource.resourceType), "FhirBrowserHelp");
     }
 
     #clear = () => {

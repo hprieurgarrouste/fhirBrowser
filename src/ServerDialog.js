@@ -27,7 +27,7 @@ export default class ServerDialog extends HTMLElement {
         this.#editMode = false;
 
         this.#list = shadow.querySelector('server-list');
-        this.#list.addEventListener('serverchanged', this.#serverListClick);
+        this.#list.onClick = this.#serverListClick;
 
         this.#form = shadow.querySelector("server-form");
         this.#form.onOk = this.#serverFormOk;
@@ -44,7 +44,7 @@ export default class ServerDialog extends HTMLElement {
 
         shadow.getElementById("setupCancel").onclick = this.#setupCancel;
 
-        shadow.getElementById("setupOk").onclick = this.#setupOk;
+        shadow.getElementById("setupSave").onclick = this.#setupSave;
         shadow.getElementById("setupClose").onclick = this.#appDialogClose;
 
         shadow.getElementById("setupToggle").onclick = () => { this.editMode = true };
@@ -63,7 +63,7 @@ export default class ServerDialog extends HTMLElement {
         });
     }
 
-    #setupOk = () => {
+    #setupSave = () => {
         settingsService.setAll(this._conf);
         this.editMode = false;
         this.#loadConf();
@@ -83,8 +83,7 @@ export default class ServerDialog extends HTMLElement {
         this.#form.hidden = false;
     }
 
-    #serverListClick = (event) => {
-        const serverCode = event.detail.serverCode;
+    #serverListClick = (serverCode) => {
         const server = this._conf[serverCode];
         if (this.editMode) {
             this.#form.value = { "serverCode": serverCode, "server": server };
@@ -92,8 +91,6 @@ export default class ServerDialog extends HTMLElement {
         } else {
             this.editMode = false;
             this.hidden = true;
-            event.preventDefault();
-            event.stopPropagation();
             this.#onSelect({
                 'code': serverCode,
                 'configuration': server

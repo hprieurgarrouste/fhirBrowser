@@ -146,8 +146,9 @@ export default class ServerForm extends HTMLElement {
     get onOk() {
         return this.#onOk;
     }
-    set onOk(okFct) {
-        this.#onOk = okFct;
+    /** @param {Function} callback */
+    set onOk(callback) {
+        this.#onOk = callback;
     }
 
     #onCancel = (event) => {
@@ -156,8 +157,9 @@ export default class ServerForm extends HTMLElement {
     get onCancel() {
         return this.#onCancel;
     }
-    set onCancel(cancelFct) {
-        this.#onCancel = cancelFct;
+    /** @param {Function} callback */
+    set onCancel(callback) {
+        this.#onCancel = callback;
     }
 
     #onDelete = () => {
@@ -166,8 +168,9 @@ export default class ServerForm extends HTMLElement {
     get onDelete() {
         return this.#onDelete;
     }
-    set onDelete(deleteFct) {
-        this.#onDelete = deleteFct;
+    /** @param {Function} callback */
+    set onDelete(callback) {
+        this.#onDelete = callback;
     }
 
     checkValidity = () => {

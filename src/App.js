@@ -96,17 +96,19 @@ export default class App extends HTMLElement {
             const response = await fetch(url, {
                 "headers": context.server.headers
             });
+            const contentType = response.headers.get("Content-Type");
             if (!response.ok) {
-                snackbarService.error(`${response.status} ${response.statusText}`);
+                const msg = `${response.status} ${response.statusText}`;
+                if (!contentType) throw new Error(msg);;
+                snackbarService.error(msg);
             }
             this.#body.style.visibility = "visible";
-            const contentType = response.headers.get("Content-Type");
             let sourceType;
             let source;
-            if (contentType.includes('json')) {
+            if (contentType?.includes('json')) {
                 source = await response.json();
                 sourceType = source.resourceType;
-            } else if (contentType.includes('xml')) {
+            } else if (contentType?.includes('xml')) {
                 source = new DOMParser().parseFromString(await response.text(), "application/xml");
                 sourceType = source.documentElement.nodeName;
             } else {
@@ -137,7 +139,7 @@ export default class App extends HTMLElement {
                 throw new Error('Unknown response format');
             }
         } catch (error) {
-            snackbarService.show(error, undefined, undefined, 'error');
+            snackbarService.error(error);
         } finally {
             clearTimeout(timeoutId);
             this.#waiting.style.visibility = 'hidden'

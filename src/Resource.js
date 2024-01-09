@@ -11,7 +11,6 @@ import ResourceTtlView from "./ResourceTtlView"
 import ResourceXmlView from "./ResourceXmlView"
 
 import context from "./services/Context"
-import fhirService from "./services/Fhir"
 
 export default class Resource extends HTMLElement {
     /** @type {M2RoundButton} */
@@ -109,7 +108,7 @@ export default class Resource extends HTMLElement {
     };
 
     #helpClick = () => {
-        window.open(`${fhirService.helpUrl(this.#resourceType.type)}#resource`, "FhirBrowserHelp");
+        window.open(`${context.server.resourceHelpUrl(this.#resourceType.type)}#resource`, "FhirBrowserHelp");
     };
 
     #serverChanged = () => {

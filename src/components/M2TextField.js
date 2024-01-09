@@ -17,14 +17,20 @@ export default class M2TextField extends HTMLElement {
         shadow.innerHTML = template;
         this.#label = shadow.querySelector('label');
         this.#labelInnerText = '';
-        this.#input = shadow.querySelector('input[type="text"]');
+        this.#input = shadow.querySelector('input');
         this.#helper = shadow.getElementById('helper');
     }
 
-    static get observedAttributes() { return ['placeholder', 'readonly', 'required', 'value', 'helper']; }
+    static get observedAttributes() { return ['type', 'pattern', 'placeholder', 'readonly', 'required', 'value', 'helper']; }
 
     attributeChangedCallback(name, oldValue, newValue) {
         switch (name) {
+            case 'type':
+                this.#input.setAttribute('type', newValue);
+                break;
+            case 'pattern':
+                this.#input.setAttribute('pattern', newValue)
+                break;
             case 'placeholder':
                 this.#labelInnerText = newValue;
                 this.#input.setAttribute('placeholder', newValue);

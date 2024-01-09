@@ -5,7 +5,6 @@ import "./components/M2RoundButton"
 import BundleSearchItem from "./BundleSearchItem"
 
 import context from "./services/Context"
-import fhirService from "./services/Fhir"
 
 export default class BundleSearchPanel extends HTMLElement {
     /** @type {HTMLElement} */
@@ -58,7 +57,7 @@ export default class BundleSearchPanel extends HTMLElement {
     }
 
     helpClick = (event) => {
-        window.open(fhirService.helpUrl("search"), "FhirBrowserHelp");
+        window.open(context.server.resourceHelpUrl("search"), "FhirBrowserHelp");
         event.preventDefault();
         event.stopPropagation();
     }

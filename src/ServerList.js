@@ -3,6 +3,7 @@ import template from "./templates/ServerList.html";
 import M2List from "./components/M2List";
 import M2ListItem from "./components/M2ListItem";
 import M2ListRow from "./components/M2ListRow";
+import ServerConfiguration from "./ServerConfiguration";
 
 export default class ServerList extends HTMLElement {
     /** @type {M2List} */
@@ -17,6 +18,15 @@ export default class ServerList extends HTMLElement {
         this.#list.onclick = this.#appListClick;
     }
 
+    #onClick = () => { };
+    /** @param {Function} callback */
+    set onClick(callback) {
+        this.#onClick = callback;
+    }
+    get onClick() {
+        return this.#onClick;
+    }
+
     /**
      * @param {PointerEvent} event
      */
@@ -25,14 +35,7 @@ export default class ServerList extends HTMLElement {
         event.stopPropagation();
         const row = event.target.closest('m2-list-row');
         if (row) {
-            this.value = row.dataset.id;
-            this.dispatchEvent(new CustomEvent('serverchanged', {
-                bubbles: true,
-                cancelable: true,
-                detail: {
-                    'serverCode': row.dataset.id
-                }
-            }));
+            this.#onClick(row.dataset.id);
         }
     }
 
