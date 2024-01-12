@@ -8,7 +8,7 @@ export default class M2Card extends HTMLElement {
     /** @type {HTMLSpanElement} */
     #headerSecondary;
 
-    constructor() {
+    constructor(icon, primary, secondary) {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
         shadow.innerHTML = template;
@@ -16,6 +16,9 @@ export default class M2Card extends HTMLElement {
         this.#headerIcon = shadow.querySelector('header>i');
         this.#headerPrimary = shadow.getElementById('primary');
         this.#headerSecondary = shadow.getElementById('secondary');
+        if (icon) this.icon = icon;
+        if (primary) this.primary = primary;
+        if (secondary) this.secondary = secondary;
     }
 
     static get observedAttributes() { return ["data-primary", "data-secondary", "data-icon"]; }
@@ -34,6 +37,30 @@ export default class M2Card extends HTMLElement {
             default:
                 break;
         }
+    }
+
+    get icon() {
+        return this.getAttribute('data-icon');
+    }
+    /** @param {String} name */
+    set icon(name) {
+        this.setAttribute('data-icon', name);
+    }
+
+    get primary() {
+        return this.getAttribute('data-primary');
+    }
+    /** @param {String} caption */
+    set primary(caption) {
+        this.setAttribute('data-primary', caption);
+    }
+
+    get secondary() {
+        return this.getAttribute('data-secondary');
+    }
+    /** @param {String} caption */
+    set secondary(caption) {
+        this.setAttribute('data-secondary', caption);
     }
 };
 
