@@ -55,7 +55,7 @@ class FhirService {
      * @param {String} release
      * @returns
      */
-    schema = async (release) => {
+    fetchSchema = async (release) => {
         const url = new URL(`${this.#server_url}/${release}/fhir.schema.json`);
         const response = await fetch(url, {
             "cache": "force-cache"
