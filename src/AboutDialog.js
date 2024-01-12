@@ -1,6 +1,6 @@
 import template from "./templates/AboutDialog.html";
 
-import { version } from '../package.json';
+import packageInfo from '../package.json';
 
 export default class AboutDialog extends HTMLElement {
     constructor() {
@@ -16,7 +16,7 @@ export default class AboutDialog extends HTMLElement {
             this.#appDialogClose();
         };
 
-        shadow.getElementById('version').innerText = version;
+        shadow.getElementById('version').innerText = packageInfo.version;
     }
 
     #appDialogClose = () => this.hidden = true;

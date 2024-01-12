@@ -51,7 +51,7 @@ export default class ResourceReferences extends HTMLElement {
     }
 
     /**
-     * @param {any} resourceType
+     * @param {fhir4.CapabilityStatementRestResource} resourceType
      * @param {String} resourceId
      * @returns {void}
      */

@@ -28,12 +28,12 @@ export default class ServerResources extends HTMLElement {
     }
 
     /**
-     * @param {Fhir.CapabilityStatement} capabilityStatement
+     * @param {fhir4.CapabilityStatement} capabilityStatement
      * @returns {void}
      */
     load = (capabilityStatement) => {
         this.#list.clear();
-        this.#list.append(...capabilityStatement?.rest[0]?.resource
+        this.#list.append(...capabilityStatement.rest[0].resource
             .filter(res => res.interaction.some(({ code }) => 'search-type' == code))
             .sort((r1, r2) => r1.type.localeCompare(r2.type, undefined, { sensitivity: 'base' }))
             .map(r => this.#makeListRow(r.type))

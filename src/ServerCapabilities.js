@@ -17,7 +17,8 @@ export default class ServerCapabilities extends HTMLElement {
     }
 
     /**
-     * @param {Fhir.CapabilityStatement} capabilityStatement
+     * @param {fhir4.CapabilityStatement} capabilityStatement
+     * @returns {void}
      */
     load = (capabilityStatement) => {
         const make = (name, value) => {

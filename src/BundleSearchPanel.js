@@ -9,6 +9,8 @@ import context from "./services/Context"
 export default class BundleSearchPanel extends HTMLElement {
     /** @type {HTMLElement} */
     #main;
+    /** @type {fhir4.CapabilityStatementRestResource} */
+    #resourceType;
     constructor() {
         super();
         const shadow = this.attachShadow({ mode: 'closed' });
@@ -24,8 +26,6 @@ export default class BundleSearchPanel extends HTMLElement {
 
         this.#main = shadow.querySelector('main');
         this.#main.addEventListener('keydown', this.mainKeyDown);
-
-        this._resourceType = null;
     }
 
     connectedCallback() {
@@ -53,7 +53,7 @@ export default class BundleSearchPanel extends HTMLElement {
                 hash.push(`${value.name}=${encodeURIComponent(value.value)}`);
             }
         });
-        location.hash = `#/${this._resourceType.type}?${hash.length ? hash.join('&') + '&' : ''}_summary=true&_format=json`;
+        location.hash = `#/${this.#resourceType.type}?${hash.length ? hash.join('&') + '&' : ''}_summary=true&_format=json`;
     }
 
     helpClick = (event) => {
@@ -85,8 +85,8 @@ export default class BundleSearchPanel extends HTMLElement {
         }
         const resourceType = context.server.capabilities.rest[0].resource.find(res => res.type === resourceName);
         if (resourceType) {
-            if (resourceType.type !== this._resourceType?.type) {
-                this._resourceType = resourceType;
+            if (resourceType.type !== this.#resourceType?.type) {
+                this.#resourceType = resourceType;
                 this.metadata = resourceType;
             }
             this.clear();
@@ -115,7 +115,7 @@ export default class BundleSearchPanel extends HTMLElement {
     }
 
     /**
-     * @param {any} resourceType
+     * @param {fhir4.CapabilityStatementRestResource} resourceType
      */
     set metadata(resourceType) {
         this.#main.scrollTop = 0;

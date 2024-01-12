@@ -65,7 +65,7 @@ export default class ResourceHistory extends HTMLElement {
     }
 
     /**
-     * @param {any} resourceType
+     * @param {fhir4.CapabilityStatementRestResource} resourceType
      * @param {String} resourceId
      * @returns {void}
      */

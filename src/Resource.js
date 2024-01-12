@@ -26,7 +26,7 @@ export default class Resource extends HTMLElement {
     /** @type {HTMLHeadingElement} */
     #title;
 
-    /** @type {any} */
+    /** @type {fhir4.CapabilityStatementRestResource} */
     #resourceType;
     /** @type {String} */
     #resourceId;
@@ -146,7 +146,7 @@ export default class Resource extends HTMLElement {
     }
 
     /**
-     * @param {any} resource
+     * @param {fhir4.Resource} resource
      */
     set source(resource) {
         let format;

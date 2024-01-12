@@ -1,6 +1,7 @@
 import ServerConfiguration from "./ServerConfiguration";
 
 import fhirService from "./services/Fhir"
+import Schema from "./services/Schema"
 
 /**
  * @class Server
@@ -9,6 +10,7 @@ export default class Server {
 
     /** @type {ServerConfiguration} */
     #serverConfiguration = null;
+    /** @type {fhir4.CapabilityStatement} */
     #capabilities = null;
     #serverReferences = null;
     #headers = {};
@@ -50,7 +52,7 @@ export default class Server {
     }
 
     /**
-     * @returns {object}
+     * @returns {fhir4.CapabilityStatement}
      */
     get capabilities() {
         return this.#capabilities
@@ -64,6 +66,7 @@ export default class Server {
         return fhirService.release(this.#capabilities.fhirVersion) || null;
     }
 
+    /** @returns {Schema} */
     get schema() {
         return this.#schema;
     }
@@ -88,7 +91,7 @@ export default class Server {
         }
         this.#capabilities = await this.#fetchCapabilities();
         this.#serverReferences = await this.#parseReferences(this.#capabilities);
-        this.#schema = await fhirService.schema(this.release);
+        this.#schema = new Schema(await fhirService.fetchSchema(this.release));
     }
 
     fetch = async (href, searchParams = {}) => {
@@ -120,6 +123,7 @@ export default class Server {
         return response.json();
     }
 
+    /** @returns {fhir4.CapabilityStatement} */
     #fetchCapabilities = async () => {
         const url = new URL(`${this.#serverConfiguration.url}/metadata`);
         url.searchParams.set("_format", "json");

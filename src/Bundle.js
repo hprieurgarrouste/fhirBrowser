@@ -33,8 +33,8 @@ export default class Bundle extends HTMLElement {
 
     /** @type {String} */
     #resourceType;
-    /** @type {Fhir.Bundle} */
-    #source;
+    /** @type {fhir4.Bundle} */
+    #bundle;
 
     constructor() {
         super();
@@ -104,7 +104,7 @@ export default class Bundle extends HTMLElement {
     }
 
     #onRowClick = ({ detail }) => {
-        const entry = this.#source.entry.find(({ resource }) => resource.id == detail.resourceId);
+        const entry = this.#bundle.entry.find(({ resource }) => resource.id == detail.resourceId);
         if (entry) {
             const url = entry.fullUrl.replace(`${context.server.url}`, '');
             location.hash = `#${url}`;
@@ -123,7 +123,7 @@ export default class Bundle extends HTMLElement {
         this.#columns = columns;
         this.#table.clear();
         this.#columns.forEach(column => this.#table.addColumn(column));
-        this.#parsePage(this.#source);
+        this.#parsePage(this.#bundle);
 
         const pref = preferencesService.get("columns", {});
         pref[this.#resourceType] = this.#columns;
@@ -147,7 +147,7 @@ export default class Bundle extends HTMLElement {
     }
 
     #copyClick = () => {
-        navigator.clipboard.writeText(JSON.stringify(this.#source)).then(function () {
+        navigator.clipboard.writeText(JSON.stringify(this.#bundle)).then(function () {
             snackbarService.show("Copying to clipboard was successful");
         }, function (err) {
             console.error('Async: Could not copy text: ', err);
@@ -156,7 +156,7 @@ export default class Bundle extends HTMLElement {
 
     #downloadClick = () => {
         const fileName = this.#resourceType;
-        const file = new File([JSON.stringify(this.#source)], fileName, {
+        const file = new File([JSON.stringify(this.#bundle)], fileName, {
             type: 'data:text/json;charset=utf-8',
         });
         const url = URL.createObjectURL(file);
@@ -241,14 +241,14 @@ export default class Bundle extends HTMLElement {
     }
 
     /**
-     * @param {any} response
+     * @param {fhir4.Bundle} bundle
      */
-    set source(response) {
+    set source(bundle) {
 
         let resourceType;
         let singleResourceType = false;
-        if (response.entry?.length) {
-            const types = [...new Set(response.entry.map(entry => entry.resource.resourceType))];
+        if (bundle.entry?.length) {
+            const types = [...new Set(bundle.entry.map(entry => entry.resource.resourceType))];
             singleResourceType = (types.length == 1);
             if (singleResourceType) {
                 resourceType = types[0];
@@ -275,7 +275,7 @@ export default class Bundle extends HTMLElement {
             this.#searchPanel.hidden = true;
             this.#columns = ['resourceType', 'id'];
             if ('Bundle' == resourceType) {
-                title = `${response.type} ${title.toLowerCase()}`;
+                title = `${bundle.type} ${title.toLowerCase()}`;
             }
         }
         this.#title.innerText = title;
@@ -283,8 +283,8 @@ export default class Bundle extends HTMLElement {
         this.#table.clear();
         this.#columns.forEach(column => this.#table.addColumn(column));
 
-        this.#source = response;
-        this.#parsePage(response);
+        this.#bundle = bundle;
+        this.#parsePage(bundle);
     }
 };
 customElements.define('fhir-bundle', Bundle);

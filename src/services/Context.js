@@ -1,4 +1,7 @@
+import Server from "../Server"
+
 class Context {
+    /** @type {Server} */
     #server = null;
     #serverChangeListener = [];
     #appContainer = null;
@@ -32,6 +35,7 @@ class Context {
     get appContainer() {
         return this.#appContainer;
     }
+    /** @param {ShadowRoot} node  */
     set appContainer(node) {
         this.#appContainer = node;
     }
