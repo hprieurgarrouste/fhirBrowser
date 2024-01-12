@@ -22,7 +22,12 @@
         text-overflow: ellipsis;
     }
 
-    main>section {
+    m2-tabs {
+        flex: 1 1 auto;
+    }
+
+    m2-tabs>section {
+        border-top: 1px solid var(--border-color);
         padding: 1em;
         flex: 1 1 auto;
         height: 0;
@@ -34,10 +39,6 @@
         flex-direction: row;
         flex-wrap: wrap;
         gap: 1em;
-    }
-
-    #issue m2-card {
-        max-width: 40%;
     }
 
     #text {
@@ -64,11 +65,13 @@
                 <h3 slot="middle" id="title">OperationOutcome</h3>
             </m2-app-bar>
         </header>
-        <section>
-            <h4>Issue</h4>
-            <section id="issue"></section>
-            <h4>Text</h4>
-            <section id="text"></section>
-        </section>
+        <m2-tabs>
+            <section data-caption="Issue">
+                <section id="issue"></section>
+            </section>
+            <section data-caption="Text">
+                <section id="text"></section>
+            </section>
+        </m2-tabs>
     </main>
 </div>
