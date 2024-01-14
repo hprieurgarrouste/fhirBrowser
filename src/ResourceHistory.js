@@ -6,7 +6,6 @@ import M2ListRow from "./components/M2ListRow"
 import M2ListItem from "./components/M2ListItem"
 
 import context from "./services/Context"
-import fhirService from "./services/Fhir"
 
 export default class ResourceHistory extends HTMLElement {
     /** @type {M2List} */
