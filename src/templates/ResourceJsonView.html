@@ -61,43 +61,43 @@
         color: inherit;
     }
 
-    #content span.value.string::before {
+    #content span.value::before {
         content: '"';
     }
 
-    #content span.value.string::after {
+    #content span.value::after {
         content: '"';
     }
 
-    #content dt.array>span.value::before {
+    #content span.value.array::before {
         content: '[';
     }
 
-    #content dt.array>span.value::after {
+    #content span.value.array::after {
         content: ']';
     }
 
-    #content dt.object>span.value::before {
+    #content span.value.object::before {
         content: '{';
     }
 
-    #content dt.object>span.value::after {
+    #content span.value.object::after {
         content: '}';
     }
 
     #content dt,
-    #content dt.array>span.value::after,
-    #content dt.object>span.value::after {
+    #content span.value.array::after,
+    #content span.value.object::after {
         padding-left: var(--indent);
     }
 
-    #content dt.array,
-    #content dt.object {
+    #content dt:has(span.value.array),
+    #content dt:has(span.value.object) {
         padding-left: 0;
     }
 
-    #content dt.array::before,
-    #content dt.object::before {
+    #content dt:has(span.value.array)::before,
+    #content dt:has(span.value.object)::before {
         cursor: pointer;
         content: 'expand_less ';
         font-family: 'Material Symbols Sharp';
@@ -111,7 +111,8 @@
         content: ",";
     }
 
-    #content dt.collapsed::before {
+    #content dt.collapsed:has(span.value.array)::before,
+    #content dt.collapsed:has(span.value.object)::before {
         content: 'expand_more ';
     }
 
@@ -119,12 +120,12 @@
         display: none;
     }
 
-    #content dt.array.collapsed span.value::after {
+    #content dt.collapsed span.value.array::after {
         content: '...]';
         padding-left: 0;
     }
 
-    #content dt.object.collapsed span.value::after {
+    #content dt.collapsed span.value.object::after {
         content: '...}';
         padding-left: 0;
     }
@@ -150,6 +151,10 @@
         margin-right: 0.25em;
     }
 
+    .raw {
+        margin: 0;
+    }
+
     @media (max-width:480px) {
         #content {
             line-height: 2em;
@@ -161,7 +166,9 @@
     <resource-template-view hidden></resource-template-view>
     <footer>
         <section>
-            <m2-round-button id="template-toggle" title="Template" data-icon="wysiwyg"></m2-round-button>
+            <m2-round-button id="mode-toggle-raw" title="Raw" data-icon="raw_on"></m2-round-button>
+            <m2-round-button id="mode-toggle-object" title="Object" data-icon="data_object"></m2-round-button>
+            <m2-round-button id="mode-toggle-template" title="Template" data-icon="wysiwyg"></m2-round-button>
         </section>
         <section></section>
         <section>

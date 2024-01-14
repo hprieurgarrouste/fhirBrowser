@@ -5,12 +5,21 @@ export default class Schema {
         this.#schema = schema;
     }
 
+    getRefByResourceType = (resourceType) => {
+        return this.#schema.discriminator.mapping[resourceType];
+    }
+
     getDefinitionByResourceType = (resourceType) => {
-        return this.getDefinitionByRef(this.#schema.discriminator.mapping[resourceType]);
+        return this.getDefinitionByRef(this.getRefByResourceType(resourceType));
     }
 
     getDefinitionByRef = (ref) => {
         return this.#evalRef(ref);
+    }
+
+    /** @param {String} name */
+    getDefinitionByName = (name) => {
+        return this.#schema.definitions[name];
     }
 
     #evalRef = (ref) => {
