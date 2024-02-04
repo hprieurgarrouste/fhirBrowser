@@ -1,12 +1,13 @@
 {
   "name": "fhirbrowser",
-  "version": "0.9.13",
+  "version": "0.9.14",
   "description": "FHIR Browser",
   "main": "index.html",
   "scripts": {
     "serve": "serve",
     "dev": "webpack watch --mode=development",
-    "build": "webpack"
+    "build": "webpack",
+    "emulator": "/Users/hprieur/AppData/Local/Android/sdk/emulator/emulator -avd android34"
   },
   "repository": {
     "type": "git",
@@ -24,10 +25,13 @@
   },
   "homepage": "https://github.com/hprieurgarrouste/fhirBrowser#readme",
   "devDependencies": {
+    "@types/fhir": "^0.0.40",
+    "eslint": "^8.56.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.1.1",
     "html-loader": "^4.2.0",
     "webpack-cli": "^5.1.4"
-  },
-  "dependencies": {
-    "@types/fhir": "^0.0.40"
   }
 }
