@@ -28,6 +28,10 @@
         padding-left: var(--indent);
     }
 
+    #content>dl {
+        padding-left: 0;
+    }
+
     #content dt {
         list-style-type: none;
     }
@@ -155,6 +159,38 @@
         margin: 0;
     }
 
+    #content i {
+        vertical-align: middle;
+        color: var(--primary-color);
+        font-size: large;
+        margin-left: 0.5em;
+        cursor: pointer;
+    }
+
+    #content dt.collapsed i {
+        display: none;
+    }
+
+    #preview .Narrative {
+        background-color: white;
+        border: 1px solid var(--border-color);
+        padding: 1em;
+    }
+
+    #preview .Narrative table,
+    #preview .Narrative th,
+    #preview .Narrative td {
+        border: 1px solid var(--border-color);
+    }
+
+    #preview .Narrative table {
+        border-collapse: collapse;
+    }
+
+    #preview .Narrative table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
     @media (max-width:480px) {
         #content {
             line-height: 2em;
@@ -166,9 +202,10 @@
     <resource-template-view hidden></resource-template-view>
     <footer>
         <section>
-            <m2-round-button id="mode-toggle-raw" title="Raw" data-icon="raw_on"></m2-round-button>
-            <m2-round-button id="mode-toggle-object" title="Object" data-icon="data_object"></m2-round-button>
-            <m2-round-button id="mode-toggle-template" title="Template" data-icon="wysiwyg"></m2-round-button>
+            <m2-button-group>
+                <button title="Raw" data-id="raw">raw_on</button>
+                <button title="Enhanced" data-id="object">data_object</button>
+            </m2-button-group>
         </section>
         <section></section>
         <section>

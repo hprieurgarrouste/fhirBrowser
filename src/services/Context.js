@@ -1,44 +1,46 @@
-import Server from "../Server"
+import Server from './Server'
 
 class Context {
     /** @type {Server} */
-    #server = null;
-    #serverChangeListener = [];
-    #appContainer = null;
+    #server = null
+    #serverChangeListener = []
+    #appContainer = null
 
     #dispatchServerChange = () => {
         this.#serverChangeListener.forEach(callback => {
-            callback.call();
+            callback.call()
         })
     }
 
     addListener = (callback) => {
-        this.#serverChangeListener.push(callback);
+        this.#serverChangeListener.push(callback)
     }
 
     /**
      * @returns {Server} Current server
      */
-    get server() {
-        return this.#server;
+    get server () {
+        return this.#server
     }
+
     /**
      * @param {Server} srv - Current server
      */
-    set server(srv) {
+    set server (srv) {
         if (srv != this.#server) {
-            this.#server = srv;
-            this.#dispatchServerChange();
+            this.#server = srv
+            this.#dispatchServerChange()
         }
     }
 
-    get appContainer() {
-        return this.#appContainer;
+    get appContainer () {
+        return this.#appContainer
     }
+
     /** @param {ShadowRoot} node  */
-    set appContainer(node) {
-        this.#appContainer = node;
+    set appContainer (node) {
+        this.#appContainer = node
     }
 }
 
-export default new Context();
+export default new Context()

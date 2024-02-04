@@ -1,0 +1,40 @@
+<style>
+    main {
+        border: 1px solid var(--border-color);
+        display: inline-flex;
+        flex-direction: row;
+        border-radius: 10px;
+    }
+
+    ::slotted(button) {
+        padding: 0.2em 0.4em;
+        cursor: pointer;
+
+        border: 0 none;
+        border-right: 1px solid var(--border-color);
+        color: inherit;
+        background-color: transparent;
+        border-radius: 0;
+        user-select: none;
+
+        font-family: 'Material Symbols Sharp';
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    ::slotted(button:last-child) {
+        border-right: 0 none;
+    }
+
+    ::slotted(button:hover) {
+        background-color: var(--hover-color, rgb(0 0 0 /5%));
+    }
+
+    ::slotted(button[selected]) {
+        background-color: var(--hover-color, rgb(0 0 0 / 4%));
+        color: var(--primary-color);
+    }
+</style>
+<main>
+    <slot></slot>
+</main>

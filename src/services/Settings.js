@@ -1,30 +1,29 @@
 class SettingsService {
-    #KEY = 'conf';
+    #KEY = 'conf'
 
-    setAll(conf) {
-        localStorage.setItem(this.#KEY, JSON.stringify(conf));
+    setAll (conf) {
+        localStorage.setItem(this.#KEY, JSON.stringify(conf))
     }
 
-    async getAll() {
-        let conf = localStorage.getItem(this.#KEY);
+    async getAll () {
+        const conf = localStorage.getItem(this.#KEY)
         if (conf === null) {
-            return await fetch(`./default.conf`, { "cache": "reload" })
+            return await fetch('./default.conf', { cache: 'reload' })
                 .then(response => response.json())
                 .then(conf => {
-                    localStorage.setItem(this.#KEY, JSON.stringify(conf));
-                    return conf;
-                });
+                    localStorage.setItem(this.#KEY, JSON.stringify(conf))
+                    return conf
+                })
         } else {
-            return JSON.parse(conf);
+            return JSON.parse(conf)
         }
     }
 
-    async get(key) {
+    async get (key) {
         return await this.getAll().then(conf => {
             return conf[key]
-        });
+        })
     }
-
 }
 
-export default new SettingsService();
+export default new SettingsService()

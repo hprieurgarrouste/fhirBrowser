@@ -1,28 +1,28 @@
-import template from "./templates/M2Button.html"
+import template from './templates/M2Button.html'
 
 export default class M2Button extends HTMLElement {
     /** @type {HTMLButtonElement} */
-    #input;
+    #input
 
-    constructor() {
-        super();
+    constructor () {
+        super()
         const shadow = this.attachShadow({ mode: 'closed' })
-        shadow.innerHTML = template;
-        this.#input = shadow.querySelector('button');
+        shadow.innerHTML = template
+        this.#input = shadow.querySelector('button')
     }
 
-    static get observedAttributes() { return ['value', 'disabled']; }
+    static get observedAttributes () { return ['value', 'disabled'] }
 
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (name == 'value') {
-            this.#input.innerText = newValue;
-        } else if (name == 'disabled') {
-            if (null === newValue) {
-                this.#input.removeAttribute('disabled');
+    attributeChangedCallback (name, oldValue, newValue) {
+        if (name === 'value') {
+            this.#input.innerText = newValue
+        } else if (name === 'disabled') {
+            if (newValue === null) {
+                this.#input.removeAttribute('disabled')
             } else {
-                this.#input.setAttribute('disabled', '');
+                this.#input.setAttribute('disabled', '')
             }
         }
     }
 }
-window.customElements.define('m2-button', M2Button);
+window.customElements.define('m2-button', M2Button)

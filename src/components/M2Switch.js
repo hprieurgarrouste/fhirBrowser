@@ -1,36 +1,35 @@
-import template from "./templates/M2Switch.html"
+import template from './templates/M2Switch.html'
 
 export default class M2Switch extends HTMLElement {
-
     /** @type {HTMLElement} */
-    #main;
+    #main
 
-    constructor() {
-        super();
+    constructor () {
+        super()
         const shadow = this.attachShadow({ mode: 'closed' })
-        shadow.innerHTML = template;
-        shadow.addEventListener('click', this.#clickHandler);
-        this.#main = shadow.querySelector('main');
+        shadow.innerHTML = template
+        shadow.addEventListener('click', this.#clickHandler)
+        this.#main = shadow.querySelector('main')
     }
 
-    static get observedAttributes() { return ['data-checked']; }
+    static get observedAttributes () { return ['data-checked'] }
 
-    attributeChangedCallback(name, oldValue, newValue) {
-        if ('data-checked' == name) {
-            if (null === newValue) {
-                this.#main.classList.remove('checked');
+    attributeChangedCallback (name, oldValue, newValue) {
+        if (name === 'data-checked') {
+            if (newValue === null) {
+                this.#main.classList.remove('checked')
             } else {
-                this.#main.classList.add('checked');
+                this.#main.classList.add('checked')
             }
         }
     }
 
     #clickHandler = (event) => {
         if (this.hasAttribute('data-checked')) {
-            this.removeAttribute('data-checked');
+            this.removeAttribute('data-checked')
         } else {
-            this.setAttribute('data-checked', '');
+            this.setAttribute('data-checked', '')
         }
     }
 }
-window.customElements.define('m2-switch', M2Switch);
+window.customElements.define('m2-switch', M2Switch)
