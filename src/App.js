@@ -86,28 +86,12 @@ export default class App extends HTMLElement {
 
     #fetchHash = async (hash) => {
         snackbarService.clear()
-        const url = new URL(`${context.server.url}${hash}`)
         const timeoutId = setTimeout(() => {
             this.#waiting.style.visibility = 'visible'
         }, 500)
 
         try {
-            const headers = {}
-            Object.assign(headers, context.server.headers)
-            switch (url.searchParams.get('_format')) {
-            case 'xml':
-                headers.Accept = 'application/fhir+xml'
-                break
-            case 'ttl':
-                headers.Accept = 'application/x-turtle'
-                break
-            case 'json':
-            default:
-                headers.Accept = 'application/fhir+json'
-            }
-            const response = await fetch(url, {
-                headers
-            })
+            const response = await context.server.fetchHash(hash)
             const contentType = response.headers.get('Content-Type')
             if (!response.ok) {
                 const msg = `${response.status} ${response.statusText}`

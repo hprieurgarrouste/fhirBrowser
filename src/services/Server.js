@@ -17,6 +17,8 @@ export default class Server {
     #code
     /** @type {Schema} */
     #schema
+    /** @type {number} */
+    #tokenExpires
 
     /**
      * @param {String} code
@@ -83,6 +85,7 @@ export default class Server {
         case ServerConfiguration.METHODS.OAuth2:
             this.#oauth2_getToken().then(response => {
                 this.#headers.Authorization = `${response.token_type} ${response.access_token}`
+                this.#tokenExpires = new Date().getTime() + (response.expires_in * 1000)
             })
             break
         case ServerConfiguration.METHODS.None:
@@ -94,9 +97,46 @@ export default class Server {
         this.#schema = new Schema(await fhirService.fetchSchema(this.release))
     }
 
+    /**
+     *
+     * @param {String} hash
+     * @returns {Promise}
+     */
+    fetchHash = async (hash) => {
+        const url = new URL(`${this.url}${hash}`)
+        if (this.#serverConfiguration.method === ServerConfiguration.METHODS.OAuth2 && (
+            !this.#tokenExpires || this.#tokenExpires - new Date().getTime() < 1)) {
+            this.#oauth2_getToken().then(response => {
+                this.#headers.Authorization = `${response.token_type} ${response.access_token}`
+                this.#tokenExpires = new Date().getTime() + (response.expires_in * 1000)
+                const headers = headersAddAccept(this.#headers)
+                return this.fetch(url, { headers })
+            })
+        }
+        const headers = headersAddAccept(this.#headers)
+        return fetch(url, { headers })
+
+        function headersAddAccept (serverHeaders) {
+            const headers = {}
+            Object.assign(headers, serverHeaders)
+            switch (url.searchParams.get('_format')) {
+            case 'xml':
+                headers.Accept = 'application/fhir+xml'
+                break
+            case 'ttl':
+                headers.Accept = 'application/x-turtle'
+                break
+            case 'json':
+            default:
+                headers.Accept = 'application/fhir+json'
+            }
+            return headers
+        }
+    }
+
     fetch = async (href, searchParams = {}) => {
         const url = new URL(`${this.#serverConfiguration.url}${href}`)
-        Object.entries(searchParams).forEach(([key, value]) => url.searchParams.set(key, value))
+        Object.assign(url.searchParams, searchParams)
         const response = await fetch(url, {
             headers: this.#headers
         })
