@@ -3,5 +3,6 @@
         "source.fixAll.eslint": "explicit"
     },
     "files.trimTrailingWhitespace": true,
-    "eslint.format.enable": true
+    "eslint.format.enable": true,
+    "eslint.validate": ["javascript"]
 }

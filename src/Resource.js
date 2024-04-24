@@ -63,15 +63,22 @@ export default class Resource extends HTMLElement {
 
     connectedCallback () {
         context.addListener(this.#serverChanged)
-        new MutationObserver(this.#panelHiddenObserver).observe(this.#referencesPanel, { attributes: true })
-        new MutationObserver(this.#panelHiddenObserver).observe(this.#historyPanel, { attributes: true })
+        new MutationObserver(this.#panelHiddenObserver).observe(
+            this.#referencesPanel,
+            { attributes: true }
+        )
+        new MutationObserver(this.#panelHiddenObserver).observe(
+            this.#historyPanel,
+            { attributes: true }
+        )
     }
 
     #panelHiddenObserver = (mutationList) => {
         mutationList.forEach(({ type, attributeName, target }) => {
             if (type === 'attributes' && attributeName === 'hidden') {
                 if (target === this.#historyPanel) {
-                    this.#historyToggle.hidden = this.#historyDisabled || !target.hidden
+                    this.#historyToggle.hidden =
+                        this.#historyDisabled || !target.hidden
                 } else if (target === this.#referencesPanel) {
                     this.#referencesToggle.hidden = !target.hidden
                 }
@@ -85,7 +92,10 @@ export default class Resource extends HTMLElement {
         if (hashSearchParams?.length > 0) {
             const searchParams = new URLSearchParams(hashSearchParams[1])
             searchParams.set('_format', format)
-            location.hash = location.hash.replace(/\?[^?]+$/, `?${searchParams.toString()}`)
+            location.hash = location.hash.replace(
+                /\?[^?]+$/,
+                `?${searchParams.toString()}`
+            )
         } else {
             location.hash = `${location.hash}?_format=${format}`
         }
@@ -108,11 +118,18 @@ export default class Resource extends HTMLElement {
     }
 
     #helpClick = () => {
-        window.open(`${context.server.resourceHelpUrl(this.#resourceType.type)}#resource`, 'FhirBrowserHelp')
+        window.open(
+            `${context.server.resourceHelpUrl(
+                this.#resourceType.type
+            )}#resource`,
+            'FhirBrowserHelp'
+        )
     }
 
     #serverChanged = () => {
-        while (this.#tabs.firstChild) this.#tabs.removeChild(this.#tabs.lastChild)
+        while (this.#tabs.firstChild) {
+            this.#tabs.removeChild(this.#tabs.lastChild)
+        }
 
         this.#views = {}
         const server = context.server
@@ -152,7 +169,7 @@ export default class Resource extends HTMLElement {
         let format
         if (resource instanceof Document) {
             format = 'xml'
-        } else if (typeof (resource) === 'object') {
+        } else if (typeof resource === 'object') {
             format = 'json'
         } else {
             format = 'ttl'
@@ -164,10 +181,18 @@ export default class Resource extends HTMLElement {
             this.#title.innerText = resourceType
             const resourceId = view.resourceId
 
-            if (resourceId !== this.#resourceId || resourceType !== this.#resourceType?.type) {
-                this.#resourceType = context.server.capabilities.rest[0].resource.find(res => res.type === resourceType)
+            if (
+                resourceId !== this.#resourceId ||
+                resourceType !== this.#resourceType?.type
+            ) {
+                this.#resourceType =
+                    context.server.capabilities.rest[0].resource.find(
+                        (res) => res.type === resourceType
+                    )
                 this.#resourceId = resourceId
-                Object.entries(this.#views).filter(([key]) => key !== format).forEach(([, value]) => value.clear())
+                Object.entries(this.#views)
+                    .filter(([key]) => key !== format)
+                    .forEach(([, value]) => value.clear())
             }
             this.#tabs.value = format
         }
@@ -177,7 +202,10 @@ export default class Resource extends HTMLElement {
             this.#historyPanel.hidden = true
         }
 
-        this.#historyDisabled = this.#resourceType?.interaction.find(({ code }) => code === 'vread') === undefined
+        this.#historyDisabled =
+            this.#resourceType?.interaction.find(
+                ({ code }) => code === 'vread'
+            ) === undefined
         if (this.#historyDisabled) {
             this.#historyPanel.hidden = true
             this.#historyToggle.hidden = true
@@ -185,14 +213,18 @@ export default class Resource extends HTMLElement {
             this.#historyToggle.hidden = !this.#historyPanel.hidden
         }
 
-        if (!this.#historyPanel.hidden) this.#historyPanel.load(this.#resourceType, this.#resourceId)
-        if (!this.#referencesPanel.hidden) this.#referencesPanel.load(this.#resourceType, this.#resourceId)
+        if (!this.#historyPanel.hidden) {
+            this.#historyPanel.load(this.#resourceType, this.#resourceId)
+        }
+        if (!this.#referencesPanel.hidden) {
+            this.#referencesPanel.load(this.#resourceType, this.#resourceId)
+        }
     }
 
     /** @returns {String} */
     get resourceType () {
         return this.#resourceType.type
     }
-};
+}
 
 customElements.define('fhir-resource', Resource)

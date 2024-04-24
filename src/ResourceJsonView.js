@@ -193,7 +193,7 @@ export default class ResourceJsonView extends HTMLElement {
      * @param {fhir4.StructureDefinition} structureDefinition
      * @param {string} id
      * @returns {fhir4.ElementDefinition}
-     **/
+     */
     #resolveType = async (structureDefinition, id) => {
         let baseType = {
             id: `${structureDefinition.id}.${id}`,
@@ -214,7 +214,7 @@ export default class ResourceJsonView extends HTMLElement {
      * @param {object} obj
      * @param {fhir4.StructureDefinition} structureDefinition
      * @returns {HTMLElement[]}
-     **/
+     */
     #makeObjectElm = (obj, structureDefinition) => {
         const ret = []
         if (structureDefinition.id === 'Address') {
@@ -363,8 +363,8 @@ export default class ResourceJsonView extends HTMLElement {
 
         const btn = document.createElement('i')
         btn.className = 'material-symbols-sharp'
-        btn.innerText = 'map'
-        btn.title = 'Map'
+        btn.innerText = 'open_in_new'
+        btn.title = 'View'
         btn.onclick = () => { window.open(`http://www.google.com/maps?q=${query}`, '_blank') }
         return btn
     }
@@ -441,7 +441,7 @@ export default class ResourceJsonView extends HTMLElement {
     /**
      * @param {HTMLElement} valueElm
      * @param {Date} value
-     **/
+     */
     #makeInstantValueElm = (valueElm, value) => {
         valueElm.classList.add('instant')
         valueElm.append(format(value))
@@ -471,7 +471,7 @@ export default class ResourceJsonView extends HTMLElement {
      *  @param {HTMLElement} valueElm
      *  @param {fhir4.Reference} reference
      *  @param {String} value
-     **/
+     */
     #makeReferenceValueElm = (valueElm, reference, value) => {
         valueElm.classList.add('href')
         valueElm.append(format(value))

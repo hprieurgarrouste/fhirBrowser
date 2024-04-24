@@ -255,7 +255,7 @@ export default class Bundle extends HTMLElement {
             }
         } else {
             const hash = window.location.hash.replace('#/', '').trim()
-            resourceType = RegExp(/^\w+/).exec(hash)[0]
+            resourceType = /^\w+/.exec(hash)[0]
         }
 
         this.#resourceType = resourceType
