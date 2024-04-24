@@ -7,13 +7,9 @@ FHIR Browser is a utility developed by and intended for FHIR® developers and al
 
 ## Getting started with Fhir Browser
 
-come back later ;)
+visit [fhirbrowser.io](https://fhirbrowser.io) and start exploring
 
-## Work in progress
 
-User-readable resource display screen
-
-https://github.com/hprieurgarrouste/fhirBrowser/assets/47881604/f2bb1439-3430-47a8-a26b-85996499e63c
 
 
 
