@@ -11,10 +11,10 @@ export default class M2Dialog extends HTMLElement {
         const shadow = this.attachShadow({ mode: 'closed' })
         shadow.innerHTML = template
 
-        shadow.querySelector('main').addEventListener('click', (event) => this.onClose(event))
+        shadow.querySelector('main').addEventListener('mousedown', (event) => this.onClose(event))
 
         this.#surface = shadow.querySelector('.surface')
-        this.#surface.addEventListener('click', (event) => event.stopPropagation())
+        this.#surface.addEventListener('mousedown', (event) => event.stopPropagation())
 
         this.#title = shadow.getElementById('title')
         if (title) this.title = title
