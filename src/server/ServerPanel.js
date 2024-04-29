@@ -1,10 +1,11 @@
 import template from './templates/ServerPanel.html'
 
-import M2Tabs from '../components/M2Tabs'
-import M2ListItem from '../components/M2ListItem'
+import '../components/M2Tabs'
+import '../components/M2Avatar'
+import '../components/M2ListItem'
 
-import ServerResources from './ServerResources'
-import ServerCapabilities from './ServerCapabilities'
+import './ServerResources'
+import './ServerCapabilities'
 
 import context from '../services/Context'
 
