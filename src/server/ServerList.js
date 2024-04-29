@@ -14,18 +14,10 @@ export default class ServerList extends HTMLElement {
         const shadow = this.attachShadow({ mode: 'closed' })
         shadow.innerHTML = template
 
+        this.onclick = () => { }
+
         this.#list = shadow.querySelector('m2-list')
         this.#list.onclick = this.#appListClick
-    }
-
-    #onClick = () => { }
-    /** @param {Function} callback */
-    set onClick (callback) {
-        this.#onClick = callback
-    }
-
-    get onClick () {
-        return this.#onClick
     }
 
     /**
@@ -36,7 +28,7 @@ export default class ServerList extends HTMLElement {
         event.stopPropagation()
         const row = event.target.closest('m2-list-row')
         if (row) {
-            this.#onClick(row.dataset.id)
+            this.onclick(row.dataset.id)
         }
     }
 

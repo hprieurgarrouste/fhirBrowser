@@ -10,7 +10,6 @@ export default class M2ColorScheme extends HTMLElement {
         super()
         const shadow = this.attachShadow({ mode: 'closed' })
         shadow.innerHTML = template
-        // shadow.addEventListener('click', this.#onClick);
         this.#themeButton = shadow.querySelector('m2-round-button')
         this.#themeButton.onclick = this.#onClick
     }

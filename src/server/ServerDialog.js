@@ -27,7 +27,7 @@ export default class ServerDialog extends HTMLElement {
         this.#editMode = false
 
         this.#list = shadow.querySelector('server-list')
-        this.#list.onClick = this.#serverListClick
+        this.#list.onclick = this.#serverListClick
 
         this.#form = shadow.querySelector('server-form')
         this.#form.onOk = this.#serverFormOk
