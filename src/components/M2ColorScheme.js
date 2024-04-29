@@ -11,14 +11,14 @@ export default class M2ColorScheme extends HTMLElement {
         const shadow = this.attachShadow({ mode: 'closed' })
         shadow.innerHTML = template
         this.#themeButton = shadow.querySelector('m2-round-button')
-        this.#themeButton.onclick = this.#onClick
+        this.#themeButton.onclick = this.#clickHandler
     }
 
     connectedCallback () {
         this.#setColorScheme(preferencesService.get('colorScheme', 'auto'))
     }
 
-    #onClick = (event) => {
+    #clickHandler = (event) => {
         const schemes = ['light', 'dark', 'auto']
         let colorScheme = preferencesService.get('colorScheme', 'auto')
         const i = schemes.findIndex((elm) => elm === colorScheme) + 1

@@ -5,10 +5,10 @@ export default class M2ButtonGroup extends HTMLElement {
         super()
         const shadow = this.attachShadow({ mode: 'closed' })
         shadow.innerHTML = template
-        shadow.querySelector('main').onclick = this.#onClick
+        shadow.querySelector('main').onclick = this.#clickHandler
     }
 
-    #onClick = (event) => {
+    #clickHandler = (event) => {
         /** @type {HTMLButtonElement} */
         const target = event.target.closest('button')
         if (target) {

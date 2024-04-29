@@ -8,7 +8,7 @@ export default class M2ListRowCheck extends HTMLElement {
         super()
         const shadow = this.attachShadow({ mode: 'closed' })
         shadow.innerHTML = template
-        shadow.querySelector('main').onclick = this.#onclick
+        shadow.querySelector('main').onclick = this.#clickHandler
         this.#checkbox = shadow.querySelector('input[type=checkbox]')
     }
 
@@ -20,7 +20,7 @@ export default class M2ListRowCheck extends HTMLElement {
         }
     }
 
-    #onclick = (event) => {
+    #clickHandler = (event) => {
         if (this.getAttribute('selected') !== null) {
             this.removeAttribute('selected')
         } else {
