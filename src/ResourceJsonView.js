@@ -234,7 +234,7 @@ export default class ResourceJsonView extends HTMLElement {
             const valueElm = document.createElement('span')
             valueElm.classList.add('value')
             if (structureDefinition.id === 'Reference' && key === 'reference') {
-                this.#makeReferenceValueElm(valueElm, obj, value)
+                this.#makeReferenceValueElm(valueElm, value)
             } else if (structureDefinition.id === 'ContactPoint' && key === 'value') {
                 this.#makeContactPointValueElm(valueElm, obj, value)
             } else {
@@ -294,6 +294,11 @@ export default class ResourceJsonView extends HTMLElement {
                         valueElm.append(...this.#makeObjectElm(value, sd))
                     })
                 }
+            } else if (propType === 'canonical') {
+                valueElm.classList.add(propType)
+                this.#makeReferenceValueElm(valueElm, value)
+            } else if (propType === 'url') {
+                this.#makeUrlValueElm(valueElm, value)
             } else {
                 valueElm.classList.add(propType)
                 valueElm.append(value)
@@ -469,10 +474,9 @@ export default class ResourceJsonView extends HTMLElement {
 
     /**
      *  @param {HTMLElement} valueElm
-     *  @param {fhir4.Reference} reference
      *  @param {String} value
      */
-    #makeReferenceValueElm = (valueElm, reference, value) => {
+    #makeReferenceValueElm = (valueElm, value) => {
         valueElm.classList.add('href')
         valueElm.append(format(value))
 
@@ -481,6 +485,23 @@ export default class ResourceJsonView extends HTMLElement {
             if (!url.startsWith('/') && !url.startsWith('?')) url = `/${url}`
             const a = document.createElement('a')
             a.setAttribute('href', `#${url}`)
+            a.append(value)
+            return a
+        }
+    }
+
+    /**
+     *  @param {HTMLElement} valueElm
+     *  @param {String} value
+     */
+    #makeUrlValueElm = (valueElm, value) => {
+        valueElm.classList.add('href')
+        valueElm.append(format(value))
+
+        function format (value) {
+            const a = document.createElement('a')
+            a.setAttribute('href', `${value}`)
+            a.setAttribute('target', '_blank')
             a.append(value)
             return a
         }
