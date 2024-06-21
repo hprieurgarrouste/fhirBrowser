@@ -331,7 +331,7 @@ export default class ResourceJsonView extends HTMLElement {
         }
 
         function makeJson () {
-            const contentType = attachment.contentType
+            const contentType = `${attachment.contentType};charset=UTF-8`
             const byteCharacters = atob(attachment.data)
             const byteArrays = []
             for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
