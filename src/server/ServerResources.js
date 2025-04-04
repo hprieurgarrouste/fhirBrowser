@@ -74,7 +74,7 @@ export default class ServerResources extends HTMLElement {
         if (row) {
             this.#list.querySelector('m2-list-row[selected]')?.removeAttribute('selected')
             row.setAttribute('selected', '')
-            location.hash = `#/${row.dataset.type}?_summary=true&_format=json`
+            location.hash = `#/${row.dataset.type}?_summary=true&_format=json&_sort=-_lastUpdated`
         }
     }
 
