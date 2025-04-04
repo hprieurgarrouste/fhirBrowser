@@ -1,0 +1,21 @@
+<style>
+    dialog {
+        inset: unset;
+		padding: 0;
+		border: none !important;
+		background: transparent;
+		font-size: 5em;
+		overflow: hidden;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+        outline: none;
+    }
+    dialog::backdrop {
+		background-color: rgb(0 0 0 / 32%);
+	}
+</style>
+<dialog>
+    <m2-circular-progress></m2-circular-progress>
+</dialog>
