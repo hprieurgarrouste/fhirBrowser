@@ -148,7 +148,7 @@ export default class Server {
             'Content-type': 'application/x-www-form-urlencoded'
         }
         if (this.#serverConfiguration.oauthGrantType === 'client_credentials') {
-            const auth = btoa(`${this.#serverConfiguration.oauthClientId}:${this.#serverConfiguration.oauthClientSecret}`)
+            const auth = window.btoa(`${this.#serverConfiguration.oauthClientId}:${this.#serverConfiguration.oauthClientSecret}`)
             headers.Authorization = `Basic ${auth}`
         }
         const urlParams = {
