@@ -1,0 +1,7 @@
+services:
+    fhirbrowser:
+        image: fhirbrowser
+        build: .
+        container_name: fhirbrowser
+        ports:
+            - '80:80'
