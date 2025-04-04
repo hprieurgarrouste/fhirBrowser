@@ -34,7 +34,7 @@ class FhirService {
      * @returns {string}
      */
     historyHelpUrl = (release) => {
-        return `${this.#server_url}/${release}//http.html#history.html`
+        return `${this.#server_url}/${release}//http.html#history`
     }
 
     /**

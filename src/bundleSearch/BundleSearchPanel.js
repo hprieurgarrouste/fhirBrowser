@@ -53,7 +53,7 @@ export default class BundleSearchPanel extends HTMLElement {
                 hash.push(`${value.name}=${encodeURIComponent(value.value)}`)
             }
         })
-        location.hash = `#/${this.#resourceType.type}?${hash.length ? hash.join('&') + '&' : ''}_summary=true&_format=json`
+        location.hash = `#/${this.#resourceType.type}?${hash.length ? hash.join('&') + '&' : ''}_summary=true&_format=json&_sort=-_lastUpdated`
     }
 
     helpClick = (event) => {
