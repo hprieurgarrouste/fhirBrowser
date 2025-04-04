@@ -547,7 +547,7 @@ export default class ResourceJsonView extends HTMLElement {
     #copyClick = () => {
         const content = JSON.stringify(this.#resource)
         navigator.clipboard.writeText(content).then(function () {
-            snackbarService.show('Copying to clipboard was successful')
+            snackbarService.info('Copying to clipboard was successful')
         }, function () {
             snackbarService.error('Could not copy text')
         })

@@ -8,7 +8,7 @@ import SnackbarService from './services/Snackbar'
 import M2RoundButton from './components/M2RoundButton'
 
 export default class ResourceXmlView extends HTMLElement {
-    /** @type {Fhir.resource} */
+    /** @type {fhir4.Resource} */
     #resource
     /** @type {HTMLElement} */
     #content
@@ -184,7 +184,7 @@ export default class ResourceXmlView extends HTMLElement {
     #copyClick = () => {
         const content = new XMLSerializer().serializeToString(this.#resource)
         navigator.clipboard.writeText(content).then(function () {
-            SnackbarService.show('Copying to clipboard was successful')
+            SnackbarService.info('Copying to clipboard was successful')
         }, function () {
             SnackbarService.error('Could not copy text')
         })

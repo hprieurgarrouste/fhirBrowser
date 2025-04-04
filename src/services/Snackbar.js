@@ -2,32 +2,47 @@ import context from './Context'
 import M2Snackbar from '../components/M2Snackbar'
 
 class SnackbarService {
-    // TODO : Add message queuing
+    /**
+     * Show an error message
+     * @param {string} message
+     */
+    error(message) {
+        this.#show(message, 'error')
+    }
 
     /**
-     * @param {String} message
+     * Show an information message
+     * @param {string} message
      */
-    error (message) {
-        this.show(message, undefined, undefined, 'error')
+    info(message) {
+        this.#show(message, 'info')
     }
 
-    clear () {
-        Array.from(context.appContainer.querySelectorAll('m2-snackbar')).forEach(msg => msg.remove())
+    /**
+     * Clear and hide the snackbar
+     */
+    clear() {
+        const nbar = context.appContainer.querySelector('m2-snackbar')
+        nbar.type = 'info'
+        nbar.innerText = ''
+        nbar.hidePopover()
     }
 
-    show (message, action, delay = 4000, type = 'info') {
-        const bar = new M2Snackbar()
-        bar.type = type
-        bar.appendChild(document.createTextNode(message))
-        if (action) {
-            action.setAttribute('slot', 'right')
-            bar.appendChild(action)
-        }
-        context.appContainer.appendChild(bar)
-        // TODO : disable timeout if action present
+    /**
+     * Show a snackbar message
+     * @param {string} message
+     * @param {{'info':'error'}} [type='info'] - notification color, default 'info'
+     * @param {number} [duration=3000] - Display time in milliseconds, default 3000
+     */
+    #show(message, type = 'info', duration = 3000) {
+        /** @type {M2Snackbar} */
+        let nbar = context.appContainer.querySelector('m2-snackbar')
+        nbar.type = type
+        nbar.innerText = message
+        nbar.showPopover()
         setTimeout(() => {
-            bar?.remove()
-        }, delay)
+            nbar?.hidePopover()
+        }, duration)
     }
 }
 

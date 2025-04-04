@@ -11,7 +11,12 @@ export default class M2Snackbar extends HTMLElement {
         this.#main = shadow.querySelector('main')
     }
 
-    set type (type = 'info') {
+    /**
+     * Set the snackbar css style
+     * @param {{'info':'error'}} [type='info'] - notification color, default 'info'
+     */
+    set type(type = 'info') {
+        this.#main.classList.remove('info','error')
         this.#main.classList.add(type)
     }
 };

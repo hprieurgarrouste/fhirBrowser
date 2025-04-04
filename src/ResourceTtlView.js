@@ -4,7 +4,7 @@ import SnackbarService from './services/Snackbar'
 export default class ResourceTtlView extends HTMLElement {
     /** @type {HTMLPreElement} */
     #content
-    /** @type {Fhir.Resource} */
+    /** @type {fhir4.Resource} */
     #resource
 
     constructor () {
@@ -72,7 +72,7 @@ export default class ResourceTtlView extends HTMLElement {
     #copyClick = () => {
         const content = this.#resource
         navigator.clipboard.writeText(content).then(function () {
-            SnackbarService.show('Copying to clipboard was successful')
+            SnackbarService.info('Copying to clipboard was successful')
         }, function () {
             SnackbarService.error('Could not copy text')
         })
