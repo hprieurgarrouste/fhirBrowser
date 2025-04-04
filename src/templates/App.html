@@ -2,8 +2,8 @@
     @import url(/assets/material.css);
 
     :host {
-        background-color: var(--background-color, rgb(255, 255, 255));
-        color: var(--text-color-normal, rgb(0, 0, 0, 87%));
+        background-color: var(--background-color, rgb(255 255 255));
+        color: var(--text-color-normal, rgb(0 0 0 / 87%));
         display: flex;
         flex-direction: column;
         font-family: var(--font-family);
@@ -59,23 +59,9 @@
         grid-auto-rows: 100%;
     }
 
-    #waiting {
-        align-items: center;
-        background-color: rgba(0, 0, 0, 32%);
-        display: flex;
-        font-size: 5em;
-        justify-content: center;
-        left: 0;
-        min-height: 100%;
-        min-width: 100%;
-        position: absolute;
-        top: 0;
-        visibility: hidden;
-    }
-
     @media (max-width:480px) {
         server-panel {
-            background-color: var(--background-color, rgb(255, 255, 255));
+            background-color: var(--background-color, rgb(255 255 255));
             position: static;
             width: 100%;
         }
@@ -105,7 +91,6 @@
         </div>
     </div>
 </main>
+<m2-snackbar popover="auto"></m2-snackbar>
 <server-dialog hidden></server-dialog>
-<div id="waiting">
-    <m2-circular-progress></m2-circular-progress>
-</div>
+<m2-waiting></m2-waiting>

@@ -1,9 +1,10 @@
 import template from './templates/App.html'
 
 import './components/M2ColorScheme'
-import './components/M2CircularProgress'
 import './components/M2LinearProgress'
 import './components/M2Button'
+import './components/M2Snackbar'
+import './components/M2Waiting'
 
 import AboutDialog from './AboutDialog'
 import './Bundle'
@@ -42,7 +43,7 @@ export default class App extends HTMLElement {
     #resourceView
     /** @type {HTMLElement} */
     #body
-    /** @type {HTMLElement} */
+    /** @type {M2Waiting} */
     #waiting
 
     constructor () {
@@ -58,7 +59,7 @@ export default class App extends HTMLElement {
         this.#navigationToggle = shadow.getElementById('navigation')
         this.#navigationToggle.onclick = () => this.#serverPanel.classList.toggle('hidden')
 
-        this.#waiting = shadow.getElementById('waiting')
+        this.#waiting = shadow.querySelector('m2-waiting')
 
         this.#serverDialog = shadow.querySelector('server-dialog')
         this.#serverDialog.onSelect = this.#connect
@@ -87,7 +88,7 @@ export default class App extends HTMLElement {
     #fetchHash = async (hash) => {
         snackbarService.clear()
         const timeoutId = setTimeout(() => {
-            this.#waiting.style.visibility = 'visible'
+            this.#waiting.show()
         }, 500)
 
         try {
@@ -138,7 +139,7 @@ export default class App extends HTMLElement {
             snackbarService.error(error)
         } finally {
             clearTimeout(timeoutId)
-            this.#waiting.style.visibility = 'hidden'
+            this.#waiting.hide()
         }
     }
 
@@ -173,12 +174,12 @@ export default class App extends HTMLElement {
     }
 
     #connect = ({ code, configuration }) => {
-        this.#waiting.style.visibility = 'visible'
+        this.#waiting.show()
         const serverConfiguration = new ServerConfiguration(configuration)
         const server = new Server(code, serverConfiguration)
         server.connect().then(() => {
             context.server = server
-            snackbarService.show(`Connected to "${code}" server.`)
+            snackbarService.info(`Connected to "${code}" server.`)
             preferencesService.set('server', code)
             this.#navigationToggle.hidden = false
             if (location.hash) {
@@ -190,7 +191,7 @@ export default class App extends HTMLElement {
             snackbarService.error(`An error occurred while connecting to the server "${code}"`)
             console.log(error)
         }).finally(() => {
-            this.#waiting.style.visibility = 'hidden'
+            this.#waiting.hide()
         })
     }
 };
