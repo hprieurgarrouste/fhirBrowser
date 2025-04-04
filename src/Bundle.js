@@ -147,7 +147,7 @@ export default class Bundle extends HTMLElement {
 
     #copyClick = () => {
         navigator.clipboard.writeText(JSON.stringify(this.#bundle)).then(function () {
-            snackbarService.show('Copying to clipboard was successful')
+            snackbarService.info('Copying to clipboard was successful')
         }, function (err) {
             console.error('Async: Could not copy text: ', err)
         })
