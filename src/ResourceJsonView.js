@@ -337,7 +337,7 @@ export default class ResourceJsonView extends HTMLElement {
 
         function makeJson () {
             const contentType = `${attachment.contentType};charset=UTF-8`
-            const byteCharacters = atob(attachment.data)
+            const byteCharacters = window.atob(attachment.data)
             const byteArrays = []
             for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
                 const slice = byteCharacters.slice(offset, offset + 1024)
@@ -360,7 +360,7 @@ export default class ResourceJsonView extends HTMLElement {
      */
     #makeAddressValueBtn = (address, structureDefinition) => {
         let query = ''
-        address.line.forEach(l => { query += ` ${l}` })
+        address.line?.forEach(l => { query += ` ${l}` })
         query += address.postalCode ? ` ${address.postalCode}` : ''
         query += address.city ? ` ${address.city}` : ''
         query += address.country ? ` ${address.country}` : ''
