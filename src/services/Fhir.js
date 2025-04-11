@@ -52,7 +52,7 @@ class FhirService {
 
     /**
      * get schema from hl7 server
-     * formerly https://hl7.org/fhir/R4/fhir.shema.json and now hosted
+     * formerly https://hl7.org/fhir/{version}/fhir.shema.json and now hosted
      * @param {String} release
      * @returns
      */
