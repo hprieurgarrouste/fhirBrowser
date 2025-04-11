@@ -52,12 +52,12 @@ class FhirService {
 
     /**
      * get schema from hl7 server
+     * formerly https://hl7.org/fhir/R4/fhir.shema.json and now hosted
      * @param {String} release
      * @returns
      */
     fetchSchema = async (release) => {
-        const url = new URL(`${this.#server_url}/${release}/fhir.schema.json`)
-        const response = await fetch(url, {
+        const response = await fetch(`./assets/fhir/${release}/fhir.schema.json`, {
             cache: 'force-cache'
         })
         return response.json()
@@ -65,7 +65,7 @@ class FhirService {
 
     fetchAllReferences = async () => {
         if (!this.#fhirReferences) {
-            const response = await fetch('./assets/references.json')
+            const response = await fetch('./assets/fhir/references.json')
             this.#fhirReferences = await response.json()
         }
         return this.#fhirReferences
