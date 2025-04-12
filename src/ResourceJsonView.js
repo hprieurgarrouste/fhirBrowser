@@ -1,9 +1,7 @@
 import template from './templates/ResourceJsonView.html'
 
-import M2Dialog from './components/M2Dialog'
-import M2ButtonGroup from './components/M2ButtonGroup'
-import M2RoundButton from './components/M2RoundButton'
-import ResourceTemplateView from './ResourceTemplateView'
+import './components/M2ButtonGroup'
+import './components/M2RoundButton'
 
 import context from './services/Context'
 import preferencesService from './services/Preferences'
@@ -16,17 +14,14 @@ export default class ResourceJsonView extends HTMLElement {
     #content
     /** @type {M2RoundButton} */
     #sortToggle
-    /** @type {ResourceTemplateView} */
-    #templateView
     /**
      * @type {Object}
-     * @property {(raw|enhanced|template)} mode
+     * @property {(raw|enhanced)} mode
      */
     #preferences
     #MODE = {
         raw: 'raw',
-        object: 'object',
-        template: 'template'
+        object: 'object'
     }
 
     /** @type {M2ButtonGroup} */
@@ -51,16 +46,6 @@ export default class ResourceJsonView extends HTMLElement {
         this.#modeToggle = shadow.querySelector('m2-button-group')
         this.#modeToggle.onclick = this.#modeToggleClick
 
-        if (false && !window.matchMedia('(max-width: 480px)').matches) { // WIP not available yet
-            const btn = document.createElement('button')
-            btn.title = 'Template'
-            btn.innerText = 'wysiwyg'
-            btn.setAttribute('data-id', 'template')
-            this.#modeToggle.append(btn)
-            this.#preferences.templateMode = false
-        }
-        this.#templateView = shadow.querySelector('resource-template-view')
-
         shadow.getElementById('download').onclick = this.#downloadClick
         shadow.getElementById('copy').onclick = this.#copyClick
         shadow.getElementById('share').onclick = this.#shareClick
@@ -78,9 +63,6 @@ export default class ResourceJsonView extends HTMLElement {
         case 'object':
             this.#preferences.mode = this.#MODE.object
             break
-        case 'template':
-            this.#preferences.mode = this.#MODE.template
-            break
         }
         preferencesService.set('jsonView', this.#preferences)
         this.#modeChange()
@@ -91,18 +73,11 @@ export default class ResourceJsonView extends HTMLElement {
         switch (this.#preferences.mode) {
         case this.#MODE.raw:
             this.#content.hidden = false
-            this.#templateView.hidden = true
             this.#sortToggle.hidden = true
             break
         case this.#MODE.object:
             this.#content.hidden = false
-            this.#templateView.hidden = true
             this.#sortToggle.hidden = false
-            break
-        case this.#MODE.template:
-            this.#content.hidden = true
-            this.#templateView.hidden = false
-            this.#sortToggle.hidden = true
             break
         }
         if (this.#resource) this.source = this.#resource
@@ -172,21 +147,17 @@ export default class ResourceJsonView extends HTMLElement {
             pre.innerText = JSON.stringify(resource, null, 4)
             this.#content.append(pre)
         } else {
-            context.server.structureDefinition(resource.resourceType).then(sd => {
-                const valueElm = document.createElement('span')
-                valueElm.classList.add('value', 'object', sd.id)
-                valueElm.append(...this.#makeObjectElm(resource, sd))
-                const dt = document.createElement('DT')
-                dt.append(valueElm)
-                const dl = document.createElement('DL')
-                dl.append(dt)
-                this.#content.append(dl)
-                // this.#content.append('{', this.#makeObjectElm(resource, sd), '}');
-            })
+            const valueElm = document.createElement('span')
+            valueElm.classList.add('value', 'object', resource.resourceType)
+            valueElm.append(...this.#makeObjectElm(resource, resource.resourceType))
+            const dt = document.createElement('DT')
+            dt.append(valueElm)
+            const dl = document.createElement('DL')
+            dl.append(dt)
+            this.#content.append(dl)
         }
         this.#content.style.cursor = 'default'
         this.#resource = resource
-        this.#templateView.source = resource
     }
 
     /**
@@ -194,64 +165,53 @@ export default class ResourceJsonView extends HTMLElement {
      * @param {string} id
      * @returns {fhir4.ElementDefinition}
      */
-    #resolveType = async (structureDefinition, id) => {
-        let baseType = {
-            id: `${structureDefinition.id}.${id}`,
-            type: [{ code: 'string' }]
+    #resolveType = (structureDefinition, id) => {
+        const prop = structureDefinition.properties[id]
+        if (prop.const) {
+            return 'string'
+        } else if (prop.type) {
+            if (prop.type === 'array') {
+                return prop.items.$ref.split('/').pop()
+            }
+            return prop.type
+        } else if (prop.$ref) {
+            return prop.$ref.split('/').pop()
         }
-        const prop = structureDefinition.snapshot.element.find(e => e.id === `${structureDefinition.id}.${id}`)
-        if (prop?.type) {
-            baseType = prop // prop.type[0].code;
-        } else if (prop?.base) {
-            const baseRoot = prop.base.path.split('.').at(0)
-            const baseSd = await context.server.structureDefinition(baseRoot)
-            baseType = this.#resolveType(baseSd, prop.base.path)
-        }
-        return baseType
     }
 
     /**
      * @param {object} obj
-     * @param {fhir4.StructureDefinition} structureDefinition
+     * @param {String} type
      * @returns {HTMLElement[]}
      */
-    #makeObjectElm = (obj, structureDefinition) => {
+    #makeObjectElm = (obj, type) => {
         const ret = []
-        if (structureDefinition.id === 'Address') {
-            const btn = this.#makeAddressValueBtn(obj, structureDefinition)
+        context.server.schema.getDefinitionByName(type)
+        // add helper btn at the begenning
+        if (type === 'Address') {
+            const btn = this.#makeAddressValueBtn(obj)
             if (btn) ret.push(btn)
-        } else if (['Binary', 'Attachment'].includes(structureDefinition.id)) {
-            const btn = this.#makeAttachmentValueBtn(obj, structureDefinition)
+        } else if (['Binary', 'Attachment'].includes(type)) {
+            const btn = this.#makeAttachmentValueBtn(obj)
             if (btn) ret.push(btn)
         }
 
         let entries = Object.entries(obj)
         if (this.#preferences.sortMode) entries = entries.sort()
 
+        const definition = context.server.schema.getDefinitionByName(type)
         /** @type {HTMLDListElement} */
         const dl = document.createElement('dl')
         dl.append(...entries.map(([key, value]) => {
             const valueElm = document.createElement('span')
             valueElm.classList.add('value')
-            if (structureDefinition.id === 'Reference' && key === 'reference') {
+            const entryType = this.#resolveType(definition, key)
+            if (type === 'Reference' && key === 'reference') {
                 this.#makeReferenceValueElm(valueElm, value)
-            } else if (structureDefinition.id === 'ContactPoint' && key === 'value') {
+            } else if (type === 'ContactPoint' && key === 'value') {
                 this.#makeContactPointValueElm(valueElm, obj, value)
             } else {
-                this.#resolveType(structureDefinition, key).then(elementDefinition => {
-                    const propType = elementDefinition.type[0].code
-                    if (elementDefinition.type.length > 1) {
-                        console.log('TYPE LENGTH!!!')
-                    }
-                    if (['instant', 'dateTime'].includes(propType)) {
-                        this.#makeInstantValueElm(valueElm, value)
-                        // TODO
-                        // } else if ('Narrative' == propType) {
-                        //    this.#makeNarrativeValueElm(valueElm, value, prop);
-                    } else {
-                        this.#makeValueElm(valueElm, value, elementDefinition, structureDefinition)
-                    }
-                })
+                this.#makeValueElm(valueElm, value, entryType)
             }
             const dt = document.createElement('dt')
             dt.append(this.#makeKeyElm(key), valueElm)
@@ -272,60 +232,32 @@ export default class ResourceJsonView extends HTMLElement {
     /**
      * @param {HTMLElement} valueElm
      * @param {fhir4.Resource} value
-     * @param {fhir4.ElementDefinition} elementDefinition
-     * @param {fhir4.StructureDefinition} structureDefinition
+     * @param {String} type
      */
-    #makeValueElm = (valueElm, value, elementDefinition, structureDefinition) => {
+    #makeValueElm = (valueElm, value, type) => {
         if (value === null) {
             valueElm.append('null')
-        } else if (elementDefinition?.type[0]?.code) {
-            const propType = elementDefinition.type[0].code
-            if (Array.isArray(value)) { // Array
-                valueElm.classList.add('array', propType)
-                valueElm.append(this.#makeArrayElm(value, elementDefinition, structureDefinition))
-            } else if (typeof value === 'object') { // Object
-                valueElm.classList.add('object', propType)
-                if (propType === 'BackboneElement') {
-                    console.log('backbone')
-                    const besd = this.#extractBackboneElement(structureDefinition, elementDefinition.id)
-                    valueElm.append(...this.#makeObjectElm(value, besd))
-                } else {
-                    context.server.structureDefinition(propType).then(sd => {
-                        valueElm.append(...this.#makeObjectElm(value, sd))
-                    })
-                }
-            } else if (propType === 'canonical') {
-                valueElm.classList.add(propType)
-                this.#makeReferenceValueElm(valueElm, value)
-            } else if (propType === 'url') {
-                this.#makeUrlValueElm(valueElm, value)
-            } else {
-                valueElm.classList.add(propType)
-                valueElm.append(value)
-            }
+        } else if (Array.isArray(value)) {
+            valueElm.classList.add('array', type)
+            valueElm.append(this.#makeArrayElm(value, type))
+        } else if (typeof value === 'object') {
+            valueElm.classList.add('object', type)
+            valueElm.append(...this.#makeObjectElm(value, type))
+        } else if (['instant', 'dateTime'].includes(type)) {
+            this.#makeInstantValueElm(valueElm, value, type)
+        } else if (['url', 'uri'].includes(type)) {
+            this.#makeUrlValueElm(valueElm, value)
         } else {
+            valueElm.classList.add(type)
             valueElm.append(value)
-        }
-    }
-
-    #extractBackboneElement = (structureDefinition, prefix) => {
-        const backboneElement = []
-        structureDefinition.snapshot.element.filter(e => e.id.startsWith(prefix)).forEach(e => backboneElement.push(e))
-        return {
-            resourceType: 'StructureDefinition',
-            id: prefix,
-            snapshot: {
-                element: backboneElement
-            }
         }
     }
 
     /**
      * @param {HTMLElement} valueElm
      * @param {fhir4.Attachment} attachment
-     * @param {fhir4.StructureDefinition} structureDefinition
      */
-    #makeAttachmentValueBtn = (attachment, structureDefinition) => {
+    #makeAttachmentValueBtn = (attachment) => {
         if (attachment.contentType && attachment.data) {
             const btn = document.createElement('i')
             btn.className = 'material-symbols-sharp'
@@ -358,7 +290,7 @@ export default class ResourceJsonView extends HTMLElement {
      * @param {fhir4.Address} address
      * @param {fhir4.StructureDefinition} structureDefinition
      */
-    #makeAddressValueBtn = (address, structureDefinition) => {
+    #makeAddressValueBtn = (address) => {
         let query = ''
         address.line?.forEach(l => { query += ` ${l}` })
         query += address.postalCode ? ` ${address.postalCode}` : ''
@@ -409,46 +341,13 @@ export default class ResourceJsonView extends HTMLElement {
         }
     }
 
-    #makeNarrativeValueElm = (valueElm, value, sd) => {
-        if (value.div) {
-            const btn = document.createElement('i')
-            btn.className = 'material-symbols-sharp'
-            btn.innerText = 'pageview'
-            btn.title = 'Preview'
-            btn.onclick = () => { this.#narrativeDialog(value.div) }
-            valueElm.append(btn)
-        }
-        this.#makeValueElm(valueElm, value, sd)
-    }
-
-    #narrativeDialog = (xhtml) => {
-        /** @type {M2Dialog} */
-        const previewDialog = new M2Dialog('Preview')
-        previewDialog.fullscreen = true
-        previewDialog.centered = true
-        previewDialog.onClose = () => {
-            previewDialog.remove()
-        }
-
-        const closeBtn = new M2RoundButton('close', 'Close')
-        closeBtn.slot = 'appBarLeft'
-        closeBtn.onclick = previewDialog.onClose
-        previewDialog.append(closeBtn)
-
-        const p = document.createElement('p')
-        p.className = 'Narrative'
-        p.innerHTML = xhtml
-        previewDialog.append(p)
-
-        context.appContainer.append(previewDialog)
-    }
-
     /**
      * @param {HTMLElement} valueElm
      * @param {Date} value
+     * @param {String} type
      */
-    #makeInstantValueElm = (valueElm, value) => {
-        valueElm.classList.add('instant')
+    #makeInstantValueElm = (valueElm, value, type) => {
+        valueElm.classList.add(type)
         valueElm.append(format(value))
 
         function format (value) {
@@ -477,7 +376,7 @@ export default class ResourceJsonView extends HTMLElement {
      *  @param {String} value
      */
     #makeReferenceValueElm = (valueElm, value) => {
-        valueElm.classList.add('href')
+        valueElm.classList.add('reference')
         valueElm.append(format(value))
 
         function format (value) {
@@ -495,7 +394,7 @@ export default class ResourceJsonView extends HTMLElement {
      *  @param {String} value
      */
     #makeUrlValueElm = (valueElm, value) => {
-        valueElm.classList.add('href')
+        valueElm.classList.add('url')
         valueElm.append(format(value))
 
         function format (value) {
@@ -509,16 +408,15 @@ export default class ResourceJsonView extends HTMLElement {
 
     /**
      * @param {fhir4.Element[]} array
-     * @param {fhir4.ElementDefinition} elementDefinition
-     * @param {fhir4.StructureDefinition} structureDefinition
+     * @param {String} type
      * @returns {HTMLDListElement}
      */
-    #makeArrayElm = (array, elementDefinition, structureDefinition) => {
+    #makeArrayElm = (array, type) => {
         const dl = document.createElement('dl')
         dl.append(...array.map((value, index) => {
             const valueElm = document.createElement('span')
             valueElm.classList.add('value')
-            this.#makeValueElm(valueElm, value, elementDefinition, structureDefinition)
+            this.#makeValueElm(valueElm, value, type)
 
             const dt = document.createElement('dt')
             dt.append(
