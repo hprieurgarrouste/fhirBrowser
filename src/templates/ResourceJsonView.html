@@ -7,14 +7,10 @@
         height: 100%;
     }
 
-    #content,
-    resource-template-view {
+    #content {
         flex: 1 1 auto;
         height: 0;
         box-shadow: inset 0 3px 4px var(--border-color);
-    }
-
-    #content {
         --indent: 32px;
         color: var(--text-color-normal, black);
         font-family: monospace;
@@ -199,7 +195,6 @@
 </style>
 <main>
     <div id="content"></div>
-    <resource-template-view hidden></resource-template-view>
     <footer>
         <section>
             <m2-button-group>

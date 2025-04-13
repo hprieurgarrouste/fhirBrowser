@@ -1,7 +1,7 @@
 import template from './templates/ServerCapabilities.html'
 
 import context from '../services/Context'
-import M2List from '../components/M2List'
+import '../components/M2List'
 import M2ListItem from '../components/M2ListItem'
 import M2ListRow from '../components/M2ListRow'
 

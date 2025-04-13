@@ -68,7 +68,7 @@ export default class Server {
         return fhirService.release(this.#capabilities.fhirVersion) || null
     }
 
-    /** @returns {Schema} */
+    /** @returns {fhir4.Schema} */
     get schema () {
         return this.#schema
     }
@@ -79,7 +79,7 @@ export default class Server {
             this.#headers[this.#serverConfiguration.apiKey] = this.#serverConfiguration.apiValue
             break
         case ServerConfiguration.METHODS.Basic:
-            const auth = btoa(`${this.#serverConfiguration.basicUsername}:${this.#serverConfiguration.basicPassword}`)
+            const auth = window.btoa(`${this.#serverConfiguration.basicUsername}:${this.#serverConfiguration.basicPassword}`)
             this.#headers.Authorization = `Basic ${auth}`
             break
         case ServerConfiguration.METHODS.OAuth2:
