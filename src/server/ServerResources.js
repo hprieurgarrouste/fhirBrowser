@@ -2,18 +2,17 @@ import template from './templates/ServerResources.html'
 
 import resourceIcon from '../assets/fhirIconSet'
 
-import M2List from '../components/M2List'
+import '../components/M2List'
 import M2Badge from '../components/M2Badge'
 import M2ListItem from '../components/M2ListItem'
 import M2ListRow from '../components/M2ListRow'
 
 import context from '../services/Context'
+import FavoritesService from '../services/Favorites'
 
 export default class ServerResources extends HTMLElement {
     /** @type {M2List} */
     #list
-    /** @type {Set} */
-    #recent
 
     constructor () {
         super()
@@ -23,8 +22,6 @@ export default class ServerResources extends HTMLElement {
         this.#list = shadow.querySelector('m2-list')
         this.#list.onFilter = this.#appListFilter
         this.#list.onclick = this.#appListClick
-
-        this.#recent = new Set()
     }
 
     /**
@@ -33,12 +30,32 @@ export default class ServerResources extends HTMLElement {
      */
     load = (capabilityStatement) => {
         this.#list.clear()
+        const favorites = FavoritesService.favorites
+        if (favorites.length !== 0) {
+            let span = document.createElement('span')
+            span.inert = true
+            span.innerText = 'Favorites'
+            this.#list.append(span)
+
+            this.#list.append(...favorites
+                .sort((r1, r2) => r1.localeCompare(r2, undefined, { sensitivity: 'base' }))
+                .map(res => this.#makeListRow(res)))
+
+            const divider = document.createElement('hr')
+            divider.inert = true
+            this.#list.append(divider)
+
+            span = document.createElement('span')
+            span.inert = true
+            span.innerText = 'Other resources'
+            this.#list.append(span)
+        }
         this.#list.append(...capabilityStatement.rest[0].resource
-            .filter(res => res.interaction && res.interaction.some(({ code }) => code === 'search-type'))
+            .filter(res => res.interaction?.some(({ code }) => code === 'search-type'))
+            .filter(res => !favorites.includes(res.type))
             .sort((r1, r2) => r1.type.localeCompare(r2.type, undefined, { sensitivity: 'base' }))
             .map(r => this.#makeListRow(r.type))
         )
-        this.#recent.clear()
     }
 
     /**
@@ -82,7 +99,7 @@ export default class ServerResources extends HTMLElement {
      * @param {string} value
      */
     #appListFilter = (value) => {
-        this.#list.childNodes.forEach(row => { row.hidden = !row.dataset.type.toLowerCase().includes(value.toLowerCase()) })
+        this.#list.querySelectorAll('m2-list-row').forEach(row => { row.hidden = !row.dataset.type.toLowerCase().includes(value.toLowerCase()) })
         this.#list.querySelector('m2-list-row[selected]')?.scrollIntoView()
     }
 
@@ -111,10 +128,6 @@ export default class ServerResources extends HTMLElement {
             item.append(badge)
             this.#getCount(row.dataset.type).then(({ total }) => { badge.value = total })
         }
-        // recent
-        this.#recent.add(row.dataset.type)
-        if (this.#recent.size > 10) this.#recent.delete(this.#recent.values().next().value)
-        // console.log(this.#recent);
     }
 
     /**

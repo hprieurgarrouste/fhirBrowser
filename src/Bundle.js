@@ -1,3 +1,5 @@
+import favoriteService from './services/Favorites'
+
 import template from './templates/Bundle.html'
 
 import M2DataTable from './components/M2DataTable'
@@ -29,6 +31,8 @@ export default class Bundle extends HTMLElement {
     #searchPanel
     /** @type {Array.<String>} */
     #columns
+    /** @type {M2RoundButton} */
+    #favoriteToggle
 
     /** @type {String} */
     #resourceType
@@ -84,6 +88,10 @@ export default class Bundle extends HTMLElement {
         this.#searchToggle.onclick = this.#searchToggleClick
 
         this.#searchPanel = shadow.getElementById('search')
+
+        this.#favoriteToggle = shadow.getElementById('favorite-toggle')
+        this.#favoriteToggle.onclick = this.#favoriteToggleClick
+        favoriteService.addListener(this.#setFavoriteToggleStyle)
     }
 
     connectedCallback () {
@@ -282,6 +290,16 @@ export default class Bundle extends HTMLElement {
 
         this.#bundle = bundle
         this.#parsePage(bundle)
+
+        this.#setFavoriteToggleStyle()
+    }
+
+    #favoriteToggleClick = () => {
+        favoriteService.toggle(this.#resourceType)
+    }
+
+    #setFavoriteToggleStyle = () => {
+        this.#favoriteToggle.style.color = favoriteService.favorites.includes(this.#resourceType) ? 'var(--primary-color)' : 'unset'
     }
 };
 customElements.define('fhir-bundle', Bundle)
