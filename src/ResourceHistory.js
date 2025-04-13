@@ -1,7 +1,9 @@
 import template from './templates/ResourceHistory.html'
 
-import M2LinearProgress from './components/M2LinearProgress'
-import M2List from './components/M2List'
+import './components/M2LinearProgress'
+import './components/M2List'
+import './components/M2SidePanel'
+
 import M2ListRow from './components/M2ListRow'
 import M2ListItem from './components/M2ListItem'
 

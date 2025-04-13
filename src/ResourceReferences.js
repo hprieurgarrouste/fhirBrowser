@@ -2,7 +2,9 @@ import template from './templates/ResourceReferences.html'
 
 import resourceIcon from './assets/fhirIconSet'
 
-import M2List from './components/M2List'
+import './components/M2List'
+import './components/M2SidePanel'
+
 import M2ListItem from './components/M2ListItem'
 import M2ListRow from './components/M2ListRow'
 
@@ -28,6 +30,10 @@ export default class ResourceReferences extends HTMLElement {
         this.#resourceId = null
     }
 
+    /**
+     * @param {Event} event
+     * @returns {void}
+     */
     #appListClick = (event) => {
         event.preventDefault()
         event.stopPropagation()
@@ -37,6 +43,10 @@ export default class ResourceReferences extends HTMLElement {
         }
     }
 
+    /**
+     * @param {String} value
+     * @returns {void}
+     */
     #appListFilter = (value) => {
         const filter = value.toLowerCase()
         this.#list.childNodes.forEach(row => {
@@ -44,6 +54,10 @@ export default class ResourceReferences extends HTMLElement {
         })
     }
 
+    /**
+     * @param {Event} event
+     * @returns {void}
+     */
     #sidePanelClose = (event) => {
         this.hidden = true
         event.preventDefault()
@@ -53,7 +67,7 @@ export default class ResourceReferences extends HTMLElement {
     /**
      * @param {fhir4.CapabilityStatementRestResource} resourceType
      * @param {String} resourceId
-     * @returns {void}
+     * @returns {Boolean} true if there is at least one reference
      */
     load (resourceType, resourceId) {
         this.#resourceId = resourceId
@@ -78,6 +92,6 @@ export default class ResourceReferences extends HTMLElement {
         }
         return this.#list.children.length > 0
     }
-};
+}
 
 customElements.define('resource-references', ResourceReferences)

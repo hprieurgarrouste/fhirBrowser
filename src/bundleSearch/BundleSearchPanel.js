@@ -1,6 +1,7 @@
 import template from './templates/BundleSearchPanel.html'
 
 import '../components/M2RoundButton'
+import '../components/M2SidePanel'
 
 import BundleSearchItem from './BundleSearchItem'
 

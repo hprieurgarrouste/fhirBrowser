@@ -1,11 +1,11 @@
 import template from './templates/Resource.html'
 
 import './components/M2AppBar'
-import M2RoundButton from './components/M2RoundButton'
+import './components/M2RoundButton'
 import './components/M2Tabs'
+import './ResourceHistory'
+import './ResourceReferences'
 
-import ResourceHistory from './ResourceHistory'
-import ResourceReferences from './ResourceReferences'
 import ResourceJsonView from './ResourceJsonView'
 import ResourceTtlView from './ResourceTtlView'
 import ResourceXmlView from './ResourceXmlView'
