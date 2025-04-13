@@ -39,12 +39,12 @@ class FhirService {
 
     /**
      * get structureDefinition from hl7 server
+     * formerly https://hl7.org/fhir/{version}/{resource}.profile.json and now hosted
      * @param {string} resourceType
      * @returns {object}
      */
     structureDefinition = async (resourceType, release) => {
-        const url = new URL(`${this.#server_url}/${release}/${resourceType.toLowerCase()}.profile.json`)
-        const response = await fetch(url, {
+        const response = await fetch(`./assets/fhir/${release}/${resourceType.toLowerCase()}.profile.json`, {
             cache: 'force-cache'
         })
         return response.json()
