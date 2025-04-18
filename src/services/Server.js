@@ -68,7 +68,7 @@ export default class Server {
         return fhirService.release(this.#capabilities.fhirVersion) || null
     }
 
-    /** @returns {fhir4.Schema} */
+    /** @returns {Schema} */
     get schema () {
         return this.#schema
     }
