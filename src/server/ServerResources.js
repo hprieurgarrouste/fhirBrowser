@@ -98,8 +98,11 @@ export default class ServerResources extends HTMLElement {
     /**
      * @param {string} value
      */
-    #appListFilter = (value) => {
-        this.#list.querySelectorAll('m2-list-row').forEach(row => { row.hidden = !row.dataset.type.toLowerCase().includes(value.toLowerCase()) })
+    #appListFilter = ({ value, caseSensitive }) => {
+        const filter = new RegExp(value, caseSensitive ? '' : 'i')
+        this.#list.querySelectorAll('m2-list-row').forEach(row => {
+            row.hidden = !filter.exec(row.dataset.type)
+        })
         this.#list.querySelector('m2-list-row[selected]')?.scrollIntoView()
     }
 

@@ -47,10 +47,10 @@ export default class ResourceReferences extends HTMLElement {
      * @param {String} value
      * @returns {void}
      */
-    #appListFilter = (value) => {
-        const filter = value.toLowerCase()
+    #appListFilter = ({ value, caseSensitive }) => {
+        const filter = new RegExp(value, caseSensitive ? '' : 'i')
         this.#list.childNodes.forEach(row => {
-            row.hidden = !(row.dataset.target.toLowerCase().includes(filter) || row.dataset.search.toLowerCase().includes(filter))
+            row.hidden = !filter.exec(`${row.dataset.target}.${row.dataset.search}`)
         })
     }
 

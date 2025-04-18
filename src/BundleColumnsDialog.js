@@ -41,10 +41,10 @@ export default class BundleColumnsDialog extends HTMLElement {
 
     #btnCancelClick = () => { this.hidden = true }
 
-    #appListFilter = (value) => {
-        const filter = value.toLowerCase()
+    #appListFilter = ({ value, caseSensitive }) => {
+        const filter = new RegExp(value, caseSensitive ? '' : 'i')
         this.#list.childNodes.forEach(row => {
-            row.hidden = !(row.dataset.id.toLowerCase().includes(filter))
+            row.hidden = !filter.exec(row.dataset.id)
         })
     }
 

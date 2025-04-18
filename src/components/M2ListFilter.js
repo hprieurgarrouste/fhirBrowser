@@ -3,6 +3,9 @@ import template from './templates/M2ListFilter.html'
 export default class M2ListFilter extends HTMLElement {
     /** @type {HTMLInputElement} */
     #text
+    /** @type {HTMLElement} */
+    #case
+    /** @type {String} */
 
     constructor () {
         super()
@@ -10,26 +13,39 @@ export default class M2ListFilter extends HTMLElement {
         shadow.innerHTML = template
 
         this.#text = shadow.getElementById('text')
-        this.#text.addEventListener('input', () => {
-            this.#onChange(this.#text.value)
-        })
+        this.#text.addEventListener('input', this.#onchangeDispatcher)
 
         shadow.querySelector('main').addEventListener('mousedown', (event) => {
             this.#text.focus()
         })
 
         shadow.getElementById('clear').onclick = this.#clearClick
+
+        this.#case = shadow.getElementById('case')
+        this.#case.onclick = this.#caseClick
+    }
+
+    clear () {
+        this.#clearClick()
     }
 
     #clearClick = () => {
         if (this.#text.value) {
             this.#text.value = ''
-            this.#onChange(this.#text.value)
+            this.#onchangeDispatcher()
         }
     }
 
-    clear () {
-        this.#clearClick()
+    #caseClick = () => {
+        this.#case.classList.toggle('selected')
+        this.#onchangeDispatcher()
+    }
+
+    #onchangeDispatcher = () => {
+        this.#onChange({
+            value: this.#text.value,
+            caseSensitive: this.#case.classList.contains('selected')
+        })
     }
 
     #onChange = () => { }
