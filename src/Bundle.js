@@ -194,12 +194,30 @@ export default class Bundle extends HTMLElement {
             second: '2-digit',
             timeZoneName: 'short'
         }
-        const date = new Date(stringdate)
         try {
+            const date = new Date(stringdate)
             return `${date.toLocaleString(undefined, dateOptions)}<br>${date.toLocaleString(undefined, timeOptions)}`
         } catch (e) {
             return stringdate
         }
+    }
+
+    #columnType = (column) => {
+        let parent = context.server.schema.getDefinitionByResourceType(this.#resourceType)
+        let type = 'string'
+        column.split('.').forEach(property => {
+            const prop = parent.properties[property]
+            const ref = prop.$ref || prop.items?.$ref
+            if (ref) {
+                parent = context.server.schema.getDefinitionByRef(ref)
+                type = ref.replace(/^#\/definitions\//, '')
+            } else if (prop.type) {
+                type = prop.type
+            } else {
+                type = 'string'
+            }
+        })
+        return type
     }
 
     #parsePage (data) {
@@ -208,7 +226,12 @@ export default class Bundle extends HTMLElement {
             this.#total.hidden = false
             this.#total.innerHTML = `Total:&nbsp;${data.total}`
         }
+
         if (data.entry) {
+            const columnTypes = this.#columns.reduce((map, column) => {
+                map[column] = this.#columnType(column)
+                return map
+            }, {})
             data.entry
                 .forEach(entry => {
                     const row = {}
@@ -227,8 +250,13 @@ export default class Bundle extends HTMLElement {
                             }
                             return true
                         })
-                        if (column === 'meta.lastUpdated') value = this.#beautifyDate(value)
-                        row[column] = value || ''
+                        if (value === null || typeof value === 'undefined') {
+                            row[column] = ''
+                        } else {
+                            const type = columnTypes[column] || 'string'
+                            if (['instant', 'dateTime'].includes(type)) value = this.#beautifyDate(value)
+                            row[column] = value
+                        }
                     })
                     this.#table.addRow(entry.resource.id, row)
                 })
@@ -245,6 +273,13 @@ export default class Bundle extends HTMLElement {
                 this.#buttons[relation]?.setAttribute('data-url', url)
             })
         }
+    }
+
+    /**
+     * @return {fhir4.Bundle} bundle
+     */
+    get source () {
+        return this.#bundle
     }
 
     /**
