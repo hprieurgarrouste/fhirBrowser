@@ -158,9 +158,21 @@
     #content i {
         vertical-align: middle;
         color: var(--primary-color);
-        font-size: large;
+        font-size: inherit;
         margin-left: 0.5em;
         cursor: pointer;
+        border: 1px solid var(--primary-color);
+        border-radius: 4px;
+        padding: 2px 4px;
+    }
+    #content i:hover {
+        background-color: var(--hover-color);
+    }
+    #content i::before {
+        content: "view";
+        font-family: var(--font-family);
+        vertical-align: bottom;
+        margin-right: 2px;
     }
 
     #content dt.collapsed i {
