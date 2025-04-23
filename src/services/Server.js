@@ -260,6 +260,11 @@ export default class Server {
         return this.#capabilities.format.some(format => formats.includes(format))
     }
 
+    /** @returns {String} URL of the validate operation help page  */
+    validateHelpUrl = () => {
+        return fhirService.validateHelpUrl(this.release)
+    }
+
     /** @returns {String} Help url */
     historyHelpUrl = () => {
         return fhirService.historyHelpUrl(this.release)

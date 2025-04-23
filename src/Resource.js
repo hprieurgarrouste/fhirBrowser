@@ -1,26 +1,40 @@
+/* eslint-disable no-unused-vars */
 import template from './templates/Resource.html'
 
-import './components/M2AppBar'
-import './components/M2RoundButton'
-import './components/M2Tabs'
-import './ResourceHistory'
-import './ResourceReferences'
+import M2RoundButton from './components/M2RoundButton'
+import M2Tabs from './components/M2Tabs'
 
+// eslint-disable-next-line no-unused-vars
+import ResourceHistory from './ResourceHistory'
 import ResourceJsonView from './ResourceJsonView'
+// eslint-disable-next-line no-unused-vars
+import ResourceReferences from './ResourceReferences'
 import ResourceTtlView from './ResourceTtlView'
+import ResourceValidate from './ResourceValidate'
 import ResourceXmlView from './ResourceXmlView'
 
 import context from './services/Context'
 
 export default class Resource extends HTMLElement {
     /** @type {M2RoundButton} */
+    #validateToggle
+    /** @type {ResourceValidate} */
+    #validatePanel
+    /** @type {Boolean} */
+    #validateDisabled
+
+    /** @type {M2RoundButton} */
     #referencesToggle
     /** @type {ResourceReferences} */
     #referencesPanel
+
     /** @type {M2RoundButton} */
     #historyToggle
     /** @type {ResourceHistory} */
     #historyPanel
+    /** @type {Boolean} */
+    #historyDisabled
+
     /** @type {M2Tabs} */
     #tabs
     /** @type {HTMLHeadingElement} */
@@ -32,8 +46,6 @@ export default class Resource extends HTMLElement {
     #resourceId
     /** @type {any} */
     #views
-    /** @type {Boolean} */
-    #historyDisabled
 
     constructor () {
         super()
@@ -41,6 +53,10 @@ export default class Resource extends HTMLElement {
         shadow.innerHTML = template
 
         shadow.getElementById('help').onclick = this.#helpClick
+
+        this.#validateToggle = shadow.getElementById('validateToggle')
+        this.#validateToggle.onclick = this.#validateToggleClick
+        this.#validatePanel = shadow.querySelector('resource-validate')
 
         this.#referencesToggle = shadow.getElementById('referencesToggle')
         this.#referencesToggle.onclick = this.#referenceToggleClick
@@ -71,16 +87,21 @@ export default class Resource extends HTMLElement {
             this.#historyPanel,
             { attributes: true }
         )
+        new MutationObserver(this.#panelHiddenObserver).observe(
+            this.#validatePanel,
+            { attributes: true }
+        )
     }
 
     #panelHiddenObserver = (mutationList) => {
         mutationList.forEach(({ type, attributeName, target }) => {
             if (type === 'attributes' && attributeName === 'hidden') {
                 if (target === this.#historyPanel) {
-                    this.#historyToggle.hidden =
-                        this.#historyDisabled || !target.hidden
+                    this.#historyToggle.hidden = this.#historyDisabled || !target.hidden
                 } else if (target === this.#referencesPanel) {
                     this.#referencesToggle.hidden = !target.hidden
+                } else if (target === this.#validatePanel) {
+                    this.#validateToggle.hidden = this.#validateDisabled || !target.hidden
                 }
             }
         })
@@ -101,8 +122,18 @@ export default class Resource extends HTMLElement {
         }
     }
 
+    #validateToggleClick = () => {
+        if (this.#validatePanel.hidden) {
+            this.#referencesPanel.hidden = true
+            this.#historyPanel.hidden = true
+            this.#validatePanel.load(this.#resourceType, this.#resourceId)
+        }
+        this.#validatePanel.hidden = !this.#validatePanel.hidden
+    }
+
     #referenceToggleClick = () => {
         if (this.#referencesPanel.hidden) {
+            this.#validatePanel.hidden = true
             this.#historyPanel.hidden = true
             this.#referencesPanel.load(this.#resourceType, this.#resourceId)
         }
@@ -111,6 +142,7 @@ export default class Resource extends HTMLElement {
 
     #historyToggleClick = () => {
         if (this.#historyPanel.hidden) {
+            this.#validatePanel.hidden = true
             this.#referencesPanel.hidden = true
             this.#historyPanel.load(this.#resourceType, this.#resourceId)
         }
@@ -198,24 +230,33 @@ export default class Resource extends HTMLElement {
         }
 
         if (window.matchMedia('(max-width: 480px)').matches) {
+            this.#validatePanel.hidden = true
             this.#referencesPanel.hidden = true
             this.#historyPanel.hidden = true
         }
 
-        this.#historyDisabled =
-            this.#resourceType?.interaction.find(
-                ({ code }) => code === 'vread'
-            ) === undefined
+        this.#validateDisabled = !(this.#resourceType?.operation?.find(({ name }) => name === 'validate') || context.server.capabilities.rest[0].operation?.find(({ name }) => name === 'validate'))
+        if (this.#validateDisabled) {
+            this.#validatePanel.hidden = true
+            this.#validateToggle.hidden = true
+        } else {
+            this.#validateToggle.hidden = !this.#validatePanel.hidden
+        }
+        if (!this.#validatePanel.hidden) {
+            this.#validatePanel.load(this.#resourceType, this.#resourceId)
+        }
+
+        this.#historyDisabled = this.#resourceType?.interaction.find(({ code }) => code === 'vread') === undefined
         if (this.#historyDisabled) {
             this.#historyPanel.hidden = true
             this.#historyToggle.hidden = true
         } else {
             this.#historyToggle.hidden = !this.#historyPanel.hidden
         }
-
         if (!this.#historyPanel.hidden) {
             this.#historyPanel.load(this.#resourceType, this.#resourceId)
         }
+
         if (!this.#referencesPanel.hidden) {
             this.#referencesPanel.load(this.#resourceType, this.#resourceId)
         }

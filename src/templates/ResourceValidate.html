@@ -1,0 +1,23 @@
+<style>
+    @import url(/assets/material.css);
+
+    main {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    m2-list {
+        flex: 1 1 auto;
+        height: 0;
+
+    }
+</style>
+<m2-side-panel data-title="Validate">
+    <m2-round-button id="help" title="Help" data-icon="help" slot="appBarLeft"></m2-round-button>
+    <m2-round-button id="close" title="Close" data-icon="close" slot="appBarRight"></m2-round-button>
+    <main slot="main">
+        <m2-linear-progress></m2-linear-progress>
+        <m2-list></m2-list>
+    </main>
+</m2-side-panel>

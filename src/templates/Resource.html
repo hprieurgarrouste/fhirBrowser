@@ -45,14 +45,16 @@
     }
 
     resource-references,
-    resource-history {
+    resource-history,
+    resource-validate {
         border-left: 1px solid var(--border-color);
     }
 
     @media (max-width:480px) {
 
         resource-references,
-        resource-history {
+        resource-history,
+        resource-validate {
             background-color: var(--background-color, rgb(255 255 255));
             position: relative;
             width: 100%;
@@ -65,6 +67,7 @@
             <m2-app-bar id="header">
                 <m2-round-button slot="left" id="help" title="Help" data-icon="help"></m2-round-button>
                 <h3 slot="middle" id="title"></h3>
+                <m2-round-button slot="right" id="validateToggle" title="Validate" data-icon="rule"></m2-round-button>
                 <m2-round-button slot="right" id="referencesToggle" title="References"
                     data-icon="article_shortcut"></m2-round-button>
                 <m2-round-button slot="right" id="historyToggle" title="History" data-icon="history"></m2-round-button>
@@ -76,4 +79,5 @@
     </section>
     <resource-references slot="main" hidden></resource-references>
     <resource-history slot="main" hidden></resource-history>
+    <resource-validate slot="main" hidden></resource-validate>
 </div>

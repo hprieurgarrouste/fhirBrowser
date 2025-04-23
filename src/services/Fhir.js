@@ -29,6 +29,15 @@ class FhirService {
     }
 
     /**
+     * Get URL of the validate operation help page
+     * @param {string} release
+     * @returns {string}
+     */
+    validateHelpUrl = (release) => {
+        return `${this.#server_url}/${release}//operation-resource-validate.html`
+    }
+
+    /**
      * Get history help url
      * @param {string} release
      * @returns {string}
