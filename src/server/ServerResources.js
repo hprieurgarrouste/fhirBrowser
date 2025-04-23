@@ -31,28 +31,38 @@ export default class ServerResources extends HTMLElement {
     load = (capabilityStatement) => {
         this.#list.clear()
         const favorites = FavoritesService.favorites
-        if (favorites.length !== 0) {
+        const filtered = []
+        filtered.push(...capabilityStatement.rest[0].resource
+            .filter(res => favorites.includes(res.type))
+            .map(res => res.type))
+
+        if (filtered.length !== 0) {
+            /** @type {HTMLSpanElement} */
             let span = document.createElement('span')
-            span.inert = true
-            span.innerText = 'Favorites'
+            Object.assign(span, {
+                inert: true,
+                innerText: 'Favorites'
+            })
             this.#list.append(span)
 
-            this.#list.append(...favorites
-                .sort((r1, r2) => r1.localeCompare(r2, undefined, { sensitivity: 'base' }))
-                .map(res => this.#makeListRow(res)))
+            filtered.sort((r1, r2) => r1.localeCompare(r2, undefined, { sensitivity: 'base' }))
+            this.#list.append(...filtered.map(res => this.#makeListRow(res)))
 
+            /** @type {HTMLHRElement} */
             const divider = document.createElement('hr')
             divider.inert = true
             this.#list.append(divider)
 
             span = document.createElement('span')
-            span.inert = true
-            span.innerText = 'Other resources'
+            Object.assign(span, {
+                inert: true,
+                innerText: 'Other resources'
+            })
             this.#list.append(span)
         }
         this.#list.append(...capabilityStatement.rest[0].resource
             .filter(res => res.interaction?.some(({ code }) => code === 'search-type'))
-            .filter(res => !favorites.includes(res.type))
+            .filter(res => !filtered.includes(res.type))
             .sort((r1, r2) => r1.type.localeCompare(r2.type, undefined, { sensitivity: 'base' }))
             .map(r => this.#makeListRow(r.type))
         )
