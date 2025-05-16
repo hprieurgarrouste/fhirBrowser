@@ -145,14 +145,21 @@ export default class Server {
 
     #oauth2_getToken = async () => {
         const headers = {
-            'Content-type': 'application/x-www-form-urlencoded'
-        }
-        if (this.#serverConfiguration.oauthGrantType === 'client_credentials') {
-            const auth = window.btoa(`${this.#serverConfiguration.oauthClientId}:${this.#serverConfiguration.oauthClientSecret}`)
-            headers.Authorization = `Basic ${auth}`
+            'Content-type': 'application/x-www-form-urlencoded',
+            Accept: 'application/json'
         }
         const urlParams = {
             grant_type: this.#serverConfiguration.oauthGrantType
+        }
+        if (this.#serverConfiguration.oauthCredentials === ServerConfiguration.CREDENTIALS.Header) {
+            const auth = window.btoa(`${this.#serverConfiguration.oauthClientId}:${this.#serverConfiguration.oauthClientSecret}`)
+            headers.Authorization = `Basic ${auth}`
+        } else {
+            urlParams.client_id = this.#serverConfiguration.oauthClientId
+            urlParams.client_secret = this.#serverConfiguration.oauthClientSecret
+        }
+        if (this.#serverConfiguration.oauthScope) {
+            urlParams.scope = this.#serverConfiguration.oauthScope
         }
 
         const response = await fetch(this.#serverConfiguration.oauthTokenUrl, {

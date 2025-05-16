@@ -32,18 +32,23 @@
         padding: 1em;
     }
 
-    .authMethod {
+    .radioGroup {
         display: flex;
         flex-flow: row wrap;
-        gap: 1em;
-        padding-bottom: 1em;
+        gap: 0.5em;
+        padding: 0 0 15px 15px;
     }
 
-    .authMethod label {
+    .radioGroup label {
         font-family: inherit;
         font-size: inherit;
-        margin-right: 1em;
         white-space: nowrap;
+    }
+    legend {
+        padding: 0;
+        color:var(--text-color-disabled);
+        font-size: smaller;
+        padding-left: 15px;
     }
 
 
@@ -59,7 +64,8 @@
         <section id="content">
             <m2-textfield id="key" placeholder="Code" required></m2-textfield>
             <m2-textfield id="url" type="url" pattern="https?://.+" placeholder="Url" required></m2-textfield>
-            <div class="authMethod">
+            <legend>Auth method:</legend>
+            <div class="radioGroup">
                 <label for="authNo">No Auth
                     <input type="radio" id="authNo" name="authMethod" value="No Auth" checked />
                 </label>
@@ -82,12 +88,21 @@
                 <m2-textfield id="basicPassword" placeholder="Password" required></m2-textfield>
             </section>
             <section id="oauthSection" hidden>
+                <m2-textfield id="oauthGranttype" placeholder="Grant Type" value="client_credentials" required readonly></m2-textfield>
                 <m2-textfield id="oauthTokenurl" type="url" pattern="https?://.+" placeholder="Access Token URL"
                     required></m2-textfield>
                 <m2-textfield id="oauthClientid" placeholder="Client ID" required></m2-textfield>
                 <m2-textfield id="oauthClientsecret" placeholder="Client Secret" required></m2-textfield>
-                <m2-textfield id="oauthGranttype" placeholder="Grant Type" value="client_credentials" required
-                    readonly></m2-textfield>
+                <m2-textfield id="oauthScope" placeholder="Scope"></m2-textfield>
+                <legend>Add credential to:</legend>
+                <div class="radioGroup">
+                    <label for="oauthCredentialsHeader">Basic Auth Header
+                        <input type="radio" id="oauthCredentialsHeader" name="oauthCredentials" value="header" checked/>
+                    </label>
+                    <label for="oauthCredentialsBody">Request body
+                        <input type="radio" id="oauthCredentialsBody" name="oauthCredentials" value="body" />
+                    </label>
+                </div>
             </section>
         </section>
         <footer>

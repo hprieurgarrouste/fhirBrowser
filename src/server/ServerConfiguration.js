@@ -1,6 +1,6 @@
 export default class ServerConfiguration {
     #url = ''
-    #method = ServerConfiguration.None
+    #method = ServerConfiguration.METHODS.None
     #headers = {}
     #apiKey = null
     #apiValue = null
@@ -10,12 +10,19 @@ export default class ServerConfiguration {
     #oauthclientid = null
     #oauthClientsecret = null
     #oauthGranttype = null
+    #oauthScope = null
+    #oauthCredentials = ServerConfiguration.CREDENTIALS.Header
 
     static METHODS = {
         None: 'noauth',
         APIKey: 'apikey',
         Basic: 'basic',
         OAuth2: 'oauth2'
+    }
+
+    static CREDENTIALS = {
+        Header: 'header',
+        Body: 'body'
     }
 
     constructor (conf = null) {
@@ -38,6 +45,8 @@ export default class ServerConfiguration {
             this.oauthClientId = conf.auth.setup?.client_id
             this.oauthClientSecret = conf.auth.setup?.client_secret
             this.oauthGrantType = conf.auth.setup?.grant_type
+            this.#oauthScope = conf.auth.setup?.scope || ''
+            this.#oauthCredentials = conf.auth.setup?.credentials || ServerConfiguration.CREDENTIALS.Header
             break
         case ServerConfiguration.METHODS.None:
         default:
@@ -67,6 +76,8 @@ export default class ServerConfiguration {
             ret.auth.setup.client_id = this.#oauthclientid
             ret.auth.setup.client_secret = this.#oauthClientsecret
             ret.auth.setup.grant_type = this.#oauthGranttype
+            ret.auth.setup.scope = this.#oauthScope
+            ret.auth.setup.credentials = this.#oauthCredentials
             break
         case ServerConfiguration.METHODS.None:
         default:
@@ -83,7 +94,6 @@ export default class ServerConfiguration {
      * @param {url} value
      */
     set url (value) {
-        const url = new URL(value)
         this.#url = value
     }
 
@@ -198,5 +208,26 @@ export default class ServerConfiguration {
      */
     set oauthGrantType (value) {
         this.#oauthGranttype = value
+    }
+
+    get oauthScope () {
+        return this.#oauthScope
+    }
+
+    /**
+     * @param {string} value
+     */
+    set oauthScope (value) {
+        this.#oauthScope = value
+    }
+
+    /** @returns {ServerConfiguration.CREDENTIALS} */
+    get oauthCredentials () {
+        return this.#oauthCredentials
+    }
+
+    /** @param {ServerConfiguration.CREDENTIALS} value */
+    set oauthCredentials (value) {
+        this.#oauthCredentials = value || ServerConfiguration.CREDENTIALS.Header
     }
 }

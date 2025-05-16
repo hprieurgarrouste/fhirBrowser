@@ -1,10 +1,15 @@
 import template from './templates/ServerForm.html'
 
 import '../components/M2Button'
+// eslint-disable-next-line no-unused-vars
 import M2Dialog from '../components/M2Dialog'
+// eslint-disable-next-line no-unused-vars
 import M2Confirm from '../components/M2Confirm'
+// eslint-disable-next-line no-unused-vars
 import M2RoundButton from '../components/M2RoundButton'
+// eslint-disable-next-line no-unused-vars
 import M2TextField from '../components/M2TextField'
+import ServerConfiguration from './ServerConfiguration'
 
 export default class ServerForm extends HTMLElement {
     /** @type {M2Dialog} */
@@ -43,6 +48,12 @@ export default class ServerForm extends HTMLElement {
     #oauthClientid
     /** @type {M2TextField} */
     #oauthClientsecret
+    /** @type {M2TextField} */
+    #oauthScope
+    /** @type {M2TextField} */
+    #oauthCredentialsHeader
+    /** @type {M2TextField} */
+    #oauthCredentialsBody
     /** @type {M2TextField} */
     #oauthGranttype
     /** @type {M2Confirm} */
@@ -83,7 +94,10 @@ export default class ServerForm extends HTMLElement {
         this.#oauthTokenurl = shadow.getElementById('oauthTokenurl')
         this.#oauthClientid = shadow.getElementById('oauthClientid')
         this.#oauthClientsecret = shadow.getElementById('oauthClientsecret')
+        this.#oauthScope = shadow.getElementById('oauthScope')
         this.#oauthGranttype = shadow.getElementById('oauthGranttype')
+        this.#oauthCredentialsHeader = shadow.getElementById('oauthCredentialsHeader')
+        this.#oauthCredentialsBody = shadow.getElementById('oauthCredentialsBody')
 
         this.#appConfirm = shadow.querySelector('m2-confirm')
         this.#appConfirm.onValidate = this.deleteConfirm
@@ -232,7 +246,9 @@ export default class ServerForm extends HTMLElement {
             server.auth.setup.access_token_url = this.#oauthTokenurl.value
             server.auth.setup.client_id = this.#oauthClientid.value
             server.auth.setup.client_secret = this.#oauthClientsecret.value
+            server.auth.setup.scope = this.#oauthScope.value
             server.auth.setup.grant_type = this.#oauthGranttype.value
+            server.auth.setup.credentials = this.#content.querySelector("input[name='oauthCredentials']:checked")?.value
             break
         default:
             break
@@ -250,24 +266,31 @@ export default class ServerForm extends HTMLElement {
         }
         this.clear()
         this.#key.value = serverCode
-        this.#url.value = server.url
-        switch (server?.auth?.method) {
+        const config = new ServerConfiguration(server)
+        this.#url.value = config.url
+        switch (config.method) {
         case 'apikey':
             this.#authApi.checked = true
-            this.#apiKey.value = server.auth.setup.key
-            this.#apiValue.value = server.auth.setup.value
+            this.#apiKey.value = config.apiKey
+            this.#apiValue.value = config.apiValue
             break
         case 'basic':
             this.#authBasic.checked = true
-            this.#basicUsername.value = server.auth.setup.username
-            this.#basicPassword.value = server.auth.setup.password
+            this.#basicUsername.value = config.basicUsername
+            this.#basicPassword.value = config.basicPassword
             break
         case 'oauth2':
             this.#authOauth.checked = true
-            this.#oauthTokenurl.value = server.auth.setup.access_token_url
-            this.#oauthClientid.value = server.auth.setup.client_id
-            this.#oauthClientsecret.value = server.auth.setup.client_secret
-            this.#oauthGranttype.value = server.auth.setup.grant_type
+            this.#oauthTokenurl.value = config.oauthTokenUrl
+            this.#oauthClientid.value = config.oauthClientId
+            this.#oauthClientsecret.value = config.oauthClientSecret
+            this.#oauthScope.value = config.oauthScope
+            this.#oauthGranttype.value = config.oauthGrantType
+            if (config.oauthCredentials === ServerConfiguration.CREDENTIALS.Body) {
+                this.#oauthCredentialsBody.checked = true
+            } else {
+                this.#oauthCredentialsHeader.checked = true
+            }
             break
         default:
             this.#authNo.checked = true
@@ -282,5 +305,5 @@ export default class ServerForm extends HTMLElement {
         // only grant type allowed
         this.#oauthGranttype.value = 'client_credentials'
     }
-};
+}
 customElements.define('server-form', ServerForm)
